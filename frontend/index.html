@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Nirvaan | Disaster Monitoring</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- LOGO -->
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                ◒
+            </div>
+
+            <div>
+
+                <h2>Nirvaan</h2>
+
+                <p>
+                    Satellite Based Disaster Monitoring
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- NAVIGATION -->
+
+        <nav class="sidebar-nav">
+
+
+            <button
+                class="nav-item active"
+                data-page="dashboard"
+            >
+
+                <span class="nav-icon">⌂</span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </button>
+
+
+
+            <button
+                class="nav-item"
+                data-page="satellite"
+            >
+
+                <span class="nav-icon">◇</span>
+
+                <span>
+                    Satellite Monitor
+                </span>
+
+            </button>
+
+
+
+            <button
+                class="nav-item"
+                data-page="detection"
+            >
+
+                <span class="nav-icon">△</span>
+
+                <span>
+                    Disaster Detection
+                </span>
+
+            </button>
+
+
+
+            <button
+                class="nav-item"
+                data-page="risk"
+            >
+
+                <span class="nav-icon">♢</span>
+
+                <span>
+                    Risk Map
+                </span>
+
+            </button>
+
+
+
+            <button
+                class="nav-item"
+                data-page="alerts"
+            >
+
+                <span class="nav-icon">♧</span>
+
+                <span>
+                    Alerts
+                </span>
+
+                <span class="alert-count">
+                    3
+                </span>
+
+            </button>
+
+
+
+            <button
+                class="nav-item"
+                data-page="reports"
+            >
+
+                <span class="nav-icon">▤</span>
+
+                <span>
+                    Reports
+                </span>
+
+            </button>
+
+
+
+            <button
+                class="nav-item"
+                data-page="history"
+            >
+
+                <span class="nav-icon">◷</span>
+
+                <span>
+                    History
+                </span>
+
+            </button>
+
+
+
+            <button
+                class="nav-item"
+                data-page="settings"
+            >
+
+                <span class="nav-icon">⚙</span>
+
+                <span>
+                    Settings
+                </span>
+
+            </button>
+
+
+        </nav>
+
+
+
+        <!-- ABOUT -->
+
+        <div class="about-box">
+
+            <h4>
+                ABOUT
+            </h4>
+
+            <p>
+                Nirvaan uses AI and satellite imagery
+                to detect disasters, monitor affected
+                areas and generate rapid alerts.
+            </p>
+
+        </div>
+
+
+
+        <!-- LOGOUT -->
+
+        <button class="logout">
+
+            ↪
+
+            <span>
+                Logout
+            </span>
+
+        </button>
+
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN AREA
+    ====================================================== -->
+
+    <section class="main-area">
+
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+
+            <div class="topbar-left">
+
+                <span class="mobile-menu">
+                    ☰
+                </span>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <span class="notification">
+                    ♧
+                </span>
+
+                <div class="system-status">
+
+                    <span class="status-dot"></span>
+
+                    System Online
+
+                </div>
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- =================================================
+             PAGE CONTENT
+        ================================================== -->
+
+        <main
+            id="pageContent"
+            class="page-content"
+        >
+
+        </main>
+
+
+    </section>
+
+
+</div>
+
+
+
+<!-- JAVASCRIPT -->
+
+<script src="data.js"></script>
+
+<script src="api.js"></script>
+
+<script src="script.js"></script>
+
+
+</body>
+
+</html>
