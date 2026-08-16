@@ -1,0 +1,37 @@
+{
+  "event_id": "wildfire-rhodes-2023",
+  "disaster_type": "wildfire",
+  "event_name": "2023 Rhodes Island Wildfire",
+  "location_name": "Rhodes Island, Greece",
+  "latitude": 36.1700,
+  "longitude": 27.9400,
+  "before_date": "2023-07-13",
+  "after_date": "2023-07-28",
+  "satellite_platform": "Sentinel-2B",
+  "processing_level": "Level-2A",
+  "tile_id": "35SNA",
+  "before_product_id": "S2B_MSIL2A_20230713T084609_N0509_R107_T35SNA_20230713T105436",
+  "after_product_id": "S2B_MSIL2A_20230728T084609_N0509_R107_T35SNA_20230728T105822",
+  "source_provider": "Copernicus Data Space Ecosystem (CDSE) / Copernicus EMS (EMSR675)",
+  "source_url": "https://dataspace.copernicus.eu/",
+  "provenance_url": "https://emergency.copernicus.eu/EMSR675",
+  "coordinate_reference_system": "EPSG:32635",
+  "resolution_m": 10.0,
+  "required_bands": [
+    "B04",
+    "B08",
+    "B11",
+    "B12"
+  ],
+  "spectral_methods": {
+    "index": "NBR / dNBR",
+    "formula": "NBR = (B08 - B12) / (B08 + B12); dNBR = NBR_before - NBR_after",
+    "description": "Normalized Burn Ratio using NIR (B08) and SWIR-2 (B12)"
+  },
+  "local_imagery": {
+    "before_path": "data/canonical/wildfire/before/B08.tif",
+    "after_path": "data/canonical/wildfire/after/B08.tif",
+    "manifest_file": "data/canonical/wildfire/manifest.json"
+  },
+  "limitations": "Heavy smoke plumes during active fire phase (July 18-24); July 28 acquisition captures post-fire burn scars clearly."
+}

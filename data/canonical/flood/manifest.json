@@ -1,0 +1,17 @@
+{
+  "event_id": "flood-emilia-romagna-2023",
+  "disaster_type": "flood",
+  "data_status": "OFFLINE_CANONICAL_READY",
+  "before_scene": {
+    "product_id": "S2B_MSIL2A_20230504T100559_N0509_R108_T32TQQ_20230504T134638",
+    "acquisition_date": "2023-05-04",
+    "bands_available": ["B02", "B03", "B04", "B08"],
+    "directory": "data/canonical/flood/before"
+  },
+  "after_scene": {
+    "product_id": "S2B_MSIL2A_20230519T100559_N0509_R108_T32TQQ_20230519T134444",
+    "acquisition_date": "2023-05-19",
+    "bands_available": ["B02", "B03", "B04", "B08"],
+    "directory": "data/canonical/flood/after"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "event_id": "wildfire-rhodes-2023",
+  "disaster_type": "wildfire",
+  "data_status": "OFFLINE_CANONICAL_READY",
+  "before_scene": {
+    "product_id": "S2B_MSIL2A_20230713T084609_N0509_R107_T35SNA_20230713T105436",
+    "acquisition_date": "2023-07-13",
+    "bands_available": ["B04", "B08", "B11", "B12"],
+    "directory": "data/canonical/wildfire/before"
+  },
+  "after_scene": {
+    "product_id": "S2B_MSIL2A_20230728T084609_N0509_R107_T35SNA_20230728T105822",
+    "acquisition_date": "2023-07-28",
+    "bands_available": ["B04", "B08", "B11", "B12"],
+    "directory": "data/canonical/wildfire/after"
+  }
+}

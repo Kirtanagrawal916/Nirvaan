@@ -1,0 +1,37 @@
+{
+  "event_id": "flood-emilia-romagna-2023",
+  "disaster_type": "flood",
+  "event_name": "2023 Emilia-Romagna Floods",
+  "location_name": "Emilia-Romagna, Italy",
+  "latitude": 44.4178,
+  "longitude": 12.2035,
+  "before_date": "2023-05-04",
+  "after_date": "2023-05-19",
+  "satellite_platform": "Sentinel-2B",
+  "processing_level": "Level-2A",
+  "tile_id": "32TQQ",
+  "before_product_id": "S2B_MSIL2A_20230504T100559_N0509_R108_T32TQQ_20230504T134638",
+  "after_product_id": "S2B_MSIL2A_20230519T100559_N0509_R108_T32TQQ_20230519T134444",
+  "source_provider": "Copernicus Data Space Ecosystem (CDSE) / Copernicus EMS (EMSR659)",
+  "source_url": "https://dataspace.copernicus.eu/",
+  "provenance_url": "https://emergency.copernicus.eu/EMSR659",
+  "coordinate_reference_system": "EPSG:32632",
+  "resolution_m": 10.0,
+  "required_bands": [
+    "B02",
+    "B03",
+    "B04",
+    "B08"
+  ],
+  "spectral_methods": {
+    "index": "NDWI",
+    "formula": "(B03 - B08) / (B03 + B08)",
+    "description": "Normalized Difference Water Index using Green (B03) and NIR (B08)"
+  },
+  "local_imagery": {
+    "before_path": "data/canonical/flood/before/B03.tif",
+    "after_path": "data/canonical/flood/after/B03.tif",
+    "manifest_file": "data/canonical/flood/manifest.json"
+  },
+  "limitations": "Optical cloud coverage on intermediate days (May 10-15); May 19 post-event pass provides optimal clear-sky observations for inundated river basin delineation."
+}
