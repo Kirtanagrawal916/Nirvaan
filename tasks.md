@@ -1,200 +1,220 @@
-# NIRVAAN — Antigravity Implementation Tasks
+# NIRVAAN — Antigravity Execution Tasks
+## Audit-Improved 4-Day Task Specification
 
-## Purpose
-
-This file converts the NIRVAAN disaster-monitoring implementation plan into **directly executable tasks for Antigravity**.
-
-Use this file as the implementation source of truth.
-
-### Execution rules for Antigravity
-
-1. Work in the existing repository and preserve existing working code.
-2. Complete tasks in the order below unless a dependency requires otherwise.
-3. Do not implement future tasks early unless required by the current task.
-4. Prefer simple, reliable implementations over unnecessary abstraction.
-5. Every task must leave the repository in a runnable state.
-6. Do not invent APIs, datasets, credentials, model weights, or external services.
-7. If an external dependency is unavailable, create a clean adapter/interface and a local fallback/mock implementation so the demo remains runnable.
-8. Never hard-code fake model results as if they were real predictions. Clearly label demo/sample outputs.
-9. Add or update tests for important calculations and deterministic logic.
-10. Update `README.md` whenever setup, usage, architecture, or functionality changes.
-11. After each task, run the relevant tests/lint/build checks and report failures.
-12. Do not make unrelated refactors.
-13. Keep the application usable offline for the core demo whenever possible.
-14. Use environment variables for secrets and document required variables in `.env.example`.
-15. At the end of each task, provide:
-   - files changed
-   - what was implemented
-   - commands run
-   - test results
-   - remaining risks/issues
+> **Use this file as the executable implementation specification.**
+>
+> `implementations.md` explains the architecture and product decisions. This file tells Antigravity exactly what to implement.
 
 ---
 
-# Phase 0 — Repository Audit
+# 0. Global Rules for Antigravity
 
-## TASK-001 — Inspect Repository and Create Baseline
+1. Read `implementations.md` and this file before implementing any task.
+2. Work only on the current task unless a dependency is required.
+3. Do not invent datasets, coordinates, source IDs, APIs, model weights, confidence values, or real-world claims.
+4. Never present a placeholder or hard-coded demo result as a real prediction.
+5. Prefer real, sourced Sentinel-2 multispectral evidence for the two canonical events.
+6. Core detection must use a documented spectral method (NDWI for flood and NBR/dNBR for wildfire) unless the team explicitly records a justified alternative in the repository.
+7. Lock **Folium + streamlit-folium** for the MVP map. Do not debate mapping libraries after TASK-003.
+8. Use Streamlit `st.session_state`, `st.cache_resource`, and `st.cache_data` where appropriate.
+9. Instant Demo Mode must use precomputed artifacts generated from the real canonical dataset; it must not fabricate output.
+10. Live Analyze Mode is secondary and must never be required for the stage demo.
+11. Every derived value must be traceable to source evidence and labeled as an estimate/prototype where appropriate.
+12. Keep the core demo offline-capable.
+13. Never download model weights/data at runtime for the canonical demo.
+14. Use environment variables for secrets; never commit secrets.
+15. Add deterministic tests for calculations and validation logic.
+16. Keep modules separated so three developers can work in parallel with minimal merge conflicts.
+17. Do not modify another team's module unless the current task explicitly requires an interface integration.
+18. After each task report:
+    - files changed
+    - implementation summary
+    - commands run
+    - tests/checks
+    - remaining risks
+19. If a task cannot be completed honestly with available data/dependencies, stop and report the blocker instead of creating fake output.
+20. Every task must leave the repository runnable or clearly state why it cannot yet run.
+
+---
+
+# PHASE 0 — BASELINE + LOCKED DECISIONS
+
+## TASK-001 — Repository Audit
+
+**Priority:** P0  
+**Owner:** Shared / Lead  
+**Depends on:** none  
+
+### Prompt
+
+```text
+Inspect the complete NIRVAAN repository before changing code.
+
+Read implementations.md and tasks.md.
+
+Report:
+- current files and architecture
+- existing framework
+- dependencies
+- existing data/models
+- existing tests
+- existing map/GIS code
+- existing configuration/secrets handling
+- what can be reused
+- what is missing
+
+Do not modify working code.
+Do not implement future tasks.
+Stop after the audit.
+```
+
+### Done when
+
+- Repository state is documented.
+- No unrelated changes are made.
+- Any existing work is preserved.
+
+---
+
+## TASK-002 — Lock Canonical Real Datasets
+
+**Priority:** P0  
+**Owner:** Person 1  
+**Depends on:** TASK-001  
+**Timebox:** 2–4 hours  
 
 ### Goal
 
-Understand the current repository before changing code.
+Select and locally store one real flood event and one real wildfire event with before/after multispectral imagery suitable for the spectral pipeline.
 
-### Antigravity prompt
+### Prompt
 
 ```text
-You are implementing NIRVAAN, an AI-powered disaster monitoring prototype using satellite imagery.
+Implement the canonical NIRVAAN dataset selection and provenance layer.
 
-First, inspect the entire existing repository.
+You must lock:
+1. one real flood event
+2. one real wildfire event
+3. before and after acquisition dates
+4. real source/product identifiers or URLs
+5. Sentinel-2 Level-2A or another explicitly justified multispectral source
+6. required bands for the selected detection method
+7. CRS and pixel size
 
-Do not modify code yet.
+Create:
+- data/catalog.json
+- one metadata.json per event
+- a short DATA_PROVENANCE.md
 
-Determine:
-1. Existing application structure
-2. Existing frontend/backend framework
-3. Existing Python/Node dependencies
-4. Existing model/inference code
-5. Existing data or sample images
-6. Existing map/GIS code
-7. Existing tests
-8. Existing environment/config files
-9. Existing README documentation
-10. Any incomplete or broken functionality
+Do not invent event details.
+Do not rely on a live download during the demo.
+If a candidate event cannot be verified, reject it and choose another.
 
-Then report:
-- current architecture
-- recommended implementation path
-- conflicts with the NIRVAAN plan
-- files that should be reused
-- files that should be created
-
-Do not rewrite working functionality.
-
-Return a concise implementation assessment.
+At the end report the exact source/provenance for both canonical events and confirm which bands are available.
 ```
 
 ### Acceptance criteria
 
-- Repository structure is understood.
-- Existing functionality is not modified.
-- Implementation risks are identified.
-- Recommended next task is clear.
+- Both events are real and source-traceable.
+- Before/after data is locally available.
+- Required spectral bands are confirmed.
+- Provenance is documented.
 
 ---
 
-# Phase 1 — Project Foundation
+## TASK-003 — Lock Technology and Detection Configuration
 
-## TASK-002 — Create Project Structure
+**Priority:** P0  
+**Owner:** Shared / Lead  
+**Depends on:** TASK-002  
+**Timebox:** 30–45 min
 
-### Goal
-
-Create a clean structure for the NIRVAAN application without breaking existing code.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Implement the NIRVAAN project structure based on the repository audit.
+Create the NIRVAAN detection and application configuration.
 
-Create or organize these logical modules where appropriate:
+Lock:
+- Streamlit as UI if no existing UI must be preserved
+- Folium + streamlit-folium for maps
+- NDWI as the primary flood evidence index
+- NBR/dNBR as the primary wildfire evidence index
+- configurable thresholds per event/disaster type
+- upload size limit
+- supported file formats
+- minimum hotspot area
+- severity bands
 
-- app.py
-- data/
-- models/
+Create config/detection.yaml or an equivalent typed configuration module.
+
+Do not hide thresholds inside code.
+Do not claim thresholds are universal emergency standards.
+```
+
+### Acceptance criteria
+
+- Mapping stack is locked.
+- Detection formulas are explicit.
+- Thresholds are configuration-driven.
+- Config can be loaded by tests and application code.
+
+---
+
+## TASK-004 — Project Structure + Environment
+
+**Priority:** P0  
+**Owner:** Person 3  
+**Depends on:** TASK-001  
+
+### Prompt
+
+```text
+Create or normalize the NIRVAAN project structure from implementations.md.
+
+Create only the modules actually needed for the MVP:
 - preprocessing/
 - detection/
 - analysis/
 - mapping/
+- reports/
+- ui/
+- demo/
 - utils/
 - tests/
-
-Use the existing framework if one already exists.
-
-Do not duplicate existing functionality.
-Do not delete working files.
-Do not introduce unnecessary architecture.
+- data/
+- config/
 
 Add:
-- configuration module
-- logging utility
-- environment-variable handling
+- requirements.txt
 - .env.example
-- .gitignore updates where needed
+- .gitignore
+- minimal app.py
 
-Make sure the project still runs after this task.
-
-Run the existing tests and the application startup check.
+Preserve existing functionality.
+Avoid unnecessary backend/API architecture.
+Run a startup check.
 ```
 
 ### Acceptance criteria
 
-- Logical modules exist.
-- Existing application still starts.
-- Configuration is centralized.
+- Repository structure exists.
+- App starts.
 - No secrets are committed.
 
 ---
 
-## TASK-003 — Dependency Setup
+## TASK-005 — Event Schema + Dataset Loader
 
-### Goal
+**Priority:** P0  
+**Owner:** Person 1  
+**Depends on:** TASK-002  
 
-Install and document the minimum dependencies required for the MVP.
-
-### Antigravity prompt
-
-```text
-Set up the minimum dependencies required for NIRVAAN.
-
-Target capabilities:
-- Python application
-- image processing
-- numerical processing
-- GIS/raster processing
-- interactive visualization
-- testing
-
-Prefer existing dependencies already present in the repository.
-
-Use:
-- numpy
-- pandas
-- opencv-python
-- rasterio
-- geopandas
-- shapely
-- streamlit
-- plotly
-
-Only add packages that are actually needed.
-
-Update requirements.txt or the repository's existing dependency file.
-
-Do not add large or unnecessary dependencies.
-
-Verify installation and application startup.
-```
-
-### Acceptance criteria
-
-- Dependency file is complete.
-- Environment setup is documented.
-- Application starts successfully.
-
----
-
-# Phase 2 — Data Layer
-
-## TASK-004 — Create Disaster Event Data Schema
-
-### Goal
-
-Create a consistent schema for satellite disaster events.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Create a typed/validated data schema for NIRVAAN disaster events.
+Implement a typed/validated disaster-event schema and local dataset loader.
 
-The schema must support:
+Support:
 - event_id
 - disaster_type
 - location_name
@@ -205,1402 +225,1420 @@ The schema must support:
 - before_date
 - after_date
 - source
+- product_id or source_url
+- CRS
 - resolution_m
-- coordinate_reference_system
-- optional metadata
+- available_bands
+- optional AOI
 
-Support at least:
-- flood
-- wildfire
+Support flood and wildfire.
 
-Create sample metadata JSON files for local demo events.
+The loader must:
+- validate metadata
+- resolve local files
+- reject missing files
+- reject unsupported disaster types
+- expose provenance
 
-Do not fabricate real-world claims.
-Clearly mark placeholder/demo metadata where actual values are unavailable.
-
-Add validation and tests.
+Add tests for valid and invalid events.
 ```
 
 ### Acceptance criteria
 
-- Event schema exists.
-- Invalid metadata is rejected.
-- Sample events can be loaded.
+- Canonical events load through one interface.
+- Invalid metadata fails clearly.
+- Provenance is preserved.
 
 ---
 
-## TASK-005 — Add Demo Dataset Loader
+# PHASE 1 — REMOTE-SENSING PIPELINE
 
-### Goal
+## TASK-006 — Raster/Image Validation + Upload Safety
 
-Allow the application to load local satellite demo data reliably.
+**Priority:** P0  
+**Owner:** Person 1  
+**Depends on:** TASK-005  
 
-### Antigravity prompt
-
-```text
-Implement a dataset loader for NIRVAAN.
-
-Requirements:
-1. Load disaster events from the local data directory.
-2. Validate metadata.
-3. Resolve before/after image paths.
-4. Provide clear errors for missing files.
-5. Support flood and wildfire demo events.
-6. Return a normalized event object to downstream modules.
-
-Do not download data automatically.
-Do not rely on live APIs.
-
-Add unit tests for:
-- valid event
-- missing image
-- invalid metadata
-- unsupported disaster type
-```
-
-### Acceptance criteria
-
-- Local datasets load through one clean interface.
-- Errors are actionable.
-- Tests pass.
-
----
-
-# Phase 3 — Image Preprocessing
-
-## TASK-006 — Implement Image Loader and Validation
-
-### Goal
-
-Build reliable image input handling.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Implement NIRVAAN image loading and validation.
-
-Support common image/raster formats already appropriate for the project.
+Implement robust raster/image validation for both canonical data and user uploads.
 
 Validate:
-- file existence
-- readable image
-- dimensions
-- channel count
-- numeric range
+- file exists
+- readable raster/image
+- supported format
+- file size against configurable MAX_UPLOAD_MB
+- dimensions/pixel count against configurable limit
+- expected bands/channels
 - before/after compatibility
+- numeric value sanity
 
-Return useful metadata with the loaded image.
+Return safe, actionable validation errors.
 
-Handle invalid images gracefully.
-
-Do not silently alter source imagery.
-
-Add tests for valid and invalid inputs.
-```
-
-### Acceptance criteria
-
-- Valid images load consistently.
-- Invalid inputs produce clear errors.
-- Tests pass.
-
----
-
-## TASK-007 — Implement Image Alignment and Normalization
-
-### Goal
-
-Prepare before/after imagery for comparison.
-
-### Antigravity prompt
-
-```text
-Implement preprocessing for NIRVAAN before/after satellite imagery.
-
-Requirements:
-1. Resize or resample only when appropriate.
-2. Ensure compatible dimensions.
-3. Normalize pixel values for model inference.
-4. Provide an alignment hook/interface for geospatial registration.
-5. Preserve geospatial metadata when the source format provides it.
-6. Make preprocessing deterministic.
-
-Do not invent geospatial coordinates.
-Do not destroy source metadata.
-
-Add tests for output shapes and deterministic normalization.
-```
-
-### Acceptance criteria
-
-- Before/after inputs have compatible dimensions.
-- Preprocessing is deterministic.
-- Metadata handling is safe.
-
----
-
-# Phase 4 — Disaster Detection
-
-## TASK-008 — Create Model Adapter Interface
-
-### Goal
-
-Make AI inference replaceable.
-
-### Antigravity prompt
-
-```text
-Create a clean model adapter interface for NIRVAAN.
-
-The interface must support:
-- image input
-- disaster type prediction
-- confidence score
-- optional segmentation/probability mask
-
-Do not couple the UI to a specific ML framework.
-
-Create:
-1. base detector interface
-2. real model adapter placeholder if a usable model already exists
-3. local deterministic demo adapter only as a clearly labeled fallback
-
-The fallback must not pretend to be a real AI prediction.
-
-Return structured results.
-
-Add tests for schema and error handling.
-```
-
-### Acceptance criteria
-
-- UI can consume a standard prediction result.
-- Real model integration can be added without changing the UI.
-- Demo fallback is clearly labeled.
-
----
-
-## TASK-009 — Integrate Disaster Classifier
-
-### Goal
-
-Support flood and wildfire classification.
-
-### Antigravity prompt
-
-```text
-Integrate the best available existing/pretrained disaster classifier in the repository or selected approved dependency.
-
-Target classes:
-- flood
-- wildfire
-- no_disaster / unknown where supported
-
-Requirements:
-- model loading is separate from inference
-- model is initialized once
-- inference errors are handled
-- confidence is returned
-- unsupported model outputs are mapped safely
-
-Do not train a new model from scratch unless training code/data already exists and is trivial enough for the current environment.
-
-If no valid model is available, keep the model adapter interface and connect the clearly labeled local demo fallback.
-
-Add an inference smoke test.
-```
-
-### Acceptance criteria
-
-- End-to-end inference works for available model/data.
-- Model loading does not happen on every request.
-- No fake confidence claims are presented as real model results.
-
----
-
-# Phase 5 — Change Detection
-
-## TASK-010 — Implement Before/After Difference Pipeline
-
-### Goal
-
-Detect changes between pre-event and post-event imagery.
-
-### Antigravity prompt
-
-```text
-Implement NIRVAAN before-vs-after change detection.
-
-Pipeline:
-1. Validate compatible images.
-2. Preprocess consistently.
-3. Compute a meaningful pixel/band difference.
-4. Normalize the difference.
-5. Apply a configurable threshold or model-based mask.
-6. Reduce isolated noise where appropriate.
-7. Return:
-   - difference image
-   - binary/probability mask
-   - affected pixel count
-   - summary statistics
-
-Expose configuration values rather than hard-coding them.
-
-Document that threshold-based change detection is a prototype method and is not automatically equivalent to verified physical damage.
-
+Do not silently change source data.
 Add deterministic tests.
 ```
 
 ### Acceptance criteria
 
-- Difference image generated.
-- Mask generated.
-- Noise handling works.
-- Results are reproducible.
+- Oversized/malformed uploads are rejected gracefully.
+- Valid Sentinel-2-derived inputs load.
+- Tests cover size/type failures.
 
 ---
 
-## TASK-011 — Implement Disaster Mask Processing
+## TASK-007 — Preprocessing and Alignment
 
-### Goal
+**Priority:** P0  
+**Owner:** Person 1  
+**Depends on:** TASK-006  
 
-Convert model/change results into clean analysis regions.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Implement disaster mask post-processing.
+Implement deterministic preprocessing for multispectral before/after imagery.
 
 Requirements:
-- normalize mask format
-- remove very small isolated regions
-- optionally fill small holes
-- compute connected components
-- rank regions by area or confidence
-- preserve a configurable minimum region size
+- band selection
+- nodata handling
+- reflectance/value normalization as appropriate to source
+- spatial compatibility check
+- resampling only when justified
+- preserve CRS/transform/resolution
+- produce analysis-ready arrays
 
-Return georeferenced or image-coordinate polygons where source metadata allows.
-
-Do not overclaim physical accuracy.
-
-Add tests with synthetic masks.
+Do not invent missing metadata.
+If images cannot be safely aligned, return a clear error.
+Add tests for shape, metadata preservation, and deterministic output.
 ```
 
 ### Acceptance criteria
 
-- Stable masks are produced.
-- Connected regions can be extracted.
-- Tiny noise can be filtered.
+- Before/after data is compatible for analysis.
+- Metadata remains traceable.
 
 ---
 
-# Phase 6 — Severity and Impact
+## TASK-008 — Flood Spectral Detector (NDWI)
 
-## TASK-012 — Implement Affected Area Calculation
+**Priority:** P0  
+**Owner:** Person 1  
+**Depends on:** TASK-003, TASK-007  
 
-### Goal
-
-Estimate affected area from the mask.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Implement affected-area estimation for NIRVAAN.
+Implement the NIRVAAN flood detector using Sentinel-2 spectral evidence.
+
+Primary formula:
+NDWI = (B03 - B08) / (B03 + B08)
 
 Requirements:
-1. Calculate affected pixels.
-2. Determine pixel ground area from trusted raster metadata when available.
-3. Calculate square meters.
-4. Convert to square kilometers.
-5. Never invent resolution when metadata is missing.
-6. If resolution is unavailable, return a clearly labeled unavailable/estimate state.
+1. calculate NDWI safely with divide-by-zero handling
+2. apply the configured threshold
+3. compare before/after evidence where appropriate
+4. create a binary/probability-style evidence mask
+5. return summary statistics
+6. expose threshold and band configuration
+7. label output as spectral evidence, not a trained-model probability
+
+Store or return enough metadata for the methodology panel.
+Add synthetic tests for the formula and threshold behavior.
+```
+
+### Acceptance criteria
+
+- NDWI calculation is correct.
+- Mask is reproducible.
+- Threshold is configurable.
+- No fake ML probability is claimed.
+
+---
+
+## TASK-009 — Wildfire Spectral Detector (NBR/dNBR)
+
+**Priority:** P0  
+**Owner:** Person 1  
+**Depends on:** TASK-003, TASK-007  
+
+### Prompt
+
+```text
+Implement the NIRVAAN wildfire detector using Sentinel-2 spectral evidence.
+
+Formulas:
+NBR = (B08 - B12) / (B08 + B12)
+dNBR = NBR_before - NBR_after
+
+Requirements:
+- safe division
+- before/after calculation
+- configurable threshold
+- binary evidence mask
+- summary statistics
+- clear method metadata
+
+Do not call dNBR a trained model prediction.
+Add deterministic tests.
+```
+
+### Acceptance criteria
+
+- NBR/dNBR works on synthetic data.
+- Threshold is configurable.
+- Wildfire mask is reproducible.
+
+---
+
+## TASK-010 — Unified Detection Result Contract
+
+**Priority:** P0  
+**Owner:** Person 1  
+**Depends on:** TASK-008, TASK-009  
+
+### Prompt
+
+```text
+Create a common detection result schema consumed by downstream analysis and UI.
+
+Fields should include:
+- event_id
+- disaster_type
+- method
+- evidence_score or clearly defined confidence field
+- mask reference/data
+- before_date
+- after_date
+- source/provenance
+- threshold/configuration
+- limitations
+- is_estimate
+
+Ensure flood and wildfire detectors produce the same outer schema.
+Add schema validation tests.
+```
+
+### Acceptance criteria
+
+- Downstream code does not need to know detector internals.
+- Both disaster types conform to the same contract.
+
+---
+
+# PHASE 2 — IMPACT ANALYSIS
+
+## TASK-011 — Mask Post-processing
+
+**Priority:** P0  
+**Owner:** Person 1  
+**Depends on:** TASK-010  
+
+### Prompt
+
+```text
+Implement mask cleanup and connected-region extraction.
+
+Include:
+- binary normalization
+- configurable minimum region size
+- removal of tiny isolated noise
+- optional hole filling only when justified
+- connected components
+- stable region IDs
+
+Return image-space and geospatial geometry when metadata permits.
+Add synthetic-mask tests.
+```
+
+### Acceptance criteria
+
+- Noise filtering is deterministic.
+- Region extraction is stable.
+
+---
+
+## TASK-012 — Affected Area Calculation
+
+**Priority:** P0  
+**Owner:** Person 2  
+**Depends on:** TASK-011  
+
+### Prompt
+
+```text
+Implement affected-area calculation.
 
 Formula:
 area_km2 = affected_pixels * pixel_area_m2 / 1_000_000
 
-Add unit tests with known synthetic values.
+Requirements:
+- use trusted raster resolution/transform
+- calculate pixel ground area correctly for the supported projection
+- never invent resolution
+- return unavailable when resolution cannot be trusted
+- label result as estimate
+
+Add unit tests with known synthetic rasters.
 ```
 
 ### Acceptance criteria
 
-- Calculation is correct.
-- Missing resolution is handled safely.
-- Units are explicit.
+- Area calculation is numerically correct.
+- Missing resolution is safe.
 
 ---
 
-## TASK-013 — Implement Prototype Severity Score
+## TASK-013 — Prototype Severity Engine
 
-### Goal
+**Priority:** P0  
+**Owner:** Person 2  
+**Depends on:** TASK-011, TASK-012  
 
-Create a consistent prototype severity ranking.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Implement NIRVAAN's prototype severity scoring.
+Implement a deterministic prototype severity engine.
 
-Inputs may include:
-- affected area ratio
-- affected region concentration
-- model confidence
-- proximity to critical infrastructure if available
+Inputs:
+- affected-area ratio
+- evidence strength
+- hotspot concentration
+- optional infrastructure proximity
 
 Return:
-- numeric severity score
-- severity label
-- contributing factors
+- severity_score 0–100
+- severity_band
+- contributing_factors
 
-Default prototype bands:
-0–20% LOW
-20–50% MODERATE
-50–75% HIGH
-75%+ CRITICAL
+Use configurable prototype bands.
 
-Make thresholds configurable.
-
-Clearly label this as a hackathon prototype scoring system, not an operational emergency standard.
-
-Add unit tests around threshold boundaries.
+Do not call this an operational emergency standard.
+Add boundary tests.
 ```
 
 ### Acceptance criteria
 
-- Severity score is deterministic.
-- Boundary cases are tested.
-- UI receives both score and label.
+- Same input always produces same result.
+- Factors are visible.
+- Thresholds are configurable.
 
 ---
 
-## TASK-014 — Implement Hotspot Extraction
+## TASK-014 — Hotspot Extraction
 
-### Goal
+**Priority:** P0  
+**Owner:** Person 2  
+**Depends on:** TASK-011  
 
-Identify highest-priority affected regions.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Implement hotspot extraction from the disaster mask.
+Implement hotspot extraction from cleaned disaster regions.
 
-Requirements:
-- identify connected/high-confidence regions
-- calculate region area
-- calculate centroid
-- calculate impact/confidence score
-- rank regions
-- return top N hotspots
-- support configurable minimum area
-
-Output schema should include:
+For each hotspot calculate:
 - hotspot_id
 - centroid
 - area
-- score
+- evidence/impact score
 - severity
+- source event ID
 
-Add tests using synthetic masks.
+Rank top N hotspots.
+Support empty-mask behavior.
+Do not invent names for locations that have no verified place name.
+Add synthetic tests.
 ```
 
 ### Acceptance criteria
 
-- Top hotspots are returned.
-- Results are sorted consistently.
-- Empty-mask behavior is handled.
+- Top hotspots are deterministic.
+- Empty result is handled safely.
 
 ---
 
-# Phase 7 — Geospatial Map
+## TASK-015 — GeoJSON / Map Data Contract
 
-## TASK-015 — Implement Map Data Layer
+**Priority:** P0  
+**Owner:** Person 2  
+**Depends on:** TASK-014  
 
-### Goal
-
-Convert analysis results into map-ready objects.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Create a map data layer for NIRVAAN.
+Create a map-ready geospatial contract.
 
 Convert:
-- event location
-- affected regions
+- event point
+- affected polygons
 - hotspots
 - severity
-- optional critical infrastructure
 
-into a consistent map schema.
-
-Support GeoJSON or another standard geospatial representation already used by the application.
-
-Do not invent coordinates.
-
-Validate geometries before rendering.
-```
-
-### Acceptance criteria
-
-- Map data is structured consistently.
-- Invalid geometry is handled.
-- Coordinates are traceable to source data.
-
----
-
-## TASK-016 — Build Interactive Disaster Map
-
-### Goal
-
-Display disaster impact clearly.
-
-### Antigravity prompt
-
-```text
-Implement the NIRVAAN interactive disaster map.
-
-The map must display:
-- disaster event location
-- affected regions
-- hotspots
-- severity
-- legend
-- optional infrastructure
+into validated GeoJSON/features.
 
 Requirements:
-- fit map bounds to event
-- clear legend
-- tooltips for important regions
-- visually distinguish severity levels
-- avoid excessive visual clutter
-- handle missing geospatial data gracefully
+- preserve CRS expectations
+- validate geometries
+- reject invalid coordinates
+- never invent coordinates
+- include properties needed by the UI
 
-Use the project's existing mapping technology where possible.
-
-Add a simple rendering smoke test or manual verification checklist.
+Add tests for valid and invalid geometry.
 ```
 
 ### Acceptance criteria
 
-- Map renders.
-- Affected regions are visible.
-- Hotspots can be identified.
-- Missing coordinates do not crash the dashboard.
+- Map data can be consumed without detector internals.
 
 ---
 
-# Phase 8 — Critical Infrastructure Context
+## TASK-016 — Lock and Implement Folium Map
 
-## TASK-017 — Add Optional Infrastructure Overlay
+**Priority:** P0  
+**Owner:** Person 2  
+**Depends on:** TASK-015  
 
-### Goal
-
-Provide operational context near disaster hotspots.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Add an optional critical-infrastructure layer.
+Implement the NIRVAAN interactive map using Folium + streamlit-folium.
 
-Support categories such as:
+Show:
+- event location
+- affected polygons
+- hotspots
+- severity legend
+- tooltips/popups
+
+Requirements:
+- fit bounds to the event/AOI
+- accessible legend labels
+- missing geospatial metadata must not crash the app
+- no invented coordinates
+- keep map rendering modular
+
+Do not introduce another map library.
+```
+
+### Acceptance criteria
+
+- Map renders inside Streamlit.
+- Hotspots and affected regions are visible.
+- Missing coordinates fail gracefully.
+
+---
+
+## TASK-017 — Optional Infrastructure Overlay
+
+**Priority:** P1  
+**Owner:** Person 2  
+**Depends on:** TASK-016  
+
+### Prompt
+
+```text
+Add an optional local/verified critical-infrastructure overlay.
+
+Prefer a local geospatial export for the canonical AOI.
+Categories may include:
 - hospitals
 - roads
-- bridges
 - schools
+- bridges
 - settlements
 
-The implementation may use:
-- available local demo data
-- an existing geospatial dataset
-- a clean adapter for a future live source
+For each hotspot calculate proximity only when data is available.
 
-Do not introduce live API dependency unless credentials/access already exist.
+Never state that nearby infrastructure is damaged.
+Use wording such as:
+"Hospital within 0.6 km of affected hotspot — field verification recommended."
 
-For each hotspot, calculate proximity to available infrastructure when possible.
-
-Label inferred/estimated impact carefully.
+If reliable infrastructure data is unavailable, skip this feature and report it rather than inventing data.
 ```
 
 ### Acceptance criteria
 
-- Infrastructure can be displayed.
-- Proximity can be calculated when data is available.
-- Missing infrastructure data does not break the app.
+- Optional layer never blocks core map functionality.
 
 ---
 
-# Phase 9 — AI Response Intelligence
+# PHASE 3 — DEMO ARTIFACTS + PERFORMANCE
 
-## TASK-018 — Define Structured Disaster Assessment Schema
+## TASK-018 — Build Canonical Instant Demo Bundles
 
-### Goal
+**Priority:** P0  
+**Owner:** Person 3  
+**Depends on:** TASK-010, TASK-013, TASK-014, TASK-016  
+**Timebox:** 2–3 hours  
 
-Create a reliable schema for the AI report generator.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Create a structured disaster-assessment schema.
+Create reproducible Instant Demo Mode artifacts for the canonical flood and wildfire events.
 
-Required fields:
+Each bundle must be generated from the real local dataset through the actual detection/analysis pipeline.
+
+Store only what is needed for near-zero-latency rendering, for example:
+- metadata
+- detection result
+- mask/derived image
+- hotspots GeoJSON
+- severity
+- structured report input
+- provenance
+
+Create a script such as demo/prepare_bundle.py that regenerates bundles.
+
+Do not hand-write fake results.
+Record generation timestamp/tool version where useful.
+```
+
+### Acceptance criteria
+
+- Both canonical events have reproducible bundles.
+- Bundles can be rendered without running expensive inference.
+
+---
+
+## TASK-019 — Streamlit State and Caching
+
+**Priority:** P0  
+**Owner:** Person 3  
+**Depends on:** TASK-004  
+
+### Prompt
+
+```text
+Implement explicit Streamlit state management.
+
+Use:
+- st.session_state for selected event, mode, current result, UI stage
+- st.cache_resource for expensive resource/model initialization
+- st.cache_data for safe deterministic reusable processing
+
+Requirements:
+- reruns must preserve current analysis
+- expensive inference must not rerun unnecessarily
+- switching events resets only event-specific state
+- Instant Demo Mode must remain instant after reruns
+
+Add a small manual verification checklist for rerun behavior.
+```
+
+### Acceptance criteria
+
+- Rerun does not wipe completed results.
+- Resources are not repeatedly initialized.
+
+---
+
+## TASK-020 — Instant vs Live Analyze Modes
+
+**Priority:** P0  
+**Owner:** Person 3  
+**Depends on:** TASK-018, TASK-019  
+
+### Prompt
+
+```text
+Implement two explicit analysis modes:
+
+1. Instant Demo Mode — default
+   - canonical event selector
+   - loads precomputed bundle
+   - no network dependency
+   - near-zero-latency rendering
+
+2. Live Analyze Mode — secondary
+   - runs the actual local pipeline on selected/uploaded imagery
+   - shows progress/loading state
+   - errors gracefully
+
+Make the UI clearly label the selected mode.
+The stage demo must never require Live Analyze Mode.
+```
+
+### Acceptance criteria
+
+- Instant Mode works offline.
+- Live Mode remains functional.
+- Modes are not mixed silently.
+
+---
+
+# PHASE 4 — AI REPORTING
+
+## TASK-021 — Structured Assessment Schema
+
+**Priority:** P0  
+**Owner:** Person 3  
+**Depends on:** TASK-010, TASK-013, TASK-014  
+
+### Prompt
+
+```text
+Create a validated situation-assessment schema containing:
 - disaster_type
-- confidence
+- evidence/confidence
 - severity
 - affected_area_km2
 - hotspots
-- critical_infrastructure
-- evidence
+- infrastructure
+- evidence/source
 - limitations
-- recommended_actions
+- recommended verification actions
+- is_estimate
 
-Make the schema serializable to JSON.
-
-Ensure recommendations are generated from available evidence and not unsupported facts.
-
-Add validation.
+Ensure it serializes to JSON.
+Reject unsupported claims/fields where possible.
 ```
 
 ### Acceptance criteria
 
-- Assessment object validates.
-- JSON serialization works.
-- Missing optional fields are handled.
+- Assessment object is validated and serializable.
 
 ---
 
-## TASK-019 — Implement AI Situation Report Generator
+## TASK-022 — Grounded Situation Report + Offline Fallback
 
-### Goal
+**Priority:** P0  
+**Owner:** Person 3  
+**Depends on:** TASK-021  
 
-Generate concise, evidence-grounded disaster summaries.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Implement an AI situation-report generator for NIRVAAN.
+Implement NIRVAAN situation-report generation.
 
-Input:
-- validated structured disaster assessment
+If an approved/configured LLM is available:
+- provide only validated structured evidence
+- request a concise responder-oriented report
+- explicitly prohibit unsupported facts
 
-Output:
-1. situation summary
-2. high-priority zones
-3. recommended verification/response actions
-4. monitoring recommendations
-5. limitations/uncertainty
+Always implement a deterministic fallback that works offline.
 
-Important:
-- Only use facts present in the structured input.
-- Never invent infrastructure damage, casualties, evacuation orders, weather, or other facts.
-- Recommendations must be phrased as decision support, not authoritative emergency commands.
-- Clearly indicate when values are estimates or prototype outputs.
+The report may include:
+- situation summary
+- high-priority zones
+- field-verification recommendations
+- monitoring recommendations
+- limitations
 
-Use an existing LLM integration only if already configured in the repository.
-Otherwise implement a deterministic template-based fallback.
+Never invent:
+- casualties
+- confirmed damage
+- evacuation orders
+- weather
+- road closures
+- resource availability
 
-Add tests for empty/incomplete evidence.
+Every derived number must remain labeled as estimate/prototype where appropriate.
+Add tests for missing/incomplete evidence.
 ```
 
 ### Acceptance criteria
 
-- Report is generated from structured evidence.
-- Unsupported claims are avoided.
-- Fallback works without an LLM service.
+- LLM is optional.
+- Offline fallback is deterministic.
+- Unsupported claims are not generated by the fallback.
 
 ---
 
-# Phase 10 — Streamlit Dashboard
+# PHASE 5 — DASHBOARD
 
-## TASK-020 — Build Dashboard Shell
+## TASK-023 — Dashboard Shell
 
-### Goal
+**Priority:** P0  
+**Owner:** Person 3  
+**Depends on:** TASK-004  
 
-Create the main NIRVAAN user interface.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Build the NIRVAAN dashboard using the existing frontend framework, preferably Streamlit if no frontend framework exists.
+Build the NIRVAAN Streamlit dashboard shell.
 
-Dashboard sections:
-
+Sections:
 1. Header
-   NIRVAAN
-   AI Satellite Disaster Monitoring
+2. Mode selector
+3. Canonical event selector / upload
+4. Analyze action
+5. Detection summary
+6. Before/after comparison
+7. Map
+8. Severity/impact
+9. Hotspots
+10. AI assessment
+11. Show Your Work
 
-2. Event selector / image upload
-
-3. Analyze button
-
-4. Top metrics:
-   - disaster type
-   - confidence
-   - severity
-   - affected area
-
-5. Before/after imagery
-
-6. Interactive map
-
-7. Hotspot list
-
-8. AI assessment
-
-9. Response recommendations
-
-Use reusable UI functions/components.
-Keep the dashboard clean and readable.
-
-Do not put analysis logic directly into UI functions.
+Keep analysis logic out of UI rendering functions.
+Use small reusable UI modules.
 ```
 
 ### Acceptance criteria
 
 - Dashboard loads.
-- User can select a demo event.
-- Main sections are visible.
-- UI is separated from analysis logic.
+- Main sections render without backend results.
 
 ---
 
-## TASK-021 — Add Analysis Workflow to Dashboard
+## TASK-024 — Staged Reveal UX
 
-### Goal
+**Priority:** P0  
+**Owner:** Person 3  
+**Depends on:** TASK-020, TASK-023  
 
-Connect all backend modules to the UI.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Connect the complete NIRVAAN analysis pipeline to the dashboard.
+Implement the staged NIRVAAN analysis flow:
 
-Workflow:
+DETECT → COMPARE → MAP → ASSESS
 
-Select event
-→ Load before/after imagery
-→ Preprocess
-→ Run detection
-→ Change detection
-→ Severity
-→ Affected area
-→ Hotspots
-→ Map
-→ AI assessment
-→ Recommendations
+During Live Analyze Mode show progress through these stages.
+During Instant Demo Mode reveal the same stages quickly without artificial long waits.
 
-Requirements:
-- show progress/loading state
-- cache model initialization where appropriate
-- prevent duplicate expensive work
-- display actionable errors
-- preserve previous successful state when possible
-
-Do not fabricate outputs when analysis fails.
+The UI should feel like a coherent analysis story rather than a page of unrelated cards.
 ```
 
 ### Acceptance criteria
 
-- Full workflow executes from one user action.
-- Errors are visible and understandable.
-- Results are displayed in all major sections.
+- Demo narration maps naturally to UI stages.
 
 ---
 
-## TASK-022 — Add Before/After Comparison UI
+## TASK-025 — Before/After Slider Comparison
 
-### Goal
+**Priority:** P0  
+**Owner:** Person 3  
+**Depends on:** TASK-023  
 
-Make the satellite change visually obvious.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Add a clear before-vs-after comparison component.
+Implement an interactive before/after comparison where practical, preferably a swipe/slider.
 
 Display:
 - before image
 - after image
-- optional difference/mask image
 - dates
-- source information
-- resolution if known
-
-Allow a simple side-by-side layout.
-
-Clearly label all images and avoid implying that "after" means confirmed damage.
+- source
+- resolution when known
+- optional evidence mask/difference
 
 Do not distort imagery.
+Clearly label source and dates.
 ```
 
 ### Acceptance criteria
 
-- Before and after are easy to compare.
-- Metadata is visible.
-- Difference/mask can be inspected.
+- Judge can visually compare before and after quickly.
 
 ---
 
-## TASK-023 — Add Severity and Hotspot UI
+## TASK-026 — Severity / Hotspot Presentation
 
-### Goal
+**Priority:** P0  
+**Owner:** Person 3  
+**Depends on:** TASK-013, TASK-014, TASK-023  
 
-Make risk information immediately understandable.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Add severity and hotspot visualizations.
-
-Show:
-- severity label
+Add concise dashboard panels for:
 - severity score
+- severity band
 - affected area
 - hotspot count
-- ranked hotspot table/list
+- ranked hotspot list
 
-Each hotspot should show:
-- rank
-- score
-- severity
-- area
-- location/centroid
-
-Use accessible labels instead of color alone.
+Every derived number must show ESTIMATE or PROTOTYPE where appropriate.
+Do not rely on color alone to communicate severity.
 ```
 
 ### Acceptance criteria
 
-- Severity is obvious.
-- Hotspots are ranked.
-- Important values are visible without opening hidden menus.
+- Key impact information is understandable in seconds.
 
 ---
 
-# Phase 11 — Reliability
+## TASK-027 — Show Your Work / Methodology Panel
 
-## TASK-024 — Add Error Handling
+**Priority:** P1  
+**Owner:** Person 3  
+**Depends on:** TASK-003, TASK-023  
 
-### Goal
-
-Ensure the demo does not crash on normal failures.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Add robust error handling across the NIRVAAN pipeline.
+Add an expandable methodology panel showing:
+- data source
+- acquisition dates
+- bands used
+- detection formula
+- configured threshold
+- pixel resolution
+- affected-area formula
+- severity factors
+- limitations
 
-Handle:
-- missing image
+Make the values come from configuration/metadata rather than hard-coded UI text.
+```
+
+### Acceptance criteria
+
+- A judge can inspect how a result was produced.
+
+---
+
+# PHASE 6 — RELIABILITY + TESTING
+
+## TASK-028 — Centralized Error Handling
+
+**Priority:** P0  
+**Owner:** Person 3  
+**Depends on:** TASK-006, TASK-016, TASK-022, TASK-023  
+
+### Prompt
+
+```text
+Implement user-safe error handling for:
+- missing files
+- malformed uploads
+- oversized uploads
 - invalid metadata
-- model loading failure
-- inference failure
-- incompatible images
+- incompatible imagery
+- invalid bands
+- detector failure
+- empty masks
 - missing geospatial metadata
-- invalid geometries
-- unavailable LLM
-- empty mask
+- invalid geometry
 - map rendering failure
+- LLM failure
 
-Display user-friendly messages in the dashboard.
-
-Log technical details for debugging.
-
-Never expose secrets in error messages.
+Show concise user messages and log technical details.
+Never expose secrets.
 ```
 
 ### Acceptance criteria
 
-- Known failure cases are handled.
-- Dashboard remains usable.
-- Logs contain actionable diagnostics.
+- Known failure cases do not crash the app.
 
 ---
 
-## TASK-025 — Add Offline Demo Fallback
+## TASK-029 — Deterministic Unit Test Suite
 
-### Goal
+**Priority:** P0  
+**Owner:** Person 1 + Person 2  
+**Depends on:** TASK-008 through TASK-015  
 
-Make the core demo reliable even if external services fail.
-
-### Antigravity prompt
-
-```text
-Implement an offline-safe NIRVAAN demo path.
-
-Requirements:
-- bundled/local sample imagery
-- local metadata
-- cached or local model where available
-- deterministic fallback for AI report generation if external LLM is unavailable
-- no live API required for the primary demo
-
-Do not fake real-world observations.
-Clearly label deterministic/sample fallback outputs.
-
-Add a documented "Demo Mode".
-```
-
-### Acceptance criteria
-
-- NIRVAAN can run with no external API dependency for the core demo.
-- Demo Mode is clearly identified.
-- Failure of optional services does not crash the application.
-
----
-
-# Phase 12 — Testing
-
-## TASK-026 — Unit Tests for Deterministic Logic
-
-### Goal
-
-Cover important calculations.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Create or complete unit tests for:
+Create/complete deterministic tests for:
+- NDWI formula
+- NBR/dNBR formula
+- threshold behavior
 - metadata validation
 - image validation
-- normalization
-- affected area calculation
-- severity boundaries
-- hotspot extraction
-- geometry validation
-- response schema validation
+- mask cleanup
+- affected area
+- severity boundary cases
+- hotspot ranking
+- GeoJSON validation
+- assessment schema
+- fallback report generation
 
-Use synthetic inputs where possible.
-
-Do not depend on internet access for unit tests.
+Tests must not require internet access.
+Use synthetic arrays/geometries where possible.
 ```
 
 ### Acceptance criteria
 
 - Core deterministic tests pass.
-- Edge cases are covered.
+- Boundary and empty cases are covered.
 
 ---
 
-## TASK-027 — End-to-End Demo Test
+## TASK-030 — End-to-End Demo Verification
 
-### Goal
+**Priority:** P0  
+**Owner:** Shared  
+**Depends on:** TASK-020, TASK-024, TASK-026, TASK-028, TASK-029  
 
-Verify the full application workflow.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Create an end-to-end verification procedure for the NIRVAAN demo.
+Verify the complete NIRVAAN Instant Demo Mode for both canonical events.
 
-Verify:
-1. application starts
-2. demo event loads
-3. before image appears
-4. after image appears
-5. inference runs
-6. confidence displays
-7. change mask appears
-8. affected area calculates
-9. severity displays
-10. hotspots appear
-11. map renders
-12. AI report appears
-13. recommendations appear
+Check:
+1. app starts
+2. event loads
+3. source metadata appears
+4. detection appears
+5. evidence mask appears
+6. before/after comparison works
+7. severity appears
+8. affected area appears or safely reports unavailable
+9. hotspots appear
+10. Folium map renders
+11. AI report appears
+12. offline fallback works
+13. Streamlit rerun preserves result
+14. no network is required
 
-Use automated tests where practical and a documented manual checklist for UI-only behavior.
+Also verify Live Analyze Mode with at least one valid input if practical.
 
-Run the full test suite.
+Record failures instead of hiding them.
 ```
 
 ### Acceptance criteria
 
-- Full demo path works.
-- Any remaining failure is documented.
+- Both canonical demo journeys complete successfully offline.
 
 ---
 
-# Phase 13 — Product Polish
+# PHASE 7 — POLISH + OPTIONAL WOW FACTORS
 
-## TASK-028 — Improve Dashboard UX
+## TASK-031 — Data/Model Transparency
 
-### Goal
+**Priority:** P1  
+**Owner:** Person 3  
+**Depends on:** TASK-027  
 
-Make the application hackathon-demo ready.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Polish the NIRVAAN dashboard without changing core functionality.
+Add visible transparency labels throughout the dashboard.
+
+Show where appropriate:
+- SATELLITE-DERIVED EVIDENCE
+- ESTIMATE
+- PROTOTYPE SCORE
+- FIELD VERIFICATION REQUIRED
+- source
+- acquisition date
+- method
+
+Keep the main UI concise; use methodology expansion for detail.
+```
+
+### Acceptance criteria
+
+- Derived values are not visually mistaken for verified facts.
+
+---
+
+## TASK-032 — Optional NASA FIRMS Wildfire Overlay
+
+**Priority:** P2  
+**Owner:** Person 2  
+**Depends on:** TASK-030  
+
+### Prompt
+
+```text
+Only if the core demo is already stable, add an optional NASA FIRMS active-fire overlay for the wildfire canonical event.
+
+Requirements:
+- it must be clearly labeled as optional live context
+- core demo must work if the overlay is unavailable
+- do not block startup on network access
+- display source and timestamp
+
+If implementation threatens stability, do not implement it.
+```
+
+### Acceptance criteria
+
+- Optional overlay never blocks core demo.
+
+---
+
+## TASK-033 — Dashboard Polish
+
+**Priority:** P1  
+**Owner:** Person 3  
+**Depends on:** TASK-030  
+
+### Prompt
+
+```text
+Polish NIRVAAN without changing analysis behavior.
 
 Improve:
+- hierarchy
 - spacing
 - typography
-- section hierarchy
 - metric cards
-- loading indicators
-- error states
-- labels
 - legends
 - empty states
+- loading states
+- error states
+- mobile/desktop readability where practical
 
-Keep the interface professional and compact.
-
-Prioritize readability over decorative animation.
-
+Prioritize clarity over animation.
 Do not add unrelated features.
 ```
 
 ### Acceptance criteria
 
-- Dashboard feels coherent and professional.
-- Important insights can be understood quickly.
+- The judge can understand the result within seconds.
 
 ---
 
-## TASK-029 — Add Data/Model Transparency
+## TASK-034 — README + Data Provenance + Demo Runbook
 
-### Goal
+**Priority:** P1  
+**Owner:** Person 3  
+**Depends on:** TASK-030  
 
-Make the prototype trustworthy.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Add transparent metadata to the NIRVAAN UI.
+Complete documentation using only facts actually present in the repository.
 
-Clearly display where appropriate:
-- imagery source
-- acquisition dates
-- spatial resolution
-- model name/version if known
-- confidence
-- prototype assumptions
-- estimated vs observed values
+Update/create:
+- README.md
+- DATA_PROVENANCE.md
+- DEMO_RUNBOOK.md
+
+README must include:
+- problem
+- solution
+- architecture
+- features
+- tech stack
+- setup
+- commands
+- data sources
+- detection methods
 - limitations
+- demo modes
 
-Do not overwhelm the main dashboard; use an expandable methodology/about section if helpful.
-```
-
-### Acceptance criteria
-
-- Users can understand the source and limitations of results.
-- Estimates are not presented as confirmed facts.
-
----
-
-# Phase 14 — Documentation
-
-## TASK-030 — Complete README
-
-### Goal
-
-Make the repository understandable to judges and teammates.
-
-### Antigravity prompt
-
-```text
-Update README.md with:
-
-1. Project overview
-2. Problem
-3. Solution
-4. Key features
-5. Architecture
-6. Tech stack
-7. Repository structure
-8. Setup instructions
-9. Environment variables
-10. Demo instructions
-11. Supported disaster types
-12. Data/model sources
-13. Limitations
-14. Future work
-15. Hackathon demo flow
-
-Use commands that actually work in the repository.
-
-Do not invent setup steps.
-```
-
-### Acceptance criteria
-
-- A new developer can follow README instructions.
-- Demo instructions work.
-
----
-
-## TASK-031 — Create Demo Runbook
-
-### Goal
-
-Make the final demonstration reproducible.
-
-### Antigravity prompt
-
-```text
-Create DEMO_RUNBOOK.md for NIRVAAN.
-
-Include:
+DEMO_RUNBOOK must include:
 - exact startup command
-- demo dataset/event to use
-- expected visible outputs
-- 2-minute demo flow
-- backup path if model/API fails
-- common troubleshooting steps
+- canonical event to select
+- expected outputs
+- 2–3 minute demo sequence
+- offline fallback
+- troubleshooting
 - final pre-demo checklist
-
-Keep it practical and command-oriented.
 ```
 
 ### Acceptance criteria
 
-- Another teammate can run the demo using only the runbook.
+- A teammate can run the demo from the docs.
 
 ---
 
-# Phase 15 — Final Freeze
+## TASK-035 — Final Submission Freeze
 
-## TASK-032 — Production-Style Cleanup for Hackathon Submission
+**Priority:** P0  
+**Owner:** Shared  
+**Depends on:** TASK-030, TASK-033, TASK-034  
 
-### Goal
-
-Freeze a stable submission build.
-
-### Antigravity prompt
+### Prompt
 
 ```text
-Prepare NIRVAAN for hackathon submission.
+Freeze NIRVAAN for hackathon submission.
 
 Do not add new product features.
 
 Perform:
-- dead-code review
-- obvious bug fixes
-- dependency cleanup
-- import cleanup
+- full test suite
 - startup verification
-- test-suite verification
-- README verification
-- Demo Mode verification
+- offline verification
+- Instant Demo Mode verification
 - secret scan
+- dependency review
+- unused import/dead-code review
 - git diff review
+- README/runbook verification
+- provenance verification
+- final UI smoke test
 
-Do not remove necessary experimental code unless it is confirmed unused.
+Confirm that no fake outputs, invented sources, or unsupported claims remain.
 
 Return:
 - final test status
-- known issues
-- recommended commit message
 - final run command
+- known issues
+- exact recommended release commit message
 ```
 
 ### Acceptance criteria
 
-- Application starts cleanly.
-- Tests pass or known failures are documented.
-- No secrets are committed.
-- Demo is reproducible.
+- Submission build is reproducible.
+- Core demo works offline.
+- Known limitations are documented.
 
 ---
 
-# 4-Day Execution Order
+# 4-DAY EXECUTION SCHEDULE
 
-## DAY 1 — Foundation
+## DAY 1 — Evidence First
+
+### Morning — P0 gate
 
 ```text
 TASK-001
 ↓
-TASK-002
+TASK-002  ← REAL DATA LOCK
 ↓
-TASK-003
-↓
+TASK-003  ← METHOD + MAP LOCK
+```
+
+**Do not proceed to broad UI work until TASK-002 is successful.**
+
+### Afternoon
+
+```text
 TASK-004
-↓
 TASK-005
-↓
 TASK-006
-↓
 TASK-007
-```
-
-### Day 1 mandatory milestone
-
-```text
-Local satellite event
-        ↓
-Preprocessing
-        ↓
-Model interface
-        ↓
-Initial inference
-        ↓
-Structured result
-```
-
----
-
-## DAY 2 — AI + GIS Intelligence
-
-```text
 TASK-008
-↓
 TASK-009
-↓
 TASK-010
-↓
+```
+
+### Day 1 gate
+
+At least one real event produces a reproducible spectral evidence mask and structured result locally.
+
+---
+
+## DAY 2 — Impact + Map + Instant Demo
+
+```text
 TASK-011
-↓
 TASK-012
-↓
 TASK-013
-↓
 TASK-014
-↓
 TASK-015
-↓
 TASK-016
-```
-
-Optional after the above:
-
-```text
-TASK-017
-```
-
-### Day 2 mandatory milestone
-
-```text
-Disaster
-→ Confidence
-→ Change mask
-→ Severity
-→ Affected area
-→ Hotspots
-→ Map data
-```
-
----
-
-## DAY 3 — Product Integration
-
-```text
 TASK-018
-↓
 TASK-019
-↓
 TASK-020
-↓
-TASK-021
-↓
-TASK-022
-↓
-TASK-023
-↓
-TASK-024
 ```
 
-Optional:
+### Day 2 gate
 
-```text
-TASK-017
-TASK-025
-```
-
-### Day 3 mandatory milestone
-
-A judge can execute:
-
-```text
-Select Event
-→ Analyze
-→ See Disaster
-→ See Before/After
-→ See Severity
-→ See Map
-→ See AI Assessment
-```
+Both canonical events can produce map-ready impact intelligence offline, and Instant Demo Mode renders without expensive inference.
 
 ---
 
-## DAY 4 — Reliability + Submission
+## DAY 3 — Product + AI
 
 ```text
+TASK-021
+TASK-022
+TASK-023
+TASK-024
 TASK-025
-↓
 TASK-026
-↓
-TASK-027
-↓
 TASK-028
-↓
 TASK-029
-↓
-TASK-030
-↓
+```
+
+Then:
+
+```text
+TASK-027
 TASK-031
-↓
+```
+
+### Day 3 gate
+
+A judge can complete:
+
+```text
+Select event
+→ detect
+→ compare
+→ map
+→ severity
+→ AI assessment
+```
+
+in under two minutes.
+
+---
+
+## DAY 4 — Freeze
+
+```text
+TASK-030
+TASK-033
+TASK-034
+TASK-035
+```
+
+Only after stability:
+
+```text
+TASK-017
 TASK-032
 ```
 
 ### Day 4 rule
 
-**No major new features after TASK-027 unless the full demo is already stable.**
+**No new core feature after the end-to-end demo is stable.**
 
 ---
 
-# Priority Labels
+# TEAM PARALLELIZATION
 
-## P0 — Must Work
+## Person 1 — Remote Sensing / Detection
 
-- TASK-004
-- TASK-005
-- TASK-006
-- TASK-007
-- TASK-008
-- TASK-009
-- TASK-010
-- TASK-012
-- TASK-013
-- TASK-014
-- TASK-016
-- TASK-020
-- TASK-021
-- TASK-022
-- TASK-023
-- TASK-024
-- TASK-025
-- TASK-027
-
-## P1 — Strongly Recommended
-
-- TASK-003
-- TASK-011
-- TASK-015
-- TASK-018
-- TASK-019
-- TASK-026
-- TASK-028
-- TASK-029
-- TASK-030
-- TASK-031
-- TASK-032
-
-## P2 — Optional
-
-- TASK-017
-- live satellite ingestion
-- weather integration
-- alerts
-- social-media monitoring
-- additional disaster categories
-- multi-day prediction
-
----
-
-# Final User Journey
-
-The final application should follow this exact experience:
+Branch:
 
 ```text
-1. User opens NIRVAAN
-          ↓
-2. Selects Flood Demo Event
-          ↓
-3. Clicks "Analyze Disaster"
-          ↓
-4. System preprocesses imagery
-          ↓
-5. AI detects disaster
-          ↓
-6. Confidence appears
-          ↓
-7. Before/after imagery appears
-          ↓
-8. Change mask appears
-          ↓
-9. Affected area is calculated
-          ↓
-10. Severity is calculated
-          ↓
-11. Hotspots are extracted
-          ↓
-12. Interactive map is rendered
-          ↓
-13. Critical infrastructure context appears
-          ↓
-14. AI situation report is generated
-          ↓
-15. Priority actions are shown
+feature/detection
 ```
 
----
-
-# Definition of Done
-
-NIRVAAN is ready for the hackathon when all of the following are true:
-
-- [ ] One flood demo works end-to-end
-- [ ] One wildfire demo works or is clearly marked optional
-- [ ] Before/after images render
-- [ ] Disaster classification works
-- [ ] Confidence is shown
-- [ ] Change mask works
-- [ ] Severity works
-- [ ] Affected area works
-- [ ] Hotspots work
-- [ ] Map works
-- [ ] AI report works
-- [ ] Recommendations work
-- [ ] Offline/demo fallback works
-- [ ] Errors are handled
-- [ ] Tests pass
-- [ ] README is complete
-- [ ] Demo runbook is complete
-- [ ] No secrets are committed
-- [ ] 2–3 minute demo is rehearsed
-
----
-
-# Suggested Antigravity Master Prompt
-
-Use this prompt when you want Antigravity to take ownership of the complete plan:
+Primary tasks:
 
 ```text
-You are the lead implementation engineer for NIRVAAN — an AI Satellite Threat & Response Assistant for disaster monitoring.
+TASK-002
+TASK-005
+TASK-006
+TASK-007
+TASK-008
+TASK-009
+TASK-010
+TASK-011
+TASK-029
+```
 
-The repository contains:
+Owns:
+- dataset verification
+- multispectral preprocessing
+- NDWI/NBR
+- masks
+- detection contracts
+- detector tests
+
+---
+
+## Person 2 — GIS / Impact
+
+Branch:
+
+```text
+feature/gis-analysis
+```
+
+Primary tasks:
+
+```text
+TASK-012
+TASK-013
+TASK-014
+TASK-015
+TASK-016
+TASK-017
+TASK-029
+TASK-032
+```
+
+Owns:
+- area
+- severity
+- hotspots
+- GeoJSON
+- Folium
+- infrastructure
+- optional FIRMS layer
+
+---
+
+## Person 3 — Product / Integration
+
+Branch:
+
+```text
+feature/product-integration
+```
+
+Primary tasks:
+
+```text
+TASK-004
+TASK-018
+TASK-019
+TASK-020
+TASK-021
+TASK-022
+TASK-023
+TASK-024
+TASK-025
+TASK-026
+TASK-027
+TASK-028
+TASK-031
+TASK-033
+TASK-034
+```
+
+Owns:
+- Streamlit
+- state/cache
+- demo bundles
+- AI report
+- UI
+- methodology
+- error handling
+- docs
+
+---
+
+# INTEGRATION CONTRACT BETWEEN TEAM MEMBERS
+
+### Person 1 publishes
+
+```text
+DetectionResult
+```
+
+containing:
+
+```text
+event_id
+disaster_type
+method
+evidence_score
+mask
+source
+limitations
+```
+
+### Person 2 publishes
+
+```text
+ImpactResult
+```
+
+containing:
+
+```text
+affected_area
+severity
+hotspots
+geojson
+```
+
+### Person 3 consumes both
+
+The UI/report layer must not import private functions from Person 1/2 internals.
+
+Prefer:
+
+```text
+shared schemas / public functions
+```
+
+This is a merge-conflict prevention rule as well as an architecture rule.
+
+---
+
+# GIT / ANTIGRAVITY EXECUTION RULE
+
+Each developer works only on their feature branch.
+
+Before starting work:
+
+```bash
+git checkout main
+git pull origin main
+git checkout YOUR_BRANCH
+git rebase main
+```
+
+After a task:
+
+```bash
+git status
+git add .
+git commit -m "feat: implement TASK-XXX"
+git push
+```
+
+Open a Pull Request only when the task is tested.
+
+Do not directly commit to `main`.
+
+---
+
+# STANDARD ANTIGRAVITY TASK PROMPT
+
+Use this when starting any task:
+
+```text
+You are implementing NIRVAAN.
+
+Current task: TASK-XXX from tasks.md.
+
+Read:
 - implementations.md
 - tasks.md
+- all relevant existing code
 
-Use tasks.md as the executable task specification.
+Before coding:
+1. inspect dependencies and interfaces
+2. identify files owned by this task
+3. preserve other developers' modules
 
-Your mission is to implement NIRVAAN as a stable hackathon MVP within the existing repository.
+Implement ONLY TASK-XXX and required dependencies.
 
 Rules:
-1. Inspect the existing repository before modifying code.
-2. Follow tasks.md in dependency order.
-3. Complete the highest-priority unfinished task first.
-4. Reuse existing working code.
-5. Avoid unnecessary rewrites.
-6. Keep the core demo runnable without external APIs.
-7. Never fabricate scientific observations or model outputs.
-8. Clearly label estimates, demo data, prototype thresholds, and fallbacks.
-9. Add tests for deterministic logic.
-10. After every task:
-   - run relevant tests
-   - verify the application still starts
-   - summarize files changed
-   - summarize implementation
-   - summarize test results
-   - identify remaining issues
-11. Do not stop at documentation if implementation is still incomplete.
-12. Do not implement optional P2 features until all P0 tasks are complete.
-13. If a dependency or model is unavailable, implement a clean adapter/fallback and continue.
-14. Keep all external credentials in environment variables.
-15. Prioritize a stable demo over feature count.
+- no invented datasets or APIs
+- no fake model results
+- no unsupported real-world claims
+- keep outputs traceable
+- keep the core demo offline-capable
+- do not introduce a new framework unless explicitly required
+- add/update deterministic tests where relevant
 
-Start by executing TASK-001.
+After implementation:
+1. run relevant tests
+2. run startup/smoke check
+3. inspect git diff
+4. report files changed
+5. report commands run
+6. report test results
+7. report known risks
 
-After TASK-001, continue sequentially through the highest-priority unfinished tasks.
-
-Do not ask me to restate the requirements. Use tasks.md and implementations.md as the source of truth.
+Stop after this task. Do not implement future tasks.
 ```
+
+---
+
+# FINAL DEFINITION OF DONE
+
+NIRVAAN is ready only when:
+
+- [ ] real flood event is locked
+- [ ] real wildfire event is locked
+- [ ] source/provenance is documented
+- [ ] required Sentinel-2 bands are confirmed
+- [ ] NDWI flood detector works
+- [ ] NBR/dNBR wildfire detector works
+- [ ] before/after comparison works
+- [ ] affected area is traceable to resolution
+- [ ] severity is clearly a prototype score
+- [ ] hotspots work
+- [ ] Folium map works
+- [ ] optional infrastructure does not block core demo
+- [ ] Instant Demo Mode works offline
+- [ ] Live Analyze Mode is optional
+- [ ] Streamlit state/caching is verified
+- [ ] upload size/type limits work
+- [ ] grounded report works
+- [ ] offline report fallback works
+- [ ] Show Your Work panel works
+- [ ] estimate/prototype labels are visible
+- [ ] deterministic tests pass
+- [ ] README + provenance + runbook are complete
+- [ ] 2–3 minute demo has been rehearsed twice successfully
+- [ ] no fake outputs or invented source claims remain
