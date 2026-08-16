@@ -9,6 +9,8 @@ Strictly prohibits unsupported claims (casualties, evacuation orders, confirmed 
 import os
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from reports.recommendations import generate_response_recommendations
+
 PROHIBITED_TERMS = [
     "casualty",
     "casualties",
@@ -61,6 +63,13 @@ def serialize_evidence_payload(
     impact_band = sev.get("impact_band", "Low")
     factors = sev.get("contributing_factors", {})
 
+    recommendations_payload = generate_response_recommendations(
+        severity_result=sev,
+        population_impact=pop,
+        infrastructure_impact=infra,
+        risk_zones=zones
+    )
+
     return {
         "event": {
             "event_id": event_id,
@@ -98,6 +107,7 @@ def serialize_evidence_payload(
             "contributing_factors": factors,
             "provenance_label": "PROTOTYPE",
         },
+        "response_recommendations": recommendations_payload,
         "provenance_metadata": {
             "is_prototype": True,
             "disclaimer": "Prototype situation report based solely on satellite evidence and proxy data — not an operational emergency declaration."
@@ -117,6 +127,7 @@ def generate_fallback_situation_report(evidence_payload: Dict[str, Any]) -> str:
     pop = evidence_payload.get("population_exposure", {})
     infra = evidence_payload.get("infrastructure_proximity", {})
     sev = evidence_payload.get("composite_severity", {})
+    recs = evidence_payload.get("response_recommendations", {})
 
     event_name = event.get("event_name", "Disaster Observation")
     disaster_type = event.get("disaster_type", "Disaster")
@@ -172,9 +183,17 @@ def generate_fallback_situation_report(evidence_payload: Dict[str, Any]) -> str:
 
     report_lines.extend([
         "",
-        "## 4. Secondary Monitoring Actions",
-        "- Schedule secondary satellite re-observation on next orbit pass.",
-        "- Verify evidence spectral index thresholds against local ground validation points.",
+        "## 4. Responder Recommendations",
+    ])
+
+    suggestions = recs.get("formatted_suggestions", [])
+    if suggestions:
+        for sug in suggestions:
+            report_lines.append(f"- {sug}")
+    else:
+        report_lines.append("- Perform ground verification in target AOI to validate satellite observation thresholds.")
+
+    report_lines.extend([
         "",
         "## 5. Data Provenance & Limitations",
         "> [!IMPORTANT]",
@@ -216,7 +235,8 @@ def generate_llm_situation_report(evidence_payload: Dict[str, Any], api_key: Opt
         1. Executive Situation Summary
         2. High-Priority Impact Zones
         3. Field-Verification Recommendations
-        4. Limitations & Data Provenance
+        4. Responder Recommendations
+        5. Limitations & Data Provenance
         """
 
         # Optional Gemini import
