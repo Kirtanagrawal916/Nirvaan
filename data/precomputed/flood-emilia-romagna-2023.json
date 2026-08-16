@@ -1,0 +1,122 @@
+{
+  "contract_version": "1.0.0",
+  "event_id": "flood-emilia-romagna-2023",
+  "disaster_type": "flood",
+  "status": "success",
+  "timestamp": "2026-08-16T11:02:01.790718+00:00",
+  "event_metadata": {
+    "event_id": "flood-emilia-romagna-2023",
+    "disaster_type": "flood",
+    "description": "",
+    "latitude": 44.4178,
+    "longitude": 12.2035,
+    "before_date": "2023-05-04",
+    "after_date": "2023-05-19"
+  },
+  "detection_summary": {
+    "event_id": "flood-emilia-romagna-2023",
+    "disaster_type": "flood",
+    "method": "NDWI_CHANGE_DETECTION",
+    "threshold": 0.0,
+    "CRS": "EPSG:32632 (WGS 84 / UTM zone 32N)",
+    "resolution_m": 10.0,
+    "dimensions": [
+      512,
+      512
+    ],
+    "valid_pixel_count": 262144,
+    "changed_pixel_count": 0,
+    "changed_ratio": 0.0,
+    "provenance": {
+      "source_provider": "Copernicus Data Space Ecosystem (CDSE) / Copernicus EMS (EMSR659)",
+      "product_id": "S2B_MSIL2A_20230504T100559_N0509_R108_T32TQQ_20230504T134638",
+      "tile_id": "32TQQ",
+      "before_date": "2023-05-04",
+      "after_date": "2023-05-19",
+      "provenance_url": "https://emergency.copernicus.eu/EMSR659"
+    }
+  },
+  "affected_area": {
+    "event_id": "flood-emilia-romagna-2023",
+    "disaster_type": "flood",
+    "affected_pixel_count": 0,
+    "pixel_area_m2": 100.0,
+    "affected_area_m2": 0.0,
+    "affected_area_hectares": 0.0,
+    "affected_area_km2": 0.0,
+    "CRS": "EPSG:32632 (WGS 84 / UTM zone 32N)",
+    "resolution_m": 10.0,
+    "method": "PROJECTED_UTM_SQUARE_PIXEL",
+    "provenance": {
+      "source_provider": "Copernicus Data Space Ecosystem (CDSE) / Copernicus EMS (EMSR659)",
+      "product_id": "S2B_MSIL2A_20230504T100559_N0509_R108_T32TQQ_20230504T134638",
+      "tile_id": "32TQQ",
+      "before_date": "2023-05-04",
+      "after_date": "2023-05-19",
+      "provenance_url": "https://emergency.copernicus.eu/EMSR659"
+    }
+  },
+  "severity": {
+    "event_id": "flood-emilia-romagna-2023",
+    "disaster_type": "flood",
+    "severity_level": "LOW",
+    "severity_score": 0.0,
+    "severity_method": "FLOOD_AREA_RATIO_PROTOTYPE",
+    "input_metrics": {
+      "affected_pixel_count": 0,
+      "affected_area_km2": 0.0,
+      "affected_ratio_percent": 0.0
+    },
+    "thresholds_used": {
+      "low": "< 20%",
+      "moderate": "20% - 50%",
+      "high": "50% - 75%",
+      "critical": ">= 75%"
+    },
+    "affected_area_km2": 0.0,
+    "provenance": {
+      "source_provider": "Copernicus Data Space Ecosystem (CDSE) / Copernicus EMS (EMSR659)",
+      "product_id": "S2B_MSIL2A_20230504T100559_N0509_R108_T32TQQ_20230504T134638",
+      "tile_id": "32TQQ",
+      "before_date": "2023-05-04",
+      "after_date": "2023-05-19",
+      "provenance_url": "https://emergency.copernicus.eu/EMSR659"
+    },
+    "limitations": "Prototype scoring criteria for hackathon decision support; not an authoritative operational emergency standard."
+  },
+  "hotspots": [],
+  "mask_reference": {
+    "dimensions": [
+      512,
+      512
+    ],
+    "CRS": "EPSG:32632 (WGS 84 / UTM zone 32N)",
+    "resolution_m": 10.0,
+    "valid_pixel_count": 262144,
+    "affected_pixel_count": 0,
+    "transform": [
+      0.0,
+      10.0,
+      0.0,
+      0.0,
+      0.0,
+      -10.0
+    ],
+    "category_labels": {
+      "0": "No Change",
+      "1": "Detected Change"
+    }
+  },
+  "provenance": {
+    "source_provider": "Copernicus Data Space Ecosystem (CDSE) / Copernicus EMS (EMSR659)",
+    "product_id": "S2B_MSIL2A_20230504T100559_N0509_R108_T32TQQ_20230504T134638",
+    "tile_id": "32TQQ",
+    "before_date": "2023-05-04",
+    "after_date": "2023-05-19",
+    "provenance_url": "https://emergency.copernicus.eu/EMSR659"
+  },
+  "warnings": [],
+  "limitations": [
+    "Hackathon prototype pipeline; not an official emergency dispatch system."
+  ]
+}
