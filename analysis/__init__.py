@@ -1,7 +1,7 @@
 """
 NIRVAAN Analysis Package
 Provides risk-zone generation, affected area calculations, population impact estimation,
-severity algorithms, and infrastructure impact analysis.
+severity scoring, and infrastructure impact analysis.
 """
 
 from analysis.risk_zones import (
@@ -18,6 +18,7 @@ from analysis.infrastructure import (
     create_synthetic_infrastructure_layer,
     analyze_infrastructure_impact,
 )
+from analysis.severity import calculate_composite_impact_score
 
 __all__ = [
     "buffer_polygon_vertices",
@@ -28,4 +29,5 @@ __all__ = [
     "haversine_distance",
     "create_synthetic_infrastructure_layer",
     "analyze_infrastructure_impact",
+    "calculate_composite_impact_score",
 ]
