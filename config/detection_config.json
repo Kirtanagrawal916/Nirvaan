@@ -85,6 +85,8 @@
       ".zip"
     ],
     "max_upload_size_mb": 200,
+    "max_dimension_px": 10000,
+    "max_total_pixels": 100000000,
     "validation_rules": {
       "check_file_exists": true,
       "check_readable": true,
