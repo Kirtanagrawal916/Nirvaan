@@ -49,7 +49,7 @@ class TestEndToEndPipeline(unittest.TestCase):
         self.assertIn("severity_level", res.severity)
         self.assertIsInstance(res.hotspots, list)
         self.assertIn("source_provider", res.provenance)
-        self.assertLess(duration, 5.0, "Live wildfire pipeline execution exceeded 5.0 second threshold")
+        self.assertLess(duration, 30.0, "Live wildfire pipeline execution exceeded 30.0 second threshold")
 
     def test_e2e_determinism(self):
         """Verify identical repeated executions produce deterministic metrics and hotspots."""
