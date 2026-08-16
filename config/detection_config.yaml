@@ -1,0 +1,106 @@
+# NIRVAAN — Disaster Detection & Mapping Technical Lock Configuration
+# Version: 1.0.0
+# Notice: All thresholds are PROTOTYPE CONFIGURATION parameters for hackathon evaluation.
+
+flood:
+  detection_method: "NDWI"
+  formula: "(Green - NIR) / (Green + NIR)"
+  required_bands:
+    green: "B03"
+    nir: "B08"
+  prototype_thresholds:
+    ndwi_water_threshold: 0.0
+    min_affected_area_m2: 100.0
+    confidence_base: 0.85
+  post_processing:
+    kernel_size: 3
+    morphological_opening: true
+    min_region_pixels: 10
+
+wildfire:
+  detection_method: "NBR_dNBR"
+  formula_nbr: "(NIR - SWIR2) / (NIR + SWIR2)"
+  formula_dnbr: "pre_fire_nbr - post_fire_nbr"
+  required_bands:
+    nir: "B08"
+    swir1: "B11"
+    swir2: "B12"
+  prototype_thresholds:
+    dnbr_severity_classes:
+      unburned:
+        min: -0.1
+        max: 0.1
+        label: "UNBURNED / LOW RISK"
+      low_severity:
+        min: 0.1
+        max: 0.27
+        label: "LOW SEVERITY"
+      moderate_severity:
+        min: 0.27
+        max: 0.66
+        label: "MODERATE SEVERITY"
+      high_severity:
+        min: 0.66
+        max: 2.0
+        label: "HIGH SEVERITY / CRITICAL"
+    min_affected_area_m2: 100.0
+    confidence_base: 0.90
+  post_processing:
+    kernel_size: 3
+    remove_isolated_pixels: true
+    min_region_pixels: 10
+
+mapping:
+  primary_library: "folium"
+  streamlit_wrapper: "streamlit-folium"
+  default_zoom: 12
+  tiles: "OpenStreetMap"
+  attribution: "Copernicus Sentinel-2 / NIRVAAN Prototype"
+  layer_colors:
+    flood_mask: "#0066FF"
+    unburned: "#2ECC71"
+    low_severity: "#F1C40F"
+    moderate_severity: "#E67E22"
+    high_severity: "#E74C3C"
+    hotspot_centroid: "#9B59B6"
+
+upload:
+  accepted_extensions:
+    - ".tif"
+    - ".tiff"
+    - ".png"
+    - ".jpg"
+    - ".jpeg"
+    - ".zip"
+  max_upload_size_mb: 200
+  validation_rules:
+    check_file_exists: true
+    check_readable: true
+    verify_channels: true
+    verify_bands_present: true
+
+caching_and_state:
+  session_state_keys:
+    - "selected_event_id"
+    - "selected_disaster_type"
+    - "active_mode"
+    - "analysis_result"
+    - "error_message"
+  caching_rules:
+    st_cache_data:
+      - "deterministic_preprocessing"
+      - "spectral_calculations"
+      - "mask_generation"
+      - "area_statistics"
+    st_cache_resource:
+      - "raster_readers"
+      - "model_weight_loaders"
+
+operating_modes:
+  default_mode: "INSTANT_DEMO"
+  available_modes:
+    INSTANT_DEMO:
+      description: "Uses precomputed canonical datasets for zero-latency, reliable hackathon demo presentations."
+      canonical_catalog: "data/catalog.json"
+    LIVE_ANALYZE:
+      description: "Runs full optical processing pipeline dynamically on uploaded/selected satellite imagery."
