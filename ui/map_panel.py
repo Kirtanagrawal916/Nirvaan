@@ -6,7 +6,13 @@ Includes fallback handling when outside an active Streamlit app session.
 """
 
 from typing import Any, Dict, List, Optional
-import folium
+
+try:
+    import folium
+    HAS_FOLIUM = True
+except ImportError:
+    folium = None
+    HAS_FOLIUM = False
 
 from mapping.map_builder import build_folium_map
 

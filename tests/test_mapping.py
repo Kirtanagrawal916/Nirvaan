@@ -12,7 +12,12 @@ user_site = site.getusersitepackages()
 if user_site not in sys.path:
     sys.path.insert(0, user_site)
 
-import folium
+try:
+    import folium
+    HAS_FOLIUM = True
+except ImportError:
+    folium = None
+    HAS_FOLIUM = False
 
 from mapping.geojson import (
     DEFAULT_CRS,
@@ -136,6 +141,7 @@ class TestCoordinateHandlingAndMapping(unittest.TestCase):
         self.assertEqual(get_severity_color("Extreme"), "#8e44ad")
         self.assertEqual(get_severity_color(None), "#95a5a6")
 
+    @unittest.skipUnless(HAS_FOLIUM, "folium not installed")
     def test_build_folium_map_valid_data(self):
         event_loc = {
             "name": "Assam Flood 2024",
@@ -166,6 +172,7 @@ class TestCoordinateHandlingAndMapping(unittest.TestCase):
         self.assertIn("Assam Flood 2024", map_html)
         self.assertIn("Severity Index", map_html)
 
+    @unittest.skipUnless(HAS_FOLIUM, "folium not installed")
     def test_build_folium_map_missing_metadata(self):
         folium_map = build_folium_map(
             event_location={},
@@ -177,6 +184,7 @@ class TestCoordinateHandlingAndMapping(unittest.TestCase):
         map_html = folium_map.get_root().render()
         self.assertIn("No valid geospatial coordinates available", map_html)
 
+    @unittest.skipUnless(HAS_FOLIUM, "folium not installed")
     def test_render_map_panel_fallback(self):
         res = render_map_panel(event_location={"lat": 15.0, "lon": 75.0})
         self.assertIsInstance(res, folium.Map)

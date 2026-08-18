@@ -7,8 +7,14 @@ Handles missing or malformed metadata without crashing.
 """
 
 from typing import Any, Dict, List, Optional, Tuple
-import folium
-from folium import plugins
+try:
+    import folium
+    from folium import plugins
+    HAS_FOLIUM = True
+except ImportError:
+    folium = None
+    plugins = None
+    HAS_FOLIUM = False
 
 from mapping.geojson import (
     validate_coordinates,
@@ -87,7 +93,7 @@ def build_folium_map(
     severity_level: Optional[str] = "High",
     default_center: Tuple[float, float] = (20.0, 0.0),
     zoom_start: int = 10
-) -> folium.Map:
+) -> Any:
     """
     Construct a Folium Map with layers for:
     - Event Location marker & popup

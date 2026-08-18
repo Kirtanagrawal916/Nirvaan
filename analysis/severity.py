@@ -210,3 +210,11 @@ def calculate_composite_impact_score(
         "is_prototype": True,
         "disclaimer": "Prototype composite score — not an operational emergency standard. Field verification recommended."
     }
+
+
+# Re-export detection severity layer symbols for package compatibility
+try:
+    from detection.severity import SeverityClassifier, SeverityResult, classify_severity
+except ImportError:
+    pass
+
