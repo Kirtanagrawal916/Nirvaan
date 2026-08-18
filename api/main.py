@@ -10,6 +10,13 @@ from typing import Any, Dict
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.server import (
+    handle_health_check,
+    handle_disaster_latest_endpoint,
+    handle_disasters_history_endpoint,
+    handle_satellite_latest_endpoint,
+)
+
 app = FastAPI(
     title="NIRVAAN Disaster Monitoring API",
     version="1.0.0-prototype",
@@ -35,6 +42,34 @@ app.add_middleware(
 
 # B-03 — GET /api/v1/health
 @app.get("/api/v1/health")
+@app.get("/api/health")
 def health_check() -> Dict[str, str]:
     """Health check endpoint returning HTTP 200 OK status."""
     return {"status": "ok"}
+
+
+# API-01 — GET /api/disaster/latest
+@app.get("/api/disaster/latest")
+@app.get("/api/v1/disaster/latest")
+def get_latest_disaster() -> Dict[str, Any]:
+    """Returns the latest disaster detection result formatted for frontend compatibility."""
+    response = handle_disaster_latest_endpoint()
+    return response["data"]
+
+
+# API-02 — GET /api/disasters
+@app.get("/api/disasters")
+@app.get("/api/v1/disasters")
+def get_disaster_history() -> Any:
+    """Returns history of disaster events formatted for frontend compatibility."""
+    response = handle_disasters_history_endpoint()
+    return response["data"]
+
+
+# API-03 — GET /api/satellite/latest
+@app.get("/api/satellite/latest")
+@app.get("/api/v1/satellite/latest")
+def get_latest_satellite_images() -> Dict[str, Any]:
+    """Returns satellite imagery URLs formatted for frontend compatibility."""
+    response = handle_satellite_latest_endpoint()
+    return response["data"]

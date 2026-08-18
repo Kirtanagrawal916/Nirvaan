@@ -22,6 +22,26 @@ class TestAPIServiceEndpoints(unittest.TestCase):
         self.assertEqual(res["data"]["status"], "HEALTHY")
         self.assertIn("version", res["data"])
 
+    def test_disaster_latest_endpoint(self):
+        res = handle_api_request("/api/disaster/latest", method="GET")
+        self.assertEqual(res["status_code"], 200)
+        self.assertIn("type", res["data"])
+        self.assertIn("location", res["data"])
+        self.assertIn("severity", res["data"])
+        self.assertIn("affectedArea", res["data"])
+
+    def test_disasters_history_endpoint(self):
+        res = handle_api_request("/api/disasters", method="GET")
+        self.assertEqual(res["status_code"], 200)
+        self.assertIsInstance(res["data"], list)
+        self.assertGreater(len(res["data"]), 0)
+
+    def test_satellite_latest_endpoint(self):
+        res = handle_api_request("/api/satellite/latest", method="GET")
+        self.assertEqual(res["status_code"], 200)
+        self.assertIn("beforeImage", res["data"])
+        self.assertIn("afterImage", res["data"])
+
     def test_detect_endpoint_valid_request(self):
         payload = {
             "event": {

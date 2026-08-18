@@ -35,6 +35,34 @@ class TestFastAPIApplication(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("access-control-allow-origin", response.headers)
 
+    def test_latest_disaster_endpoint(self):
+        response = self.client.get("/api/disaster/latest")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("type", data)
+        self.assertIn("location", data)
+        self.assertIn("confidence", data)
+        self.assertIn("severity", data)
+        self.assertIn("affectedArea", data)
+
+    def test_disaster_history_endpoint(self):
+        response = self.client.get("/api/disasters")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIsInstance(data, list)
+        self.assertGreater(len(data), 0)
+        item = data[0]
+        self.assertIn("id", item)
+        self.assertIn("type", item)
+        self.assertIn("location", item)
+
+    def test_latest_satellite_endpoint(self):
+        response = self.client.get("/api/satellite/latest")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("beforeImage", data)
+        self.assertIn("afterImage", data)
+
 
 if __name__ == "__main__":
     unittest.main()
