@@ -1,17 +1,15 @@
 /* =========================================================
    NIRVAAN API LAYER
 
-   IMPORTANT:
-
-   Your backend teammate can later replace
-   the placeholder URL below with the actual
-   backend API.
-
+   Supports configurable backend URL for local development
+   and production deployment (e.g. Vercel + Render).
 ========================================================= */
 
 
 const API_BASE_URL =
-    "http://localhost:5000/api";
+    (typeof window !== "undefined" && window.NIRVAAN_API_URL)
+    ? window.NIRVAAN_API_URL
+    : "http://localhost:8000/api";
 
 
 /* =========================================================
@@ -31,7 +29,7 @@ async function getLatestDisaster() {
         if (!response.ok) {
 
             throw new Error(
-                "API request failed"
+                `API request failed with status ${response.status}`
             );
 
         }
@@ -43,42 +41,35 @@ async function getLatestDisaster() {
 
         return data;
 
-
     }
 
     catch (error) {
 
         console.log(
-            "Backend API not connected yet."
+            "Backend API not connected or error occurred. Using demo fallback.",
+            error
         );
 
 
         /*
-            Temporary prototype data.
-
-            Once backend is ready,
-            this fallback won't be needed.
+            Fallback data matching NIRVAAN precomputed / static contract.
         */
 
         return {
 
             type: "Flood",
 
-            location:
-                "Surat, Gujarat",
+            location: "Emilia-Romagna, Italy",
 
             confidence: 94.7,
 
-            severity: "HIGH",
+            severity: "LOW",
 
-            affectedArea:
-                "31.8 km²",
+            affectedArea: "0.0 km²",
 
-            beforeImage:
-                null,
+            beforeImage: "assets/before.jpg",
 
-            afterImage:
-                null
+            afterImage: "assets/after.jpg"
 
         };
 
@@ -105,7 +96,7 @@ async function getDisasterHistory() {
         if (!response.ok) {
 
             throw new Error(
-                "Unable to fetch disasters"
+                `Unable to fetch disasters with status ${response.status}`
             );
 
         }
@@ -117,7 +108,14 @@ async function getDisasterHistory() {
 
     catch (error) {
 
-        return nirvaanData.disasters;
+        console.log(
+            "Backend API not connected or error occurred. Using history fallback.",
+            error
+        );
+
+        return (typeof nirvaanData !== "undefined" && nirvaanData.disasters)
+            ? nirvaanData.disasters
+            : [];
 
     }
 
@@ -142,7 +140,7 @@ async function getSatelliteImages() {
         if (!response.ok) {
 
             throw new Error(
-                "Satellite API unavailable"
+                `Satellite API unavailable with status ${response.status}`
             );
 
         }
@@ -154,11 +152,16 @@ async function getSatelliteImages() {
 
     catch (error) {
 
+        console.log(
+            "Backend API not connected or error occurred. Using satellite fallback.",
+            error
+        );
+
         return {
 
-            beforeImage: null,
+            beforeImage: "assets/before.jpg",
 
-            afterImage: null
+            afterImage: "assets/after.jpg"
 
         };
 
