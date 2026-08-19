@@ -3,7 +3,7 @@
   "event_id": "wildfire-rhodes-2023",
   "disaster_type": "wildfire",
   "status": "success",
-  "timestamp": "2026-08-19T16:53:18.583917+00:00",
+  "timestamp": "2026-08-19T20:49:13.375340+00:00",
   "event_metadata": {
     "event_id": "wildfire-rhodes-2023",
     "disaster_type": "wildfire",
@@ -11,7 +11,8 @@
     "latitude": 36.17,
     "longitude": 27.94,
     "before_date": "2023-07-13",
-    "after_date": "2023-07-28"
+    "after_date": "2023-07-28",
+    "data_provenance": "SYNTHETIC_FALLBACK"
   },
   "detection_summary": {
     "event_id": "wildfire-rhodes-2023",
@@ -54,7 +55,8 @@
       "tile_id": "35SNA",
       "before_date": "2023-07-13",
       "after_date": "2023-07-28",
-      "provenance_url": "https://emergency.copernicus.eu/EMSR675"
+      "provenance_url": "https://emergency.copernicus.eu/EMSR675",
+      "data_provenance": "SYNTHETIC_FALLBACK"
     }
   },
   "affected_area": {
@@ -74,7 +76,8 @@
       "tile_id": "35SNA",
       "before_date": "2023-07-13",
       "after_date": "2023-07-28",
-      "provenance_url": "https://emergency.copernicus.eu/EMSR675"
+      "provenance_url": "https://emergency.copernicus.eu/EMSR675",
+      "data_provenance": "SYNTHETIC_FALLBACK"
     }
   },
   "severity": {
@@ -131,7 +134,8 @@
       "tile_id": "35SNA",
       "before_date": "2023-07-13",
       "after_date": "2023-07-28",
-      "provenance_url": "https://emergency.copernicus.eu/EMSR675"
+      "provenance_url": "https://emergency.copernicus.eu/EMSR675",
+      "data_provenance": "SYNTHETIC_FALLBACK"
     },
     "limitations": "Prototype scoring criteria for hackathon decision support; not an authoritative operational emergency standard."
   },
@@ -164,9 +168,13 @@
     "tile_id": "35SNA",
     "before_date": "2023-07-13",
     "after_date": "2023-07-28",
-    "provenance_url": "https://emergency.copernicus.eu/EMSR675"
+    "provenance_url": "https://emergency.copernicus.eu/EMSR675",
+    "data_provenance": "SYNTHETIC_FALLBACK"
   },
-  "warnings": [],
+  "data_provenance": "SYNTHETIC_FALLBACK",
+  "warnings": [
+    "This result uses synthetic placeholder data, not real satellite imagery. For demonstration purposes only."
+  ],
   "limitations": [
     "Hackathon prototype pipeline; not an official emergency dispatch system."
   ]

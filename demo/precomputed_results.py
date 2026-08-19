@@ -78,6 +78,8 @@ def load_demo_result(
 
     # Validate contract structure and schema compatibility
     try:
+        if isinstance(data, dict) and "data_provenance" not in data:
+            data["data_provenance"] = "SYNTHETIC_FALLBACK"
         contract = DetectionResultContract.from_dict(data)
         contract.validate()
         return contract

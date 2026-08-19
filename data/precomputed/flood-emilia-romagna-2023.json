@@ -3,7 +3,7 @@
   "event_id": "flood-emilia-romagna-2023",
   "disaster_type": "flood",
   "status": "success",
-  "timestamp": "2026-08-19T16:53:18.263244+00:00",
+  "timestamp": "2026-08-19T20:49:13.230209+00:00",
   "event_metadata": {
     "event_id": "flood-emilia-romagna-2023",
     "disaster_type": "flood",
@@ -11,7 +11,8 @@
     "latitude": 44.4178,
     "longitude": 12.2035,
     "before_date": "2023-05-04",
-    "after_date": "2023-05-19"
+    "after_date": "2023-05-19",
+    "data_provenance": "SYNTHETIC_FALLBACK"
   },
   "detection_summary": {
     "event_id": "flood-emilia-romagna-2023",
@@ -33,7 +34,8 @@
       "tile_id": "32TQQ",
       "before_date": "2023-05-04",
       "after_date": "2023-05-19",
-      "provenance_url": "https://emergency.copernicus.eu/EMSR659"
+      "provenance_url": "https://emergency.copernicus.eu/EMSR659",
+      "data_provenance": "SYNTHETIC_FALLBACK"
     }
   },
   "affected_area": {
@@ -53,7 +55,8 @@
       "tile_id": "32TQQ",
       "before_date": "2023-05-04",
       "after_date": "2023-05-19",
-      "provenance_url": "https://emergency.copernicus.eu/EMSR659"
+      "provenance_url": "https://emergency.copernicus.eu/EMSR659",
+      "data_provenance": "SYNTHETIC_FALLBACK"
     }
   },
   "severity": {
@@ -80,7 +83,8 @@
       "tile_id": "32TQQ",
       "before_date": "2023-05-04",
       "after_date": "2023-05-19",
-      "provenance_url": "https://emergency.copernicus.eu/EMSR659"
+      "provenance_url": "https://emergency.copernicus.eu/EMSR659",
+      "data_provenance": "SYNTHETIC_FALLBACK"
     },
     "limitations": "Prototype scoring criteria for hackathon decision support; not an authoritative operational emergency standard."
   },
@@ -113,9 +117,13 @@
     "tile_id": "32TQQ",
     "before_date": "2023-05-04",
     "after_date": "2023-05-19",
-    "provenance_url": "https://emergency.copernicus.eu/EMSR659"
+    "provenance_url": "https://emergency.copernicus.eu/EMSR659",
+    "data_provenance": "SYNTHETIC_FALLBACK"
   },
-  "warnings": [],
+  "data_provenance": "SYNTHETIC_FALLBACK",
+  "warnings": [
+    "This result uses synthetic placeholder data, not real satellite imagery. For demonstration purposes only."
+  ],
   "limitations": [
     "Hackathon prototype pipeline; not an official emergency dispatch system."
   ]

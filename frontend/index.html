@@ -405,8 +405,13 @@
 
             <div class="topbar-right">
 
-                <!-- ALERT BELL ICON BUTTON -->
+                <div id="modeIndicator" class="mode-indicator instant-mode" onclick="toggleAnalysisMode()" title="Click to toggle between Instant Demo Mode and Live Analysis Mode">
+                    <span class="mode-icon">⚡</span>
+                    <span id="modeText"><strong>INSTANT DEMO</strong></span>
+                    <span class="mode-badge" id="modeBadge">DEFAULT</span>
+                </div>
 
+                <!-- ALERT BELL ICON BUTTON -->
                 <button
                     class="topbar-icon-btn alert-icon-btn"
                     data-page="alerts"
@@ -437,6 +442,18 @@
 
 
         </header>
+
+
+        <!-- PROVENANCE WARNING BANNER -->
+
+        <div
+            id="provenanceBanner"
+            class="provenance-banner synthetic-mode"
+            style="display: none;"
+        >
+            <span class="banner-icon">⚠️</span>
+            <span class="banner-text"><strong>DEMO MODE: SYNTHETIC DATA</strong> — This view displays simulated/synthetic placeholder satellite data for demonstration purposes.</span>
+        </div>
 
 
 
