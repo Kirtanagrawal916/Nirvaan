@@ -99,6 +99,14 @@ navItems.forEach(item => {
     });
 });
 
+// Bind all data-page buttons & topbar alert bell buttons
+document.querySelectorAll("[data-page], .alert-icon-btn").forEach(el => {
+    el.addEventListener("click", (e) => {
+        const page = el.dataset.page || "alerts";
+        if (page) navigateToPage(page);
+    });
+});
+
 /* =========================================================
    AUTHENTICATION & LOGIN SYSTEM
 ========================================================= */
