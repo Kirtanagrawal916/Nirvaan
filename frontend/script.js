@@ -59,7 +59,7 @@ if (document.readyState === "loading") {
 
 const pageContent = document.getElementById("pageContent");
 const navItems = document.querySelectorAll(".nav-item");
-const topbarNavLinks = document.querySelectorAll(".topbar-nav-link, .topbar-learn-btn");
+const topbarNavLinks = document.querySelectorAll(".topbar-nav-link, .alert-icon-btn, .topbar-learn-btn");
 
 function navigateToPage(page) {
     // Sync sidebar

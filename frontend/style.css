@@ -315,13 +315,75 @@ button {
     padding: 12px;
 
     cursor: pointer;
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.brand {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding:
+        5px 0 25px;
+
+}
+
+
+.brand-logo {
+
+    width: 44px;
+
+    height: 44px;
+
+    border:
+        1px solid #27272a;
+
+    background: #121215;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 22px;
 
 }
 
 
 /* =========================================================
-   MAIN
+   NIRVAAN TITLE GRADIENT STYLING
 ========================================================= */
+
+.nirvaan-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.nirvaan-tagline {
+    font-size: 10px;
+    color: #a1a1aa;
+    margin-top: 3px;
+    letter-spacing: 0.5px;
+}
+
 
 /* =========================================================
    MAIN AREA & SIDEBAR DRAWER OVERRIDES
@@ -331,8 +393,8 @@ button {
     display: none;
     position: fixed;
     left: 0;
-    top: 72px;
-    height: calc(100vh - 72px);
+    top: 80px;
+    height: calc(100vh - 80px);
     z-index: 99;
 }
 
@@ -352,13 +414,13 @@ button {
 ========================================================= */
 
 .topbar {
-    height: 72px;
-    border-bottom: 1px solid #1e2e42;
-    background: #07111f;
+    height: 80px;
+    border-bottom: 1px solid #1c1c1f;
+    background: #000000;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 24px;
+    padding: 0 36px;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -367,129 +429,150 @@ button {
 .topbar-left {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 18px;
 }
 
 .topbar-brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     cursor: pointer;
 }
 
 .topbar-brand-logo {
-    width: 40px;
-    height: 40px;
-    border: 2px solid #4ca7ff;
-    border-radius: 50%;
+    width: 46px;
+    height: 46px;
+    background: #121215;
+    border: 1px solid #27272a;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #4ca7ff;
-    font-size: 22px;
-    background: #081628;
+    font-size: 24px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+    transition: all 0.25s ease;
 }
 
-.topbar-brand-text h2 {
-    font-size: 18px;
-    color: #ffffff;
-    line-height: 1.1;
-    margin: 0;
-}
-
-.topbar-brand-text p {
-    font-size: 10px;
-    color: #8492a5;
-    margin: 2px 0 0 0;
+.topbar-brand:hover .topbar-brand-logo {
+    border-color: #38bdf8;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+    transform: translateY(-1px);
 }
 
 .topbar-center-nav {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 14px;
     overflow-x: auto;
 }
 
 .topbar-nav-link {
     background: transparent;
     border: none;
-    color: #94a3b8;
-    font-size: 13px;
+    color: #a1a1aa;
+    font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 14px;
-    border-radius: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
     white-space: nowrap;
     transition: all 0.2s ease;
 }
 
 .topbar-nav-link:hover {
-    background: #142237;
-    color: #f8fafc;
+    background: #121215;
+    color: #f4f4f5;
 }
 
 .topbar-nav-link.active {
-    background: linear-gradient(90deg, #4135cf, #353db5);
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
     color: #ffffff;
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(58, 54, 210, 0.3);
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
 }
 
 .topbar-nav-link .nav-icon {
-    font-size: 15px;
+    font-size: 16px;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Alert Bell Icon Button */
+.alert-icon-btn {
+    width: 42px;
+    height: 42px;
+    background: #121215;
+    border: 1px solid #27272a;
+    border-radius: 10px;
+    color: #f4f4f5;
+    font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.alert-icon-btn:hover {
+    background: #18181b;
+    border-color: #ef4444;
+    color: #ffffff;
+    box-shadow: 0 2px 12px rgba(239, 68, 68, 0.25);
 }
 
 .alert-count-badge {
-    background: #f05258;
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ef4444;
     color: white;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 800;
     border-radius: 50%;
     width: 20px;
     height: 20px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-left: 2px;
+    border: 2px solid #000000;
 }
 
-.topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-/* Sign Out Outline Button - Matches screenshot style */
+/* Sign Out Outline Button */
 .topbar-signout-btn {
     background: transparent;
-    border: 1px solid #2e435e;
-    color: #e2e8f0;
+    border: 1px solid #27272a;
+    color: #e4e4e7;
     font-size: 13px;
     font-weight: 600;
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: 9px 18px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .topbar-signout-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: #475569;
+    background: #18181b;
+    border-color: #3f3f46;
     color: #ffffff;
 }
 
-/* Square Menu Icon Button - Matches screenshot style */
+/* Square Menu Icon Button */
 .topbar-menu-btn {
-    width: 38px;
-    height: 38px;
+    width: 42px;
+    height: 42px;
     background: transparent;
-    border: 1px solid #2e435e;
-    border-radius: 8px;
-    color: #94a3b8;
-    font-size: 16px;
+    border: 1px solid #27272a;
+    border-radius: 10px;
+    color: #a1a1aa;
+    font-size: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -498,9 +581,9 @@ button {
 }
 
 .topbar-menu-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: #475569;
-    color: #f8fafc;
+    background: #18181b;
+    border-color: #3f3f46;
+    color: #f4f4f5;
 }
 
 /* Light Mode Overrides for Topbar Navbar */
@@ -511,17 +594,8 @@ html[data-theme="light"] .topbar {
 }
 
 html[data-theme="light"] .topbar-brand-logo {
-    background: #eff6ff;
-    border-color: #2563eb;
-    color: #2563eb;
-}
-
-html[data-theme="light"] .topbar-brand-text h2 {
-    color: #0f172a;
-}
-
-html[data-theme="light"] .topbar-brand-text p {
-    color: #64748b;
+    background: #f1f5f9;
+    border-color: #cbd5e1;
 }
 
 html[data-theme="light"] .topbar-nav-link {
@@ -534,9 +608,25 @@ html[data-theme="light"] .topbar-nav-link:hover {
 }
 
 html[data-theme="light"] .topbar-nav-link.active {
-    background: linear-gradient(90deg, #2563eb, #1d4ed8);
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
     color: #ffffff;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+html[data-theme="light"] .alert-icon-btn {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #334155;
+}
+
+html[data-theme="light"] .alert-icon-btn:hover {
+    background: #f1f5f9;
+    border-color: #ef4444;
+    color: #0f172a;
+}
+
+html[data-theme="light"] .alert-count-badge {
+    border-color: #ffffff;
 }
 
 html[data-theme="light"] .topbar-signout-btn {
