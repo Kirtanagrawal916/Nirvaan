@@ -63,6 +63,24 @@ class TestFastAPIApplication(unittest.TestCase):
         self.assertIn("beforeImage", data)
         self.assertIn("afterImage", data)
 
+    def test_static_asset_before_image_accessible(self):
+        response = self.client.get("/assets/before.jpg")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("image/", response.headers.get("content-type", ""))
+
+    def test_static_asset_after_image_accessible(self):
+        response = self.client.get("/assets/after.jpg")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("image/", response.headers.get("content-type", ""))
+
+    def test_missing_asset_returns_404(self):
+        response = self.client.get("/assets/nonexistent.jpg")
+        self.assertEqual(response.status_code, 404)
+
+    def test_path_traversal_rejected(self):
+        response = self.client.get("/assets/../config/detection_config.json")
+        self.assertIn(response.status_code, [400, 404])
+
 
 if __name__ == "__main__":
     unittest.main()

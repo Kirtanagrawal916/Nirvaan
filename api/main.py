@@ -39,6 +39,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# BH-02 — Static Asset Serving
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+ASSETS_DIR = BASE_DIR / "frontend" / "assets"
+
+if ASSETS_DIR.exists():
+    app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
+
 
 # B-03 — GET /api/v1/health
 @app.get("/api/v1/health")
