@@ -417,17 +417,20 @@
                     <span class="alert-count-badge">3</span>
                 </button>
 
-                <button
-                    id="themeToggleBtn"
-                    class="theme-toggle-btn"
-                    type="button"
-                    aria-label="Toggle light and dark theme"
-                    title="Toggle Theme"
-                >
-                    <span class="theme-icon dark-icon">☀️</span>
-                    <span class="theme-icon light-icon">🌙</span>
-                    <span id="themeToggleText" class="theme-label">Light Mode</span>
-                </button>
+                <!-- ATTRACIVE SLIDING THEME SWITCHER -->
+                <div class="theme-switch-wrapper" id="themeSwitchWrapper" title="Switch Theme (Light / Dark)">
+                    <span class="theme-switch-icon sun-icon">☀️</span>
+                    <button
+                        id="themeToggleBtn"
+                        class="theme-switch-track"
+                        type="button"
+                        role="switch"
+                        aria-label="Toggle light and dark theme"
+                    >
+                        <span class="theme-switch-thumb"></span>
+                    </button>
+                    <span class="theme-switch-icon moon-icon">🌙</span>
+                </div>
 
             </div>
 

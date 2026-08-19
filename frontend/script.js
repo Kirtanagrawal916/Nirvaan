@@ -6,9 +6,10 @@ function initTheme() {
     const savedTheme = localStorage.getItem("nirvaan_theme") || "dark";
     applyTheme(savedTheme);
 
-    const themeToggleBtn = document.getElementById("themeToggleBtn");
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener("click", () => {
+    const themeSwitchWrapper = document.getElementById("themeSwitchWrapper");
+
+    if (themeSwitchWrapper) {
+        themeSwitchWrapper.addEventListener("click", () => {
             const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
             const newTheme = currentTheme === "dark" ? "light" : "dark";
             applyTheme(newTheme);
