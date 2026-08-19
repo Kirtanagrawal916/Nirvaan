@@ -354,9 +354,9 @@ async function showDashboard() {
 
     const disasterTypeUpper = (latest && latest.type) ? latest.type.toUpperCase() + " DETECTED" : "FLOOD DETECTED";
     const confidenceScore = (latest && latest.confidence !== undefined) ? latest.confidence : 94.7;
-    const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "HIGH";
-    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "31.8 km²";
-    const location = (latest && latest.location) ? latest.location : "Surat, Gujarat";
+    const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "LOW";
+    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "0.0 km²";
+    const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
     const beforeImgPath = (satellite && satellite.beforeImage) ? satellite.beforeImage : "assets/before.jpg";
     const afterImgPath = (satellite && satellite.afterImage) ? satellite.afterImage : "assets/after.jpg";
@@ -787,7 +787,14 @@ async function showSatellite() {
    DISASTER DETECTION
 ========================================================= */
 
-function showDetection() {
+async function showDetection() {
+
+    const latest = await getLatestDisaster();
+    const disasterTypeUpper = (latest && latest.type) ? latest.type.toUpperCase() + " DETECTED" : "FLOOD DETECTED";
+    const confidenceScore = (latest && latest.confidence !== undefined) ? latest.confidence : 94.7;
+    const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "LOW";
+    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "0.0 km²";
+    const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
     pageContent.innerHTML = `
 
@@ -822,7 +829,7 @@ function showDetection() {
                 <br>
 
                 <strong>
-                    Confidence: 94.7%
+                    Confidence: ${confidenceScore}%
                 </strong>
 
             </div>
@@ -904,11 +911,11 @@ function showDetection() {
                 </div>
 
                 <h2>
-                    FLOOD DETECTED
+                    ${disasterTypeUpper}
                 </h2>
 
                 <p>
-                    Surat, Gujarat
+                    ${location}
                 </p>
 
 
@@ -919,7 +926,7 @@ function showDetection() {
                     </span>
 
                     <strong>
-                        94.7%
+                        ${confidenceScore}%
                     </strong>
 
                 </div>
@@ -931,8 +938,8 @@ function showDetection() {
                         Severity
                     </span>
 
-                    <strong class="high">
-                        HIGH
+                    <strong class="${severity.toLowerCase()}">
+                        ${severity}
                     </strong>
 
                 </div>
@@ -945,7 +952,7 @@ function showDetection() {
                     </span>
 
                     <strong>
-                        31.8 km²
+                        ${affectedArea}
                     </strong>
 
                 </div>
@@ -965,7 +972,10 @@ function showDetection() {
    RISK MAP
 ========================================================= */
 
-function showRiskMap() {
+async function showRiskMap() {
+
+    const latest = await getLatestDisaster();
+    const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
     pageContent.innerHTML = `
 
@@ -974,7 +984,7 @@ function showRiskMap() {
         </h1>
 
         <p class="page-subtitle">
-            Geographic visualization of disaster risk zones
+            Spatial distribution of high-risk disaster zones
         </p>
 
 
@@ -983,11 +993,11 @@ function showRiskMap() {
             <div class="panel-header">
 
                 <h2>
-                    📍 Disaster Risk Visualization
+                    Risk Zone Visualization
                 </h2>
 
-                <button>
-                    Fullscreen
+                <button class="primary-btn">
+                    Recalculate Risk
                 </button>
 
             </div>
@@ -1005,7 +1015,7 @@ function showRiskMap() {
 
 
                 <div class="map-label">
-                    📍 Surat, Gujarat
+                    📍 ${location}
                 </div>
 
             </div>
@@ -1022,7 +1032,9 @@ function showRiskMap() {
    ALERTS
 ========================================================= */
 
-function showAlerts() {
+async function showAlerts() {
+
+    const disasters = await getDisasterHistory();
 
     pageContent.innerHTML = `
 
@@ -1072,59 +1084,35 @@ function showAlerts() {
 
                     <tbody>
 
-                        <tr>
+                        ${(disasters || []).map(dis => `
 
-                            <td>
-                                Flood detected
-                            </td>
+                            <tr>
 
-                            <td>
-                                Surat, Gujarat
-                            </td>
+                                <td>
+                                    ${dis.type} detected
+                                </td>
 
-                            <td>
-                                <span class="status high">
-                                    HIGH
-                                </span>
-                            </td>
+                                <td>
+                                    ${dis.location}
+                                </td>
 
-                            <td>
-                                10:28 AM
-                            </td>
+                                <td>
+                                    <span class="status ${(dis.severity || "LOW").toLowerCase()}">
+                                        ${dis.severity || "LOW"}
+                                    </span>
+                                </td>
 
-                            <td>
-                                Active
-                            </td>
+                                <td>
+                                    ${dis.date || "Active"}
+                                </td>
 
-                        </tr>
+                                <td>
+                                    ${dis.status || "Active"}
+                                </td>
 
+                            </tr>
 
-                        <tr>
-
-                            <td>
-                                Wildfire detected
-                            </td>
-
-                            <td>
-                                Ahmedabad
-                            </td>
-
-                            <td>
-                                <span class="status medium">
-                                    MEDIUM
-                                </span>
-                            </td>
-
-                            <td>
-                                09:15 AM
-                            </td>
-
-                            <td>
-                                Active
-                            </td>
-
-                        </tr>
-
+                        `).join("")}
 
                     </tbody>
 
@@ -1144,7 +1132,10 @@ function showAlerts() {
    REPORTS
 ========================================================= */
 
-function showReports() {
+async function showReports() {
+
+    const latest = await getLatestDisaster();
+    const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
     pageContent.innerHTML = `
 
@@ -1172,7 +1163,7 @@ function showReports() {
 
                 <p>
                     Detailed satellite-based flood
-                    detection report for Surat.
+                    detection report for ${location}.
                 </p>
 
                 <br>
