@@ -22,6 +22,12 @@ class TestAPIServiceEndpoints(unittest.TestCase):
         self.assertEqual(res["data"]["status"], "HEALTHY")
         self.assertIn("version", res["data"])
 
+    def test_readiness_endpoint(self):
+        res = handle_api_request("/api/v1/ready", method="GET")
+        self.assertEqual(res["status_code"], 200)
+        self.assertEqual(res["data"]["status"], "READY")
+        self.assertIn("checks", res["data"])
+
     def test_disaster_latest_endpoint(self):
         res = handle_api_request("/api/disaster/latest", method="GET")
         self.assertEqual(res["status_code"], 200)

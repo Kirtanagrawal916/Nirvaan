@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.server import (
     handle_health_check,
+    handle_readiness_check,
     handle_disaster_latest_endpoint,
     handle_disasters_history_endpoint,
     handle_satellite_latest_endpoint,
@@ -56,6 +57,15 @@ if ASSETS_DIR.exists():
 def health_check() -> Dict[str, str]:
     """Health check endpoint returning HTTP 200 OK status."""
     return {"status": "ok"}
+
+
+# BH-05 — GET /api/v1/ready
+@app.get("/api/v1/ready")
+@app.get("/api/ready")
+def readiness_check() -> Dict[str, Any]:
+    """Readiness check endpoint verifying runtime data and configuration."""
+    response = handle_readiness_check()
+    return response["data"]
 
 
 # API-01 — GET /api/disaster/latest

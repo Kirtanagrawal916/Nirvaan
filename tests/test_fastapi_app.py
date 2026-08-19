@@ -30,6 +30,13 @@ class TestFastAPIApplication(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"status": "ok"})
 
+    def test_readiness_check_endpoint(self):
+        response = self.client.get("/api/v1/ready")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["status"], "READY")
+        self.assertIn("checks", data)
+
     def test_cors_headers_present(self):
         response = self.client.get("/api/v1/health", headers={"Origin": "http://localhost:3000"})
         self.assertEqual(response.status_code, 200)

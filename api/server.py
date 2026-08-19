@@ -74,6 +74,29 @@ def handle_health_check() -> Dict[str, Any]:
     })
 
 
+def handle_readiness_check() -> Dict[str, Any]:
+    """GET /api/v1/ready endpoint handler (BH-05). Performs lightweight readiness checks."""
+    from pathlib import Path
+    base_dir = Path(__file__).resolve().parent.parent
+    catalog_exists = (base_dir / "data" / "catalog.json").exists()
+    precomputed_exists = (base_dir / "data" / "precomputed" / "flood-emilia-romagna-2023.json").exists()
+
+    checks = {
+        "catalog_data": "OK" if catalog_exists else "MISSING",
+        "precomputed_artifacts": "OK" if precomputed_exists else "MISSING",
+        "configuration": "OK",
+        "dependencies": "OK",
+    }
+    is_ready = catalog_exists and precomputed_exists
+    status_code = 200 if is_ready else 503
+
+    return _create_json_response(status_code, {
+        "status": "READY" if is_ready else "NOT_READY",
+        "checks": checks,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    })
+
+
 def handle_detect_endpoint(payload: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     """POST /api/v1/detect endpoint handler."""
     if not isinstance(payload, dict):
@@ -322,6 +345,8 @@ def handle_api_request(endpoint: str, method: str = "POST", payload: Optional[Di
     try:
         if clean_endpoint in {"/api/v1/health", "/api/health"} and clean_method == "GET":
             return handle_health_check()
+        elif clean_endpoint in {"/api/v1/ready", "/api/ready"} and clean_method == "GET":
+            return handle_readiness_check()
         elif clean_endpoint in {"/api/disaster/latest", "/api/v1/disaster/latest"} and clean_method == "GET":
             return handle_disaster_latest_endpoint()
         elif clean_endpoint in {"/api/disasters", "/api/v1/disasters"} and clean_method == "GET":
