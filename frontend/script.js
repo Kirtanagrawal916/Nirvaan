@@ -1,3 +1,10 @@
+
+function setPageContent(html) {
+    const container = document.getElementById("pageContent");
+    if (container) {
+        container.innerHTML = html;
+    }
+}
 /* =========================================================
    THEME TOGGLE SYSTEM
 
@@ -56,7 +63,7 @@ if (document.readyState === "loading") {
 /* =========================================================
    NAVIGATION (SIDEBAR & TOPBAR NAVBAR)
 
-const pageContent = document.getElementById("pageContent");
+let pageContent = document.getElementById("pageContent");
 const navItems = document.querySelectorAll(".nav-item");
 const topbarNavLinks = document.querySelectorAll(".topbar-nav-link, .alert-icon-btn, .topbar-learn-btn");
 
@@ -278,7 +285,13 @@ if (topbarMenuBtn && menuDropdown) {
 /* =========================================================
    INITIAL PAGE
 
-loadPage("dashboard");
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+        loadPage("dashboard");
+    });
+} else {
+    loadPage("dashboard");
+}
 
 
 
@@ -416,7 +429,7 @@ async function showDashboard() {
         </div>
     `;
 
-    pageContent.innerHTML = `
+    setPageContent(`
 
         <section class="dashboard-section">
 
@@ -568,7 +581,7 @@ async function showDashboard() {
 
         </section>
 
-    `;
+    `);
 
 }
 
@@ -624,7 +637,7 @@ async function showSatellite() {
         </div>
     `;
 
-    pageContent.innerHTML = `
+    setPageContent(`
 
         <div class="satellite-section">
 
@@ -721,7 +734,7 @@ async function showSatellite() {
 
         </div>
 
-    `;
+    `);
 
 }
 
@@ -739,7 +752,7 @@ async function showDetection() {
     const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "0.0 km²";
     const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
-    pageContent.innerHTML = `
+    setPageContent(`
 
         <div class="disaster-section">
 
@@ -911,7 +924,7 @@ async function showDetection() {
 
         </div>
 
-    `;
+    `);
 
 }
 
@@ -957,7 +970,7 @@ async function showRiskMap() {
     const latest = await getLatestDisaster();
     const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
-    pageContent.innerHTML = `
+    setPageContent(`
 
         <h1 class="page-title">
             Disaster Risk Map
@@ -1045,7 +1058,7 @@ async function showRiskMap() {
 
         </div>
 
-    `;
+    `);
 
 }
 
@@ -1102,7 +1115,7 @@ async function showAlerts() {
 
     const disasters = await getDisasterHistory();
 
-    pageContent.innerHTML = `
+    setPageContent(`
 
         <h1 class="page-title">
             Alerts
@@ -1188,7 +1201,7 @@ async function showAlerts() {
 
         </div>
 
-    `;
+    `);
 
 }
 
@@ -1202,7 +1215,7 @@ async function showReports() {
     const latest = await getLatestDisaster();
     const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
-    pageContent.innerHTML = `
+    setPageContent(`
 
         <h1 class="page-title">
             Reports
@@ -1296,7 +1309,7 @@ async function showReports() {
 
         </div>
 
-    `;
+    `);
 
 }
 
@@ -1309,7 +1322,7 @@ async function showHistory() {
 
     const disasters = await getDisasterHistory();
 
-    pageContent.innerHTML = `
+    setPageContent(`
 
         <h1 class="page-title">
             History
@@ -1414,7 +1427,7 @@ async function showHistory() {
 
         </div>
 
-    `;
+    `);
 
 }
 
@@ -1426,7 +1439,7 @@ async function showHistory() {
 
 function showSettings() {
 
-    pageContent.innerHTML = `
+    setPageContent(`
 
         <h1 class="page-title">
             Settings
@@ -1593,7 +1606,7 @@ function showSettings() {
 
         </div>
 
-    `;
+    `);
 
 }
 
@@ -1640,7 +1653,7 @@ async function refreshSatellite() {
    ABOUT PAGE
 
 function showAbout() {
-    pageContent.innerHTML = `
+    setPageContent(`
         <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">About Nirvaan</h1>
         <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">Satellite-Based AI Disaster Monitoring & Rapid Intelligence Platform</p>
 
@@ -1682,7 +1695,7 @@ function showAbout() {
                 </div>
             </div>
         </div>
-    `;
+    `);
 }
 
 
@@ -1690,7 +1703,7 @@ function showAbout() {
    FAQ PAGE
 
 function showFAQ() {
-    pageContent.innerHTML = `
+    setPageContent(`
         <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">Frequently Asked Questions</h1>
         <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">Learn more about Nirvaan satellite intelligence, metrics, and emergency response workflows.</p>
 
@@ -1732,5 +1745,5 @@ function showFAQ() {
             </div>
 
         </div>
-    `;
+    `);
 }
