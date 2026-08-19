@@ -29,18 +29,24 @@ class TestAPIServiceEndpoints(unittest.TestCase):
         self.assertIn("location", res["data"])
         self.assertIn("severity", res["data"])
         self.assertIn("affectedArea", res["data"])
+        self.assertEqual(res["data"]["type"], "Flood")
+        self.assertIn("Emilia-Romagna", res["data"]["location"])
 
     def test_disasters_history_endpoint(self):
         res = handle_api_request("/api/disasters", method="GET")
         self.assertEqual(res["status_code"], 200)
         self.assertIsInstance(res["data"], list)
-        self.assertGreater(len(res["data"]), 0)
+        self.assertGreaterEqual(len(res["data"]), 2)
+        types = [d["type"] for d in res["data"]]
+        self.assertIn("Flood", types)
+        self.assertIn("Wildfire", types)
 
     def test_satellite_latest_endpoint(self):
         res = handle_api_request("/api/satellite/latest", method="GET")
         self.assertEqual(res["status_code"], 200)
         self.assertIn("beforeImage", res["data"])
         self.assertIn("afterImage", res["data"])
+        self.assertIn("event_id", res["data"])
 
     def test_detect_endpoint_valid_request(self):
         payload = {
