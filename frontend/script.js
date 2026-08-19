@@ -1009,50 +1009,137 @@ function showRiskMap() {
     pageContent.innerHTML = `
 
         <h1 class="page-title">
-            Risk Map
+            Disaster Risk Map
         </h1>
 
         <p class="page-subtitle">
-            Geographic visualization of disaster risk zones
+            Geographic risk visualization, seismic fault lines, inundation heatmaps, and tsunami hazard zones
         </p>
 
+        <!-- MAP CONTROLS & LAYER SELECTOR -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
 
-        <div class="panel">
+            <div class="panel" style="padding: 20px;">
 
-            <div class="panel-header">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <h2 style="font-size: 16px; color: #38bdf8;">📍 Interactive Geo-Spatial Risk Engine</h2>
+                        <select id="mapLocationSelect" onchange="updateRiskMapLocation(this.value)" style="background: #0b0c10; border: 1px solid #2b2e33; color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 12.5px;">
+                            <option value="surat" selected>Surat Tapi Basin (Flood - HIGH)</option>
+                            <option value="bhuj">Bhuj Kutch Fault Line (Seismic - HIGH)</option>
+                            <option value="guwahati">Guwahati Brahmaputra (Flood - EXTREME)</option>
+                            <option value="chennai">Chennai Coastal Zone (Tsunami - WATCH)</option>
+                        </select>
+                    </div>
 
-                <h2>
-                    📍 Disaster Risk Visualization
-                </h2>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="toggleMapLayer('flood')" class="map-layer-btn active" id="layerBtnFlood">🌊 Inundation</button>
+                        <button onclick="toggleMapLayer('fault')" class="map-layer-btn" id="layerBtnFault">⚡ Fault Line</button>
+                        <button onclick="toggleMapLayer('tsunami')" class="map-layer-btn" id="layerBtnTsunami">🏖️ Tsunami Zone</button>
+                    </div>
+                </div>
 
-                <button>
-                    Fullscreen
-                </button>
+                <!-- ENHANCED RISK MAP DISPLAY CONTAINER -->
+                <div class="map-container" id="riskMapDisplay" style="height: 380px; position: relative; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); background: radial-gradient(circle at center, #0f1923 0%, #070d14 100%);">
+
+                    <div class="map-grid"></div>
+
+                    <!-- INTERACTIVE MAP OVERLAY ZONES -->
+                    <div class="risk-zone zone-red" id="mapZoneRed" style="top: 35%; left: 42%; width: 140px; height: 140px;"></div>
+                    <div class="risk-zone zone-orange" id="mapZoneOrange" style="top: 25%; left: 32%; width: 220px; height: 220px;"></div>
+                    <div class="risk-zone zone-green" style="top: 15%; left: 20%; width: 320px; height: 320px;"></div>
+
+                    <div class="map-label" id="mapLabelText" style="position: absolute; bottom: 20px; left: 20px; background: rgba(11, 12, 16, 0.85); backdrop-filter: blur(8px); padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); font-size: 13px; font-weight: 700; color: #38bdf8;">
+                        📍 Surat, Gujarat — Active Flood Inundation Zone
+                    </div>
+
+                    <div style="position: absolute; top: 16px; right: 16px; background: rgba(11, 12, 16, 0.85); backdrop-filter: blur(8px); padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); font-size: 11px;">
+                        <div style="font-weight: 700; color: #a1a1aa; margin-bottom: 6px;">MAP LEGEND</div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;"><span style="width: 10px; height: 10px; background: #ef4444; border-radius: 50%; display: inline-block;"></span> Critical Inundation</div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;"><span style="width: 10px; height: 10px; background: #f97316; border-radius: 50%; display: inline-block;"></span> Warning Buffer</div>
+                        <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 10px; height: 10px; background: #22c55e; border-radius: 50%; display: inline-block;"></span> Safe Relief Zones</div>
+                    </div>
+
+                </div>
 
             </div>
 
+            <!-- LIVE RISK ANALYTICS PANEL -->
+            <div class="panel" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <h3 style="font-size: 15px; color: #38bdf8; font-weight: 700; margin-bottom: 14px;">📊 Live Spatial Analytics</h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+                        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                            <span style="font-size: 11px; color: #a1a1aa;">Active Risk Hotspots</span>
+                            <div style="font-size: 20px; font-weight: 800; color: #ef4444; margin-top: 2px;" id="riskHotspotsVal">3 Zones Active</div>
+                        </div>
 
-            <div class="map-container">
+                        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                            <span style="font-size: 11px; color: #a1a1aa;">Population in Hazard Area</span>
+                            <div style="font-size: 20px; font-weight: 800; color: #f97316; margin-top: 2px;" id="riskPopVal">142,500 People</div>
+                        </div>
 
-                <div class="map-grid"></div>
-
-                <div class="risk-zone zone-green"></div>
-
-                <div class="risk-zone zone-orange"></div>
-
-                <div class="risk-zone zone-red"></div>
-
-
-                <div class="map-label">
-                    📍 Surat, Gujarat
+                        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                            <span style="font-size: 11px; color: #a1a1aa;">Relief Center Readiness</span>
+                            <div style="font-size: 20px; font-weight: 800; color: #22c55e; margin-top: 2px;" id="riskReadinessVal">91% Operational</div>
+                        </div>
+                    </div>
                 </div>
 
+                <button class="run-detection-btn" style="margin-top: 16px;" onclick="alert('Exporting high-resolution GeoJSON risk map layer...')">
+                    📥 Export GeoJSON Risk Layer
+                </button>
             </div>
 
         </div>
 
     `;
 
+}
+
+function updateRiskMapLocation(loc) {
+    const label = document.getElementById("mapLabelText");
+    const hotspots = document.getElementById("riskHotspotsVal");
+    const pop = document.getElementById("riskPopVal");
+
+    if (loc === "surat") {
+        if (label) label.textContent = "📍 Surat, Gujarat — Active Flood Inundation Zone";
+        if (hotspots) hotspots.textContent = "3 Zones Active";
+        if (pop) pop.textContent = "142,500 People";
+    } else if (loc === "bhuj") {
+        if (label) label.textContent = "📍 Bhuj, Kutch — Active Seismic Fault Line Zone";
+        if (hotspots) hotspots.textContent = "2 Fault Rifts Active";
+        if (pop) pop.textContent = "98,200 People";
+    } else if (loc === "guwahati") {
+        if (label) label.textContent = "📍 Guwahati, Assam — Brahmaputra Critical Overflow";
+        if (hotspots) hotspots.textContent = "5 Zones Active";
+        if (pop) pop.textContent = "310,000 People";
+    } else if (loc === "chennai") {
+        if (label) label.textContent = "📍 Chennai Coast — Tsunami Early Watch Boundary";
+        if (hotspots) hotspots.textContent = "1 Warning Zone";
+        if (pop) pop.textContent = "215,000 People";
+    }
+}
+
+function toggleMapLayer(layer) {
+    const btns = ["Flood", "Fault", "Tsunami"];
+    btns.forEach(b => {
+        const el = document.getElementById("layerBtn" + b);
+        if (el) el.classList.remove("active");
+    });
+
+    const activeBtn = document.getElementById("layerBtn" + layer.charAt(0).toUpperCase() + layer.slice(1));
+    if (activeBtn) activeBtn.classList.add("active");
+
+    const redZone = document.getElementById("mapZoneRed");
+    if (layer === "fault") {
+        if (redZone) redZone.style.background = "radial-gradient(circle, rgba(168,85,247,0.7) 0%, rgba(168,85,247,0) 70%)";
+    } else if (layer === "tsunami") {
+        if (redZone) redZone.style.background = "radial-gradient(circle, rgba(56,189,248,0.7) 0%, rgba(56,189,248,0) 70%)";
+    } else {
+        if (redZone) redZone.style.background = "radial-gradient(circle, rgba(239,68,68,0.7) 0%, rgba(239,68,68,0) 70%)";
+    }
 }
 
 
@@ -1503,6 +1590,78 @@ function showSettings() {
 
             </div>
 
+        </div>
+
+        <!-- OPERATIONAL PERMISSIONS & DATA SECURITY PANEL -->
+        <div class="panel" style="margin-top: 24px; padding: 24px;">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                <h3 style="font-size: 16px; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <span>🛡️</span> Disaster Access & Operational Permissions
+                </h3>
+                <span style="font-size: 11px; color: #a1a1aa; background: rgba(56, 189, 248, 0.15); padding: 4px 10px; border-radius: 6px;">
+                    Role: Commander / Response Lead
+                </span>
+            </div>
+
+            <div class="settings-list">
+
+                <div class="setting-item">
+                    <div>
+                        <strong>🛰️ Satellite Stream Ingestion Permission (Sentinel / Landsat)</strong>
+                        <p>Authorize live telemetry data stream from ESA Sentinel Hub & USGS Landsat APIs</p>
+                    </div>
+                    <label class="setting-switch">
+                        <input type="checkbox" checked onchange="alert('Satellite Stream Authorization updated.')">
+                        <span class="setting-switch-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div>
+                        <strong>📡 High-Resolution SAR Synthetic Aperture Radar Access</strong>
+                        <p>Enable all-weather cloud-penetrating radar feeds for flood and landslide tracking</p>
+                    </div>
+                    <label class="setting-switch">
+                        <input type="checkbox" checked onchange="alert('SAR Radar Access permission updated.')">
+                        <span class="setting-switch-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div>
+                        <strong>🚨 Emergency Disaster Warning Broadcast Authorization</strong>
+                        <p>Authorize automated emergency SMS & push broadcasts to NDMA and first responder network</p>
+                    </div>
+                    <label class="setting-switch">
+                        <input type="checkbox" checked onchange="alert('Emergency Warning Broadcast Authorization updated.')">
+                        <span class="setting-switch-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div>
+                        <strong>🤖 AI Segmentation Model Calibration Rights</strong>
+                        <p>Allow manual override and fine-tuning of neural network NDWI inundation thresholds</p>
+                    </div>
+                    <label class="setting-switch">
+                        <input type="checkbox" checked onchange="alert('AI Model Calibration Rights updated.')">
+                        <span class="setting-switch-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div>
+                        <strong>🏛️ Government Inter-Agency Data Exchange (ISRO / NDMA)</strong>
+                        <p>Share encrypted spatial telemetry with state disaster management authorities</p>
+                    </div>
+                    <label class="setting-switch">
+                        <input type="checkbox" checked onchange="alert('Government Inter-Agency Data Exchange permission updated.')">
+                        <span class="setting-switch-slider"></span>
+                    </label>
+                </div>
+
+            </div>
 
         </div>
 

@@ -2772,6 +2772,81 @@ html[data-theme="light"] .input-field-group input[type="text"] {
 }
 
 
+/* =========================================================
+   MAP LAYER BUTTONS & SETTINGS SWITCH TOGGLES
+========================================================= */
+
+.map-layer-btn {
+    background: #0b0c10;
+    border: 1px solid #2b2e33;
+    color: #a1a1aa;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.map-layer-btn:hover {
+    background: #1a1c20;
+    color: #ffffff;
+}
+
+.map-layer-btn.active {
+    background: linear-gradient(135deg, #2563eb, #38bdf8);
+    border-color: #38bdf8;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(56, 189, 248, 0.3);
+}
+
+.setting-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.setting-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.setting-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #2b2e33;
+    transition: .3s;
+    border-radius: 24px;
+}
+
+.setting-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+
+.setting-switch input:checked + .setting-switch-slider {
+    background: linear-gradient(135deg, #2563eb, #38bdf8);
+}
+
+.setting-switch input:checked + .setting-switch-slider:before {
+    transform: translateX(20px);
+}
+
+
+
 
 
 
