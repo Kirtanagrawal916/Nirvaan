@@ -2406,4 +2406,19 @@ html[data-theme="light"] .social-btn:hover {
 }
 
 
+/* =========================================================
+   BUTTON SECTION & VERTICAL SPACING
+========================================================= */
+
+.button-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    min-height: 600px;
+    padding: 40px 0;
+}
+
+
+
 
