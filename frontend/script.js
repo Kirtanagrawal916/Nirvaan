@@ -27,6 +27,34 @@ function updateProvenanceBanner(dataOrProvenance) {
     }
 }
 
+let currentAnalysisMode = "INSTANT_DEMO";
+
+function toggleAnalysisMode() {
+    if (currentAnalysisMode === "INSTANT_DEMO") {
+        currentAnalysisMode = "LIVE_ANALYZE";
+    } else {
+        currentAnalysisMode = "INSTANT_DEMO";
+    }
+    updateModeIndicatorUI();
+}
+
+function updateModeIndicatorUI() {
+    const el = document.getElementById("modeIndicator");
+    const txt = document.getElementById("modeText");
+    const badge = document.getElementById("modeBadge");
+    if (!el || !txt || !badge) return;
+
+    if (currentAnalysisMode === "LIVE_ANALYZE") {
+        el.className = "mode-indicator live-mode";
+        txt.innerHTML = "<strong>LIVE ANALYZE</strong>";
+        badge.innerHTML = "FLEX MODE";
+    } else {
+        el.className = "mode-indicator instant-mode";
+        txt.innerHTML = "<strong>INSTANT DEMO</strong>";
+        badge.innerHTML = "DEFAULT";
+    }
+}
+
 const pageContent =
     document.getElementById(
         "pageContent"
