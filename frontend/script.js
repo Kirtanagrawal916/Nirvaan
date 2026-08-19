@@ -363,26 +363,62 @@ async function showDashboard() {
     const afterImgPath = (satellite && satellite.afterImage) ? satellite.afterImage : "assets/after.jpg";
 
     let satelliteHtml = `
-        <div style="padding: 16px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                <div class="sat-card-box">
-                    <span class="sat-badge normal">PRE-EVENT (BEFORE FLOOD)</span>
-                    <img src="${beforeImgPath}" alt="Before Flood Satellite Scene" class="sat-img">
-                    <div class="sat-meta">
-                        <span>🛰 Sentinel-2 L2A</span>
-                        <span>NDWI: 0.12 (Normal Flow)</span>
-                    </div>
-                </div>
+        <div style="padding: 20px;">
 
-                <div class="sat-card-box">
-                    <span class="sat-badge alert">POST-EVENT (INUNDATED FLOOD)</span>
-                    <img src="${afterImgPath}" alt="After Flood Satellite Scene" class="sat-img">
-                    <div class="sat-meta">
-                        <span>🛰 Sentinel-2 L2A</span>
-                        <span class="red-text">NDWI: 0.84 (Inundated)</span>
+            <!-- FLOOD COMPARISON SCENE -->
+            <div style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #38bdf8;">🌊 SCENE 1: FLOOD INUNDATION (Surat, Gujarat — Tapi River Basin)</span>
+                    <span style="font-size: 11px; opacity: 0.7;">Pass: Sentinel-2 L2A (10m)</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="sat-card-box">
+                        <span class="sat-badge normal">BEFORE FLOOD (PRE-EVENT)</span>
+                        <img src="assets/before.jpg" alt="Before Flood Satellite Scene" class="sat-img">
+                        <div class="sat-meta">
+                            <span>🛰 Sentinel-2 L2A</span>
+                            <span>NDWI: 0.12 (Normal Flow)</span>
+                        </div>
+                    </div>
+
+                    <div class="sat-card-box">
+                        <span class="sat-badge alert">AFTER FLOOD (POST-EVENT INUNDATED)</span>
+                        <img src="assets/after.jpg" alt="After Flood Satellite Scene" class="sat-img">
+                        <div class="sat-meta">
+                            <span>🛰 Sentinel-2 L2A</span>
+                            <span class="red-text">NDWI: 0.84 (Inundated)</span>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- TSUNAMI COMPARISON SCENE -->
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #38bdf8;">🏖️ SCENE 2: TSUNAMI COASTAL SURGE IMPACT (Chennai Coastline)</span>
+                    <span style="font-size: 11px; opacity: 0.7;">Pass: PlanetScope (3m High-Res)</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="sat-card-box">
+                        <span class="sat-badge normal">BEFORE TSUNAMI (PRE-EVENT)</span>
+                        <img src="assets/tsunami-before.jpg" alt="Before Tsunami Satellite Scene" class="sat-img">
+                        <div class="sat-meta">
+                            <span>🛰 PlanetScope (3m)</span>
+                            <span>Surge Index: 0.05 (Calm Sea)</span>
+                        </div>
+                    </div>
+
+                    <div class="sat-card-box">
+                        <span class="sat-badge alert">AFTER TSUNAMI (COASTAL INUNDATION)</span>
+                        <img src="assets/tsunami-after.jpg" alt="After Tsunami Satellite Scene" class="sat-img">
+                        <div class="sat-meta">
+                            <span>🛰 PlanetScope (3m)</span>
+                            <span class="red-text">Surge Index: 0.92 (Extreme Surge)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     `;
 
@@ -395,7 +431,7 @@ async function showDashboard() {
             </h1>
 
             <p class="page-subtitle">
-                Real-time overview of disaster monitoring and analysis
+                Real-time overview of disaster monitoring and multi-scene satellite imagery comparison
             </p>
 
 
@@ -509,23 +545,23 @@ async function showDashboard() {
 
 
 
-            <section class="dashboard-grid">
+            <section class="dashboard-grid" style="display: block; width: 100%;">
 
 
-                <!-- SATELLITE -->
+                <!-- MULTI-SCENE SATELLITE COMPARISON SHOWCASE (FULL WIDTH) -->
 
-                <div class="panel">
+                <div class="panel" style="width: 100%;">
 
                     <div class="panel-header">
 
                         <h2>
-                            ⌁ Satellite Image Comparison
+                            🛰 Multi-Temporal Satellite Image Comparison Showcase
                         </h2>
 
                         <button
                             onclick="loadPage('satellite')"
                         >
-                            View Fullscreen
+                            View Fullscreen Monitor
                         </button>
 
                     </div>
@@ -533,97 +569,6 @@ async function showDashboard() {
                     ${satelliteHtml}
 
                 </div>
-
-
-
-                <!-- DETECTION -->
-
-                <div class="panel">
-
-                    <div class="panel-header">
-
-                        <h2>
-                            ⚠ Disaster Detection
-                        </h2>
-
-                    </div>
-
-
-                    <div class="detection">
-
-                        <div class="detection-icon">
-                            ≋
-                        </div>
-
-                        <h2>
-                            ${disasterTypeUpper}
-                        </h2>
-
-                        <p>
-                            AI-powered satellite analysis (${location})
-                        </p>
-
-
-                        <div class="confidence-row">
-
-                            <span>
-                                Confidence Score
-                            </span>
-
-                            <strong>
-                                ${confidenceScore}%
-                            </strong>
-
-                        </div>
-
-
-                        <div class="progress">
-
-                            <div
-                                class="progress-value"
-                                style="width: ${confidenceScore}%;"
-                            ></div>
-
-                        </div>
-
-
-                        <div class="detail">
-
-                            <span>
-                                Severity Level
-                            </span>
-
-                            <strong class="${severity.toLowerCase() === 'high' || severity.toLowerCase() === 'extreme' ? 'high' : 'medium'}">
-                                ${severity}
-                            </strong>
-
-                        </div>
-
-
-                        <div class="detail">
-
-                            <span>
-                                Affected Area
-                            </span>
-
-                            <strong>
-                                ${affectedArea}
-                            </strong>
-
-                        </div>
-
-
-                        <button
-                            class="primary-btn full-btn"
-                            onclick="loadPage('detection')"
-                        >
-                            View Detailed Analysis
-                        </button>
-
-                    </div>
-
-                </div>
-
 
             </section>
 
@@ -1715,29 +1660,50 @@ async function refreshSatellite() {
    ABOUT PAGE
 ========================================================= */
 
+/* =========================================================
+   ABOUT PAGE
+========================================================= */
+
 function showAbout() {
     pageContent.innerHTML = `
-        <h1 class="page-title">About Nirvaan</h1>
-        <p class="page-subtitle">Satellite-Based AI Disaster Monitoring & Rapid Intelligence Platform</p>
+        <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">About Nirvaan</h1>
+        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">Satellite-Based AI Disaster Monitoring & Rapid Intelligence Platform</p>
 
-        <div class="panel" style="padding: 28px; line-height: 1.8;">
-            <h2 style="margin-bottom: 12px; color: #38bdf8; font-size: 18px;">Platform Overview</h2>
-            <p style="margin-bottom: 20px; font-size: 14px;">
-                Nirvaan leverages multi-spectral satellite imagery (Sentinel-2, Landsat-9) and deep learning models to perform rapid disaster detection, inundated area mapping, damage assessment, and real-time situational reporting for emergency response teams.
+        <div class="panel" style="padding: 32px; border-radius: 16px; margin-bottom: 24px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
+            <h2 style="margin-bottom: 16px; color: #38bdf8; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+                <span>🌐</span> Mission & System Overview
+            </h2>
+            <p style="font-size: 16px; line-height: 1.8; color: #e0e0e0; margin-bottom: 24px;">
+                <strong>Nirvaan</strong> is an advanced, satellite-driven disaster intelligence engine engineered to perform <strong>rapid disaster detection</strong>, <strong>inundated area mapping</strong>, and <strong>real-time situational risk assessment</strong>. By fusing multi-spectral satellite imagery (Copernicus Sentinel-2, USGS Landsat-9) with deep learning segmentation neural networks, Nirvaan equips emergency response managers with sub-hour actionable intelligence.
             </p>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 24px;">
-                <div class="card" style="padding: 20px; border-radius: 10px;">
-                    <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">🛰 Multi-Spectral Analysis</h3>
-                    <p style="font-size: 13px; opacity: 0.85;">Automated NDWI, dNBR, and SAR mask extraction for flood & fire boundaries.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <div class="card" style="padding: 24px; border-radius: 14px; background: #1a1c20; border: 1px solid rgba(255, 255, 255, 0.06);">
+                    <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">🛰 Multi-Spectral Imagery</h3>
+                    <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                        Automated extraction of <strong>NDWI (Water Index)</strong> and <strong>SAR (Synthetic Aperture Radar)</strong> masks to detect flood extent through heavy cloud cover.
+                    </p>
                 </div>
-                <div class="card" style="padding: 20px; border-radius: 10px;">
-                    <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">⚡ Rapid Early Warning</h3>
-                    <p style="font-size: 13px; opacity: 0.85;">Sub-hour processing pipeline converting raw satellite swaths into vector risk maps.</p>
+
+                <div class="card" style="padding: 24px; border-radius: 14px; background: #1a1c20; border: 1px solid rgba(255, 255, 255, 0.06);">
+                    <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">⚡ Rapid Early Warning</h3>
+                    <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                        Sub-hour automated pipeline processing raw satellite swaths into <strong>high-resolution vector risk maps</strong> and automated broadcasts.
+                    </p>
                 </div>
-                <div class="card" style="padding: 20px; border-radius: 10px;">
-                    <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">📊 Population Impact</h3>
-                    <p style="font-size: 13px; opacity: 0.85;">Spatial overlay estimation of affected populations, infrastructure, and roads.</p>
+
+                <div class="card" style="padding: 24px; border-radius: 14px; background: #1a1c20; border: 1px solid rgba(255, 255, 255, 0.06);">
+                    <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">📊 Population & Asset Risk</h3>
+                    <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                        Spatial demographic overlay calculating <strong>affected populations</strong>, <strong>submerged roadways</strong>, and <strong>critical infrastructure</strong>.
+                    </p>
+                </div>
+
+                <div class="card" style="padding: 24px; border-radius: 14px; background: #1a1c20; border: 1px solid rgba(255, 255, 255, 0.06);">
+                    <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">🛡️ Inter-Agency Interoperability</h3>
+                    <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                        Seamless GIS spatial telemetry exchange with <strong>NDMA</strong>, <strong>ISRO</strong>, and <strong>State Disaster Relief Forces</strong>.
+                    </p>
                 </div>
             </div>
         </div>
@@ -1751,37 +1717,46 @@ function showAbout() {
 
 function showFAQ() {
     pageContent.innerHTML = `
-        <h1 class="page-title">Frequently Asked Questions</h1>
-        <p class="page-subtitle">Learn more about Nirvaan satellite intelligence, metrics, and workflows.</p>
+        <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">Frequently Asked Questions</h1>
+        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">Learn more about Nirvaan satellite intelligence, metrics, and emergency response workflows.</p>
 
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-            <div class="panel" style="padding: 22px;">
-                <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">Q1: How does Nirvaan detect disaster affected zones?</h3>
-                <p style="font-size: 14px; line-height: 1.6; opacity: 0.88;">
-                    Nirvaan compares pre-event and post-event satellite imagery using optical spectral indices (NDWI for floods, dNBR for burn severity) and synthetic aperture radar (SAR) to identify flooded surfaces and burnt terrain regardless of cloud cover.
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+
+            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
+                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q1: How does Nirvaan detect disaster affected zones?</h3>
+                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+                    Nirvaan compares pre-event baseline scenes with post-event satellite imagery using optical spectral indices (<strong>NDWI</strong> for floods, <strong>dNBR</strong> for burn severity) and synthetic aperture radar (<strong>SAR</strong>) to identify flooded surfaces regardless of cloud cover.
                 </p>
             </div>
 
-            <div class="panel" style="padding: 22px;">
-                <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">Q2: What satellite constellations are supported?</h3>
-                <p style="font-size: 14px; line-height: 1.6; opacity: 0.88;">
-                    Currently supports Copernicus Sentinel-2 (Optical), Sentinel-1 (C-Band SAR), USGS Landsat-8/9, and custom high-resolution commercial imagery feeds via REST API endpoints.
+            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
+                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q2: What satellite constellations are supported?</h3>
+                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+                    Nirvaan natively ingests <strong>Copernicus Sentinel-2</strong> (Optical), <strong>Sentinel-1</strong> (C-Band Radar), <strong>USGS Landsat-8/9</strong>, and high-resolution <strong>PlanetScope (3m)</strong> imagery feeds via automated REST APIs.
                 </p>
             </div>
 
-            <div class="panel" style="padding: 22px;">
-                <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">Q3: How frequently is the disaster map updated?</h3>
-                <p style="font-size: 14px; line-height: 1.6; opacity: 0.88;">
-                    Automated backend jobs ingest new satellite passes as soon as they become public (typically 12 to 24 hours revisit time), triggering instant risk updates and automated alert dispatches.
+            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
+                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q3: How frequently is the disaster risk map updated?</h3>
+                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+                    Automated background tasks ingest new satellite passes as soon as they become available from orbital feeds (typically <strong>12 to 24-hour revisit cadence</strong>), instantly recalculating hazard boundaries.
                 </p>
             </div>
 
-            <div class="panel" style="padding: 22px;">
-                <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">Q4: Can SITREP situational reports be exported?</h3>
-                <p style="font-size: 14px; line-height: 1.6; opacity: 0.88;">
-                    Yes, under the <strong>Reports</strong> tab, you can export JSON metadata, GeoJSON impact boundaries, or formatted PDF situation reports for disaster management authorities.
+            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
+                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q4: Can SITREP situational reports be exported?</h3>
+                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+                    Yes, under the <strong>Reports</strong> tab, response leads can generate and export <strong>JSON metadata</strong>, <strong>GeoJSON impact vector boundaries</strong>, or formatted <strong>SITREP situation reports</strong>.
                 </p>
             </div>
+
+            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
+                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q5: How do first responders receive critical warnings?</h3>
+                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+                    Whenever the AI neural network detects inundation confidence exceeding <strong>85%</strong>, automated push notifications and SMS warning broadcasts are immediately dispatched to registered emergency commanders.
+                </p>
+            </div>
+
         </div>
     `;
 }
