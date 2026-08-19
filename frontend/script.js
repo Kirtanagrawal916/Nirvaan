@@ -1,6 +1,5 @@
 /* =========================================================
    THEME TOGGLE SYSTEM
-========================================================= */
 
 function initTheme() {
     const savedTheme = localStorage.getItem("nirvaan_theme") || "dark";
@@ -56,7 +55,6 @@ if (document.readyState === "loading") {
 
 /* =========================================================
    NAVIGATION (SIDEBAR & TOPBAR NAVBAR)
-========================================================= */
 
 const pageContent = document.getElementById("pageContent");
 const navItems = document.querySelectorAll(".nav-item");
@@ -94,7 +92,6 @@ navItems.forEach(item => {
 
 /* =========================================================
    AUTHENTICATION & LOGIN SYSTEM
-========================================================= */
 
 function initAuth() {
     const loginBtn = document.getElementById("loginBtn");
@@ -280,7 +277,6 @@ if (topbarMenuBtn && menuDropdown) {
 
 /* =========================================================
    INITIAL PAGE
-========================================================= */
 
 loadPage("dashboard");
 
@@ -288,7 +284,6 @@ loadPage("dashboard");
 
 /* =========================================================
    PAGE ROUTER
-========================================================= */
 
 async function loadPage(page) {
 
@@ -345,7 +340,6 @@ async function loadPage(page) {
 
 /* =========================================================
    DASHBOARD
-========================================================= */
 
 async function showDashboard() {
 
@@ -355,9 +349,9 @@ async function showDashboard() {
 
     const disasterTypeUpper = (latest && latest.type) ? latest.type.toUpperCase() + " DETECTED" : "FLOOD DETECTED";
     const confidenceScore = (latest && latest.confidence !== undefined) ? latest.confidence : 94.7;
-    const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "HIGH";
-    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "31.8 km²";
-    const location = (latest && latest.location) ? latest.location : "Surat, Gujarat";
+    const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "LOW";
+    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "0.0 km²";
+    const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
     const beforeImgPath = (satellite && satellite.beforeImage) ? satellite.beforeImage : "assets/before.jpg";
     const afterImgPath = (satellite && satellite.afterImage) ? satellite.afterImage : "assets/after.jpg";
@@ -582,7 +576,6 @@ async function showDashboard() {
 
 /* =========================================================
    SATELLITE MONITOR
-========================================================= */
 
 async function showSatellite() {
 
@@ -736,9 +729,15 @@ async function showSatellite() {
 
 /* =========================================================
    DISASTER DETECTION
-========================================================= */
 
-function showDetection() {
+async function showDetection() {
+
+    const latest = await getLatestDisaster();
+    const disasterTypeUpper = (latest && latest.type) ? latest.type.toUpperCase() + " DETECTED" : "FLOOD DETECTED";
+    const confidenceScore = (latest && latest.confidence !== undefined) ? latest.confidence : 94.7;
+    const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "LOW";
+    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "0.0 km²";
+    const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
     pageContent.innerHTML = `
 
@@ -952,9 +951,11 @@ function runLiveDetection() {
 
 /* =========================================================
    RISK MAP
-========================================================= */
 
-function showRiskMap() {
+async function showRiskMap() {
+
+    const latest = await getLatestDisaster();
+    const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
     pageContent.innerHTML = `
 
@@ -1096,9 +1097,10 @@ function toggleMapLayer(layer) {
 
 /* =========================================================
    ALERTS
-========================================================= */
 
-function showAlerts() {
+async function showAlerts() {
+
+    const disasters = await getDisasterHistory();
 
     pageContent.innerHTML = `
 
@@ -1148,59 +1150,35 @@ function showAlerts() {
 
                     <tbody>
 
-                        <tr>
+                        ${(disasters || []).map(dis => `
 
-                            <td>
-                                Flood detected
-                            </td>
+                            <tr>
 
-                            <td>
-                                Surat, Gujarat
-                            </td>
+                                <td>
+                                    ${dis.type} detected
+                                </td>
 
-                            <td>
-                                <span class="status high">
-                                    HIGH
-                                </span>
-                            </td>
+                                <td>
+                                    ${dis.location}
+                                </td>
 
-                            <td>
-                                10:28 AM
-                            </td>
+                                <td>
+                                    <span class="status ${(dis.severity || "LOW").toLowerCase()}">
+                                        ${dis.severity || "LOW"}
+                                    </span>
+                                </td>
 
-                            <td>
-                                Active
-                            </td>
+                                <td>
+                                    ${dis.date || "Active"}
+                                </td>
 
-                        </tr>
+                                <td>
+                                    ${dis.status || "Active"}
+                                </td>
 
+                            </tr>
 
-                        <tr>
-
-                            <td>
-                                Wildfire detected
-                            </td>
-
-                            <td>
-                                Ahmedabad
-                            </td>
-
-                            <td>
-                                <span class="status medium">
-                                    MEDIUM
-                                </span>
-                            </td>
-
-                            <td>
-                                09:15 AM
-                            </td>
-
-                            <td>
-                                Active
-                            </td>
-
-                        </tr>
-
+                        `).join("")}
 
                     </tbody>
 
@@ -1218,9 +1196,11 @@ function showAlerts() {
 
 /* =========================================================
    REPORTS
-========================================================= */
 
-function showReports() {
+async function showReports() {
+
+    const latest = await getLatestDisaster();
+    const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
     pageContent.innerHTML = `
 
@@ -1248,7 +1228,7 @@ function showReports() {
 
                 <p>
                     Detailed satellite-based flood
-                    detection report for Surat.
+                    detection report for ${location}.
                 </p>
 
                 <br>
@@ -1324,7 +1304,6 @@ function showReports() {
 
 /* =========================================================
    HISTORY
-========================================================= */
 
 async function showHistory() {
 
@@ -1444,7 +1423,6 @@ async function showHistory() {
 
 /* =========================================================
    SETTINGS
-========================================================= */
 
 function showSettings() {
 
@@ -1623,7 +1601,6 @@ function showSettings() {
 
 /* =========================================================
    SATELLITE REFRESH
-========================================================= */
 
 async function refreshSatellite() {
 
@@ -1658,11 +1635,9 @@ async function refreshSatellite() {
 
 /* =========================================================
    ABOUT PAGE
-========================================================= */
 
 /* =========================================================
    ABOUT PAGE
-========================================================= */
 
 function showAbout() {
     pageContent.innerHTML = `
@@ -1713,7 +1688,6 @@ function showAbout() {
 
 /* =========================================================
    FAQ PAGE
-========================================================= */
 
 function showFAQ() {
     pageContent.innerHTML = `

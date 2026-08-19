@@ -27,6 +27,7 @@ from analysis.infrastructure import analyze_infrastructure_impact
 from analysis.severity import calculate_composite_impact_score
 from reports.situation_report import generate_situation_report
 from demo.precomputed_results import load_demo_result
+from data.loader import list_canonical_events
 
 
 def _create_json_response(status_code: int, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -38,6 +39,24 @@ def _create_json_response(status_code: int, data: Dict[str, Any]) -> Dict[str, A
         "content_type": "application/json",
         "data": data
     }
+
+
+def create_json_error_response(
+    status_code: int,
+    code: str,
+    message: str,
+    details: Optional[Any] = None
+) -> Dict[str, Any]:
+    """
+    Standardized NIRVAAN Backend Error Response Wrapper (BH-03).
+    """
+    return _create_json_response(status_code, {
+        "status": "error",
+        "code": code,
+        "error": code,
+        "message": sanitize_log_message(message),
+        "details": details if details is not None else {}
+    })
 
 
 def handle_health_check() -> Dict[str, Any]:
@@ -55,33 +74,51 @@ def handle_health_check() -> Dict[str, Any]:
     })
 
 
+def handle_readiness_check() -> Dict[str, Any]:
+    """GET /api/v1/ready endpoint handler (BH-05). Performs lightweight readiness checks."""
+    from pathlib import Path
+    base_dir = Path(__file__).resolve().parent.parent
+    catalog_exists = (base_dir / "data" / "catalog.json").exists()
+    precomputed_exists = (base_dir / "data" / "precomputed" / "flood-emilia-romagna-2023.json").exists()
+
+    checks = {
+        "catalog_data": "OK" if catalog_exists else "MISSING",
+        "precomputed_artifacts": "OK" if precomputed_exists else "MISSING",
+        "configuration": "OK",
+        "dependencies": "OK",
+    }
+    is_ready = catalog_exists and precomputed_exists
+    status_code = 200 if is_ready else 503
+
+    return _create_json_response(status_code, {
+        "status": "READY" if is_ready else "NOT_READY",
+        "checks": checks,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    })
+
+
 def handle_detect_endpoint(payload: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     """POST /api/v1/detect endpoint handler."""
     if not isinstance(payload, dict):
-        return _create_json_response(400, {
-            "error": "BAD_REQUEST",
-            "message": sanitize_log_message("Payload must be a valid JSON object.")
-        })
+        return create_json_error_response(
+            400, "INVALID_REQUEST", "Payload must be a valid JSON object."
+        )
 
     # Validate event metadata
     event_info = payload.get("event", {})
     is_valid_meta, meta_errors = validate_event_metadata(event_info)
     if not is_valid_meta:
-        return _create_json_response(422, {
-            "error": "UNPROCESSABLE_ENTITY",
-            "message": "Invalid event metadata.",
-            "details": [sanitize_log_message(e) for e in meta_errors]
-        })
+        return create_json_error_response(
+            422, "UNPROCESSABLE_ENTITY", "Invalid event metadata.", details=[sanitize_log_message(e) for e in meta_errors]
+        )
 
     # Validate threshold configuration
     thresholds = payload.get("thresholds", {})
     is_valid_thresh, thresh_errors = validate_thresholds(thresholds)
     if not is_valid_thresh:
-        return _create_json_response(422, {
-            "error": "UNPROCESSABLE_ENTITY",
-            "message": "Invalid threshold configuration.",
-            "details": [sanitize_log_message(e) for e in thresh_errors]
-        })
+        return create_json_error_response(
+            422, "VALIDATION_ERROR", "Invalid threshold configuration.", details=[sanitize_log_message(e) for e in thresh_errors]
+        )
 
     # Extract mask/polygon detection data
     mask_grid = payload.get("mask")
@@ -193,7 +230,9 @@ def handle_report_endpoint(payload: Optional[Dict[str, Any]]) -> Dict[str, Any]:
 def handle_disaster_latest_endpoint() -> Dict[str, Any]:
     """GET /api/disaster/latest endpoint handler. Returns latest disaster detection result formatted for frontend compatibility."""
     try:
-        demo_contract = load_demo_result("flood-emilia-romagna-2023")
+        events = list_canonical_events()
+        primary_event_id = events[0]["event_id"] if events else "flood-emilia-romagna-2023"
+        demo_contract = load_demo_result(primary_event_id)
         contract_dict = demo_contract.to_dict()
 
         disaster_type = str(contract_dict.get("disaster_type", "Flood")).capitalize()
@@ -201,11 +240,11 @@ def handle_disaster_latest_endpoint() -> Dict[str, Any]:
         location = meta.get("location_name") or "Emilia-Romagna, Italy"
 
         severity_info = contract_dict.get("severity", {})
-        severity_level = str(severity_info.get("severity_level", "HIGH")).upper()
+        severity_level = str(severity_info.get("severity_level", "LOW")).upper()
 
         area_info = contract_dict.get("affected_area", {})
-        area_val = area_info.get("affected_area_km2", 31.8)
-        affected_area_str = f"{area_val:.1f} km²" if isinstance(area_val, (int, float)) else "31.8 km²"
+        area_val = area_info.get("affected_area_km2", 0.0)
+        affected_area_str = f"{area_val:.1f} km²" if isinstance(area_val, (int, float)) else "0.0 km²"
 
         confidence_info = contract_dict.get("confidence", {})
         conf_val = confidence_info.get("confidence_score", 94.7) if isinstance(confidence_info, dict) else 94.7
@@ -225,8 +264,8 @@ def handle_disaster_latest_endpoint() -> Dict[str, Any]:
             "type": "Flood",
             "location": "Emilia-Romagna, Italy",
             "confidence": 94.7,
-            "severity": "HIGH",
-            "affectedArea": "31.8 km²",
+            "severity": "LOW",
+            "affectedArea": "0.0 km²",
             "beforeImage": "assets/before.jpg",
             "afterImage": "assets/after.jpg",
         }
@@ -236,84 +275,63 @@ def handle_disaster_latest_endpoint() -> Dict[str, Any]:
 def handle_disasters_history_endpoint() -> Dict[str, Any]:
     """GET /api/disasters endpoint handler. Returns history of disaster events formatted for frontend compatibility."""
     try:
-        flood_contract = load_demo_result("flood-emilia-romagna-2023").to_dict()
-        wildfire_contract = load_demo_result("wildfire-rhodes-2023").to_dict()
+        events = list_canonical_events()
+        disasters_list = []
+        for idx, evt_summary in enumerate(events, start=1):
+            evt_id = evt_summary["event_id"]
+            contract = load_demo_result(evt_id).to_dict()
+            meta = contract.get("event_metadata", {})
+            sev = contract.get("severity", {})
+            area = contract.get("affected_area", {})
+            conf = contract.get("confidence", {})
+            conf_score = conf.get("confidence_score", 94.7 if idx == 1 else 88.2) if isinstance(conf, dict) else (94.7 if idx == 1 else 88.2)
 
-        disasters_list = [
-            {
-                "id": "NV-001",
-                "type": str(flood_contract.get("disaster_type", "Flood")).capitalize(),
-                "location": flood_contract.get("event_metadata", {}).get("location_name", "Emilia-Romagna, Italy"),
-                "severity": str(flood_contract.get("severity", {}).get("severity_level", "HIGH")).upper(),
-                "confidence": 94.7,
-                "area": f"{flood_contract.get('affected_area', {}).get('affected_area_km2', 31.8):.1f} km²",
-                "date": flood_contract.get("event_metadata", {}).get("after_date", "2023-05-19"),
+            disasters_list.append({
+                "id": f"NV-00{idx}",
+                "type": str(contract.get("disaster_type", evt_summary.get("disaster_type", "Disaster"))).capitalize(),
+                "location": meta.get("location_name") or evt_summary.get("location_name", "Unknown Location"),
+                "severity": str(sev.get("severity_level", "LOW")).upper(),
+                "confidence": float(conf_score),
+                "area": f"{area.get('affected_area_km2', 0.0):.1f} km²",
+                "date": meta.get("after_date") or evt_summary.get("after_date", "2023-05-19"),
                 "status": "Active",
-            },
-            {
-                "id": "NV-002",
-                "type": str(wildfire_contract.get("disaster_type", "Wildfire")).capitalize(),
-                "location": wildfire_contract.get("event_metadata", {}).get("location_name", "Rhodes Island, Greece"),
-                "severity": str(wildfire_contract.get("severity", {}).get("severity_level", "MEDIUM")).upper(),
-                "confidence": 88.2,
-                "area": f"{wildfire_contract.get('affected_area', {}).get('affected_area_km2', 12.4):.1f} km²",
-                "date": wildfire_contract.get("event_metadata", {}).get("after_date", "2023-07-28"),
-                "status": "Active",
-            },
-            {
-                "id": "NV-003",
-                "type": "Flood",
-                "location": "Vadodara, Gujarat",
-                "severity": "HIGH",
-                "confidence": 91.4,
-                "area": "8.2 km²",
-                "date": "14 May 2024",
-                "status": "Resolved",
-            },
-        ]
+            })
         return _create_json_response(200, disasters_list)
     except Exception:
+        events = list_canonical_events()
         fallback_list = [
             {
-                "id": "NV-001",
-                "type": "Flood",
-                "location": "Surat, Gujarat",
-                "severity": "HIGH",
-                "confidence": 94.7,
-                "area": "31.8 km²",
-                "date": "16 May 2024",
+                "id": f"NV-00{i+1}",
+                "type": str(e.get("disaster_type", "Disaster")).capitalize(),
+                "location": e.get("location_name", "Emilia-Romagna, Italy"),
+                "severity": "LOW",
+                "confidence": 94.7 if i == 0 else 88.2,
+                "area": "0.0 km²",
+                "date": e.get("after_date", "2023-05-19"),
                 "status": "Active",
-            },
-            {
-                "id": "NV-002",
-                "type": "Wildfire",
-                "location": "Ahmedabad, Gujarat",
-                "severity": "MEDIUM",
-                "confidence": 88.2,
-                "area": "12.4 km²",
-                "date": "15 May 2024",
-                "status": "Active",
-            },
-            {
-                "id": "NV-003",
-                "type": "Flood",
-                "location": "Vadodara, Gujarat",
-                "severity": "HIGH",
-                "confidence": 91.4,
-                "area": "8.2 km²",
-                "date": "14 May 2024",
-                "status": "Resolved",
-            },
+            }
+            for i, e in enumerate(events)
         ]
         return _create_json_response(200, fallback_list)
 
 
 def handle_satellite_latest_endpoint() -> Dict[str, Any]:
     """GET /api/satellite/latest endpoint handler. Returns satellite imagery URLs formatted for frontend compatibility."""
-    return _create_json_response(200, {
-        "beforeImage": "assets/before.jpg",
-        "afterImage": "assets/after.jpg"
-    })
+    try:
+        events = list_canonical_events()
+        primary_evt = events[0] if events else {}
+        return _create_json_response(200, {
+            "beforeImage": "assets/before.jpg",
+            "afterImage": "assets/after.jpg",
+            "event_id": primary_evt.get("event_id", "flood-emilia-romagna-2023"),
+            "acquisitionDateBefore": primary_evt.get("before_date", "2023-05-04"),
+            "acquisitionDateAfter": primary_evt.get("after_date", "2023-05-19")
+        })
+    except Exception:
+        return _create_json_response(200, {
+            "beforeImage": "assets/before.jpg",
+            "afterImage": "assets/after.jpg"
+        })
 
 
 def handle_api_request(endpoint: str, method: str = "POST", payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -327,6 +345,8 @@ def handle_api_request(endpoint: str, method: str = "POST", payload: Optional[Di
     try:
         if clean_endpoint in {"/api/v1/health", "/api/health"} and clean_method == "GET":
             return handle_health_check()
+        elif clean_endpoint in {"/api/v1/ready", "/api/ready"} and clean_method == "GET":
+            return handle_readiness_check()
         elif clean_endpoint in {"/api/disaster/latest", "/api/v1/disaster/latest"} and clean_method == "GET":
             return handle_disaster_latest_endpoint()
         elif clean_endpoint in {"/api/disasters", "/api/v1/disasters"} and clean_method == "GET":
@@ -340,14 +360,11 @@ def handle_api_request(endpoint: str, method: str = "POST", payload: Optional[Di
         elif clean_endpoint == "/api/v1/report" and clean_method == "POST":
             return handle_report_endpoint(payload)
         else:
-            return _create_json_response(404, {
-                "error": "NOT_FOUND",
-                "message": f"Endpoint '{clean_endpoint}' [{clean_method}] not found."
-            })
+            return create_json_error_response(
+                404, "NOT_FOUND", f"Endpoint '{clean_endpoint}' [{clean_method}] not found."
+            )
     except Exception as exc:
         safe_msg = sanitize_log_message(str(exc))
-        return _create_json_response(500, {
-            "error": "INTERNAL_SERVER_ERROR",
-            "message": "An unexpected error occurred during API processing.",
-            "details": safe_msg
-        })
+        return create_json_error_response(
+            500, "INTERNAL_ERROR", "An unexpected error occurred during API processing.", details=safe_msg
+        )

@@ -24,3 +24,5 @@ ENV/
 .DS_Store
 Thumbs.db
 
+# Node
+node_modules/
