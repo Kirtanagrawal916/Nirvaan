@@ -7,59 +7,7 @@ function setPageContent(html) {
 }
 /* =========================================================
    THEME TOGGLE SYSTEM
-
-function updateProvenanceBanner(dataOrProvenance) {
-    const banner = document.getElementById("provenanceBanner");
-    if (!banner) return;
-
-    let prov = "SYNTHETIC_FALLBACK";
-    if (typeof dataOrProvenance === "string") {
-        prov = dataOrProvenance;
-    } else if (dataOrProvenance && typeof dataOrProvenance === "object") {
-        prov = dataOrProvenance.data_provenance ||
-               (dataOrProvenance.provenance && dataOrProvenance.provenance.data_provenance) ||
-               (dataOrProvenance.event_metadata && dataOrProvenance.event_metadata.data_provenance) ||
-               "SYNTHETIC_FALLBACK";
-    }
-
-    if (prov === "REAL_SATELLITE_DATA") {
-        banner.className = "provenance-banner real-mode";
-        banner.innerHTML = `<span class="banner-icon">🛰️</span><span class="banner-text"><strong>REAL SATELLITE DATA</strong> — Processing genuine Sentinel-2 Level-2A surface reflectance imagery.</span>`;
-        banner.style.display = "flex";
-    } else {
-        banner.className = "provenance-banner synthetic-mode";
-        banner.innerHTML = `<span class="banner-icon">⚠️</span><span class="banner-text"><strong>DEMO MODE: SYNTHETIC DATA</strong> — This view displays simulated/synthetic placeholder satellite data for demonstration purposes.</span>`;
-        banner.style.display = "flex";
-    }
-}
-
-let currentAnalysisMode = "INSTANT_DEMO";
-
-function toggleAnalysisMode() {
-    if (currentAnalysisMode === "INSTANT_DEMO") {
-        currentAnalysisMode = "LIVE_ANALYZE";
-    } else {
-        currentAnalysisMode = "INSTANT_DEMO";
-    }
-    updateModeIndicatorUI();
-}
-
-function updateModeIndicatorUI() {
-    const el = document.getElementById("modeIndicator");
-    const txt = document.getElementById("modeText");
-    const badge = document.getElementById("modeBadge");
-    if (!el || !txt || !badge) return;
-
-    if (currentAnalysisMode === "LIVE_ANALYZE") {
-        el.className = "mode-indicator live-mode";
-        txt.innerHTML = "<strong>LIVE ANALYZE</strong>";
-        badge.innerHTML = "FLEX MODE";
-    } else {
-        el.className = "mode-indicator instant-mode";
-        txt.innerHTML = "<strong>INSTANT DEMO</strong>";
-        badge.innerHTML = "DEFAULT";
-    }
-}
+========================================================= */
 
 function initTheme() {
     const savedTheme = localStorage.getItem("nirvaan_theme") || "dark";
@@ -115,6 +63,7 @@ if (document.readyState === "loading") {
 
 /* =========================================================
    NAVIGATION (SIDEBAR & TOPBAR NAVBAR)
+========================================================= */
 
 let pageContent = document.getElementById("pageContent");
 const navItems = document.querySelectorAll(".nav-item");
@@ -150,8 +99,17 @@ navItems.forEach(item => {
     });
 });
 
+// Bind all data-page buttons & topbar alert bell buttons
+document.querySelectorAll("[data-page], .alert-icon-btn").forEach(el => {
+    el.addEventListener("click", (e) => {
+        const page = el.dataset.page || "alerts";
+        if (page) navigateToPage(page);
+    });
+});
+
 /* =========================================================
    AUTHENTICATION & LOGIN SYSTEM
+========================================================= */
 
 function initAuth() {
     const loginBtn = document.getElementById("loginBtn");
@@ -337,6 +295,7 @@ if (topbarMenuBtn && menuDropdown) {
 
 /* =========================================================
    INITIAL PAGE
+========================================================= */
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
@@ -350,6 +309,7 @@ if (document.readyState === "loading") {
 
 /* =========================================================
    PAGE ROUTER
+========================================================= */
 
 async function loadPage(page) {
 
@@ -406,6 +366,7 @@ async function loadPage(page) {
 
 /* =========================================================
    DASHBOARD
+========================================================= */
 
 async function showDashboard() {
 
@@ -413,13 +374,11 @@ async function showDashboard() {
     const latest = await getLatestDisaster();
     const satellite = await getSatelliteImages();
 
-    updateProvenanceBanner(latest || satellite);
-
     const disasterTypeUpper = (latest && latest.type) ? latest.type.toUpperCase() + " DETECTED" : "FLOOD DETECTED";
     const confidenceScore = (latest && latest.confidence !== undefined) ? latest.confidence : 94.7;
-    const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "LOW";
-    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "0.0 km²";
-    const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
+    const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "HIGH";
+    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "31.8 km²";
+    const location = (latest && latest.location) ? latest.location : "Surat, Gujarat";
 
     const beforeImgPath = (satellite && satellite.beforeImage) ? satellite.beforeImage : "assets/before.jpg";
     const afterImgPath = (satellite && satellite.afterImage) ? satellite.afterImage : "assets/after.jpg";
@@ -485,21 +444,16 @@ async function showDashboard() {
     `;
 
     setPageContent(`
+
         <section class="dashboard-section">
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <div>
-                    <h1 class="page-title" style="margin-bottom: 4px;">
-                        Dashboard
-                    </h1>
-                    <p class="page-subtitle">
-                        Real-time overview of disaster monitoring and multi-scene satellite imagery comparison
-                    </p>
-                </div>
-                <button class="primary-btn" id="dashboardGenerateSitrepBtn" style="padding: 10px 20px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);">
-                    ⚡ Generate SITREP
-                </button>
-            </div>
+            <h1 class="page-title">
+                Dashboard
+            </h1>
+
+            <p class="page-subtitle">
+                Real-time overview of disaster monitoring and multi-scene satellite imagery comparison
+            </p>
 
 
             <section class="stats-grid">
@@ -643,26 +597,17 @@ async function showDashboard() {
 
     `);
 
-    const sitrepBtn = document.getElementById("dashboardGenerateSitrepBtn");
-    if (sitrepBtn) {
-        const targetEventId = (latest && latest.event_id) ? latest.event_id : "flood-emilia-romagna-2023";
-        sitrepBtn.addEventListener("click", () => {
-            loadPage("reports");
-            setTimeout(() => executeSitrepGeneration(targetEventId), 150);
-        });
-    }
-
 }
 
 
 
 /* =========================================================
    SATELLITE MONITOR
+========================================================= */
 
 async function showSatellite() {
 
     const satellite = await getSatelliteImages();
-    updateProvenanceBanner(satellite);
 
     const beforeImgPath = (satellite && satellite.beforeImage) ? satellite.beforeImage : "assets/before.jpg";
     const afterImgPath = (satellite && satellite.afterImage) ? satellite.afterImage : "assets/after.jpg";
@@ -812,16 +757,9 @@ async function showSatellite() {
 
 /* =========================================================
    DISASTER DETECTION
+========================================================= */
 
-async function showDetection() {
-
-    const latest = await getLatestDisaster();
-    updateProvenanceBanner(latest);
-    const disasterTypeUpper = (latest && latest.type) ? latest.type.toUpperCase() + " DETECTED" : "FLOOD DETECTED";
-    const confidenceScore = (latest && latest.confidence !== undefined) ? latest.confidence : 94.7;
-    const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "LOW";
-    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "0.0 km²";
-    const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
+function showDetection() {
 
     setPageContent(`
 
@@ -1035,12 +973,9 @@ function runLiveDetection() {
 
 /* =========================================================
    RISK MAP
+========================================================= */
 
-async function showRiskMap() {
-
-    const latest = await getLatestDisaster();
-    updateProvenanceBanner(latest);
-    const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
+function showRiskMap() {
 
     setPageContent(`
 
@@ -1182,94 +1117,149 @@ function toggleMapLayer(layer) {
 
 /* =========================================================
    ALERTS
+========================================================= */
 
-async function showAlerts() {
-
-    const disasters = await getDisasterHistory();
-    updateProvenanceBanner(disasters && disasters[0]);
+function showAlerts() {
 
     setPageContent(`
 
-        <h1 class="page-title">
-            Alerts
+        <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
+            Emergency Disaster Alerts
         </h1>
 
-        <p class="page-subtitle">
-            Active disaster warnings and emergency notifications
+        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">
+            Real-time disaster warnings, satellite telemetry alerts, and responder dispatches
         </p>
 
+        <div class="alerts-grid">
 
-        <div class="panel">
+            <!-- ALERT BOX 1: FLOOD -->
+            <div class="alert-box-card critical">
+                <div class="alert-box-header">
+                    <div class="alert-title">
+                        <span>🌊</span>
+                        <span>Flood Inundation Warning — Surat, Gujarat (Tapi Basin)</span>
+                    </div>
+                    <span class="alert-badge critical">CRITICAL ALERT</span>
+                </div>
 
-            <div class="table-container">
+                <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin-bottom: 12px;">
+                    Sentinel-2 SAR imagery detected <strong>31.8 km² river overflow</strong> breaching Tapi embankment walls. Sub-surface flooding threatens urban residential sectors.
+                </p>
 
-                <table>
+                <div class="alert-metrics-grid">
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Inundation Extent</span>
+                        <span class="alert-metric-value">31.8 km²</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Population in Hazard</span>
+                        <span class="alert-metric-value">128,400 People</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Spectral NDWI Score</span>
+                        <span class="alert-metric-value" style="color: #ef4444;">0.84 (Critical)</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Alert Timestamp</span>
+                        <span class="alert-metric-value" style="color: #a1a1aa;">10:28 AM (Active)</span>
+                    </div>
+                </div>
 
-                    <thead>
+                <div class="alert-actions">
+                    <button class="run-detection-btn" style="max-width: 220px; font-size: 13px; padding: 10px 16px;" onclick="alert('Dispatching emergency NDRF flood response team to Surat Tapi Basin...')">
+                        🚨 Dispatch Responders
+                    </button>
+                    <button class="map-layer-btn active" style="font-size: 13px; padding: 10px 16px;" onclick="navigateToPage('risk')">
+                        📍 Open Geo Map
+                    </button>
+                </div>
+            </div>
 
-                        <tr>
+            <!-- ALERT BOX 2: SEISMIC EARTHQUAKE -->
+            <div class="alert-box-card high">
+                <div class="alert-box-header">
+                    <div class="alert-title">
+                        <span>⚡</span>
+                        <span>Seismic Fault Line Rupture — Bhuj, Kutch (Gujarat)</span>
+                    </div>
+                    <span class="alert-badge high">HIGH ALERT</span>
+                </div>
 
-                            <th>
-                                Alert
-                            </th>
+                <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin-bottom: 12px;">
+                    Seismic SAR interferometry detected <strong>4.2 cm ground rift displacement</strong> along the Kutch Fault Line. Structural integrity advisory issued for nearby settlements.
+                </p>
 
-                            <th>
-                                Location
-                            </th>
+                <div class="alert-metrics-grid">
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Seismic Rift Displacement</span>
+                        <span class="alert-metric-value">4.2 cm SAR Shift</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Population at Risk</span>
+                        <span class="alert-metric-value">98,200 People</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Rift Magnitude</span>
+                        <span class="alert-metric-value" style="color: #f97316;">5.4 Mw Equivalent</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Alert Timestamp</span>
+                        <span class="alert-metric-value" style="color: #a1a1aa;">09:15 AM (Active)</span>
+                    </div>
+                </div>
 
-                            <th>
-                                Severity
-                            </th>
+                <div class="alert-actions">
+                    <button class="run-detection-btn" style="max-width: 220px; font-size: 13px; padding: 10px 16px;" onclick="alert('Dispatching seismic inspection units to Bhuj Fault Zone...')">
+                        🚨 Dispatch Responders
+                    </button>
+                    <button class="map-layer-btn active" style="font-size: 13px; padding: 10px 16px;" onclick="navigateToPage('risk')">
+                        📍 Open Geo Map
+                    </button>
+                </div>
+            </div>
 
-                            <th>
-                                Time
-                            </th>
+            <!-- ALERT BOX 3: TSUNAMI WATCH -->
+            <div class="alert-box-card warning">
+                <div class="alert-box-header">
+                    <div class="alert-title">
+                        <span>🏖️</span>
+                        <span>Tsunami Coastal Surge Watch — Chennai Coastline</span>
+                    </div>
+                    <span class="alert-badge warning">COASTAL WATCH</span>
+                </div>
 
-                            <th>
-                                Status
-                            </th>
+                <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin-bottom: 12px;">
+                    Deep-sea buoy telemetry and PlanetScope satellite imagery identified a <strong>2.8m ocean surge wave</strong> approaching the coastal harbor region.
+                </p>
 
-                        </tr>
+                <div class="alert-metrics-grid">
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Coastal Surge Wave</span>
+                        <span class="alert-metric-value">2.8m Amplitude</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Coastal Population</span>
+                        <span class="alert-metric-value">215,000 People</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Surge Hazard Index</span>
+                        <span class="alert-metric-value" style="color: #eab308;">0.92 (Elevated)</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Alert Timestamp</span>
+                        <span class="alert-metric-value" style="color: #a1a1aa;">08:40 AM (Monitoring)</span>
+                    </div>
+                </div>
 
-                    </thead>
-
-
-                    <tbody>
-
-                        ${(disasters || []).map(dis => `
-
-                            <tr>
-
-                                <td>
-                                    ${dis.type} detected
-                                </td>
-
-                                <td>
-                                    ${dis.location}
-                                </td>
-
-                                <td>
-                                    <span class="status ${(dis.severity || "LOW").toLowerCase()}">
-                                        ${dis.severity || "LOW"}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    ${dis.date || "Active"}
-                                </td>
-
-                                <td>
-                                    ${dis.status || "Active"}
-                                </td>
-
-                            </tr>
-
-                        `).join("")}
-
-                    </tbody>
-
-                </table>
-
+                <div class="alert-actions">
+                    <button class="run-detection-btn" style="max-width: 220px; font-size: 13px; padding: 10px 16px;" onclick="alert('Activating coastal evacuation siren alert network...')">
+                        🚨 Issue Siren Alert
+                    </button>
+                    <button class="map-layer-btn active" style="font-size: 13px; padding: 10px 16px;" onclick="navigateToPage('risk')">
+                        📍 Open Geo Map
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -1281,269 +1271,109 @@ async function showAlerts() {
 
 
 /* =========================================================
-   REPORTS & ONE-CLICK SITREP GENERATION
+   REPORTS
 ========================================================= */
 
-let currentSitrepData = null;
-
-async function showReports() {
-    const latest = await getLatestDisaster();
-    updateProvenanceBanner(latest);
-
-    const activeEventId = (latest && latest.event_id) ? latest.event_id : "flood-emilia-romagna-2023";
-    const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
+function showReports() {
 
     setPageContent(`
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div>
-                <h1 class="page-title" style="margin-bottom: 4px;">Emergency Situation Reports</h1>
-                <p class="page-subtitle">One-click responder SITREP generation powered by satellite observation & spatial analytics</p>
-            </div>
-            <button class="primary-btn" id="headerGenerateSitrepBtn" style="padding: 12px 24px; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);">
-                ⚡ Generate Live SITREP
-            </button>
-        </div>
 
-        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid #1e293b; border-radius: 10px; padding: 18px; margin-bottom: 25px; display: flex; align-items: center; gap: 20px;">
-            <div style="flex: 1;">
-                <label style="font-size: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Active Disaster Event</label>
-                <select id="sitrepEventSelect" style="width: 100%; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 6px; padding: 10px; margin-top: 5px; font-size: 14px; font-weight: 600;">
-                    <option value="flood-emilia-romagna-2023" ${activeEventId.includes('flood') ? 'selected' : ''}>🌊 Emilia-Romagna Flood Event (Italy, May 2023)</option>
-                    <option value="wildfire-rhodes-2023" ${activeEventId.includes('wildfire') ? 'selected' : ''}>🔥 Rhodes Wildfire Event (Greece, July 2023)</option>
-                </select>
-            </div>
-            <div style="margin-top: 18px;">
-                <button class="primary-btn" onclick="executeSitrepGeneration(document.getElementById('sitrepEventSelect').value)" style="padding: 10px 20px;">
-                    Generate for Selected Event
+        <h1 class="page-title">
+            Reports
+        </h1>
+
+        <p class="page-subtitle">
+            Disaster analysis reports generated by Nirvaan
+        </p>
+
+
+        <div class="feature-grid">
+
+
+            <div class="feature-card">
+
+                <div class="big-icon">
+                    📄
+                </div>
+
+                <h3>
+                    Flood Analysis
+                </h3>
+
+                <p>
+                    Detailed satellite-based flood
+                    detection report for Surat.
+                </p>
+
+                <br>
+
+                <button
+                    class="primary-btn"
+                >
+                    Generate Report
                 </button>
+
             </div>
+
+
+            <div class="feature-card">
+
+                <div class="big-icon">
+                    📊
+                </div>
+
+                <h3>
+                    Risk Assessment
+                </h3>
+
+                <p>
+                    Geographic risk assessment
+                    based on detected disasters.
+                </p>
+
+                <br>
+
+                <button
+                    class="primary-btn"
+                >
+                    Generate Report
+                </button>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="big-icon">
+                    📈
+                </div>
+
+                <h3>
+                    Historical Trends
+                </h3>
+
+                <p>
+                    Analyze disaster activity over
+                    selected time periods.
+                </p>
+
+                <br>
+
+                <button
+                    class="primary-btn"
+                >
+                    Generate Report
+                </button>
+
+            </div>
+
+
         </div>
 
-        <div id="sitrepOutputContainer">
-            <div class="feature-grid">
-                <div class="feature-card" style="text-align: left;">
-                    <div class="big-icon">📄</div>
-                    <h3>Executive SITREP Summary</h3>
-                    <p>Grounded situation report containing severity indices, affected area bounds, and responder advisories.</p>
-                    <br>
-                    <button class="primary-btn" onclick="executeSitrepGeneration(document.getElementById('sitrepEventSelect').value)">Generate Report</button>
-                </div>
-                <div class="feature-card" style="text-align: left;">
-                    <div class="big-icon">📊</div>
-                    <h3>Population & Risk Assessment</h3>
-                    <p>Population exposure analysis cross-examined with land-cover classification and proxy data.</p>
-                    <br>
-                    <button class="primary-btn" onclick="executeSitrepGeneration(document.getElementById('sitrepEventSelect').value)">Generate Report</button>
-                </div>
-                <div class="feature-card" style="text-align: left;">
-                    <div class="big-icon">📈</div>
-                    <h3>Infrastructure Proximity Audit</h3>
-                    <p>Geospatial analysis of critical health, power, and transit facilities within impact buffer zones.</p>
-                    <br>
-                    <button class="primary-btn" onclick="executeSitrepGeneration(document.getElementById('sitrepEventSelect').value)">Generate Report</button>
-                </div>
-            </div>
-        </div>
     `);
 
-    const headerBtn = document.getElementById("headerGenerateSitrepBtn");
-    if (headerBtn) {
-        headerBtn.addEventListener("click", () => {
-            executeSitrepGeneration(activeEventId);
-        });
-    }
 }
 
-async function executeSitrepGeneration(eventId) {
-    const container = document.getElementById("sitrepOutputContainer");
-    if (!container) return;
-
-    const selEventId = eventId || "flood-emilia-romagna-2023";
-
-    container.innerHTML = `
-        <div class="sitrep-loading">
-            <div class="spinner"></div>
-            <h3 style="color: #f8fafc; font-size: 18px; margin-bottom: 8px;">⚡ Generating Emergency Situation Report...</h3>
-            <p style="color: #94a3b8; font-size: 13px;">Extracting multispectral Sentinel-2 indices & computing composite severity metrics</p>
-        </div>
-    `;
-
-    try {
-        const payload = {
-            event_id: selEventId,
-            event: {
-                event_id: selEventId,
-                name: selEventId.includes("wildfire") ? "Rhodes Wildfire Event" : "Emilia-Romagna Flood Event",
-                type: selEventId.includes("wildfire") ? "wildfire" : "flood",
-                location_name: selEventId.includes("wildfire") ? "Rhodes, Greece" : "Emilia-Romagna, Italy"
-            }
-        };
-
-        const startTime = performance.now();
-        const res = await generateSituationReport(payload);
-        const elapsedMs = Math.round(performance.now() - startTime);
-
-        currentSitrepData = res;
-        updateProvenanceBanner(res);
-
-        renderSitrepDocument(container, res, elapsedMs);
-
-    } catch (err) {
-        console.error("SITREP Generation Error:", err);
-        container.innerHTML = `
-            <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 10px; padding: 20px; text-align: center; color: #fca5a5;">
-                <h3 style="margin-top: 0;">❌ Report Generation Error</h3>
-                <p>${err.message || "Failed to communicate with report generation service."}</p>
-                <button class="secondary-btn" onclick="showReports()" style="margin-top: 10px;">Retry</button>
-            </div>
-        `;
-    }
-}
-
-function renderSitrepDocument(container, reportData, elapsedMs) {
-    const rJson = reportData.report_json || {};
-    const title = rJson.title || "NIRVAAN Emergency Situation Report";
-    const disasterType = (rJson.disaster_type || "DISASTER").toUpperCase();
-    const location = rJson.location || "Target Area of Interest";
-    const dataProv = reportData.data_provenance || rJson.data_provenance || "SYNTHETIC_FALLBACK";
-
-    const isSynthetic = (dataProv === "SYNTHETIC_FALLBACK");
-    const provBadgeClass = isSynthetic ? "pill-sev moderate" : "pill-type";
-    const provLabel = isSynthetic ? "⚠️ DEMO MODE: SYNTHETIC DATA" : "🛰️ SATELLITE: SENTINEL-2";
-
-    const sevScore = rJson.severity ? rJson.severity.impact_score : 65.0;
-    const sevBand = rJson.severity ? rJson.severity.impact_band : "Moderate";
-    const sevClass = (sevBand.toLowerCase() === "high" || sevBand.toLowerCase() === "extreme") ? "high" : "moderate";
-
-    const affectedArea = rJson.affected_area ? rJson.affected_area.affected_area_km2 : 14.2;
-    const popEst = (rJson.population_exposure && rJson.population_exposure.estimated_affected_population)
-        ? rJson.population_exposure.estimated_affected_population.toLocaleString()
-        : "12,500";
-    const infraCount = rJson.infrastructure_impact ? rJson.infrastructure_impact.impacted_facilities_count : 2;
-    const sensorName = (rJson.observation_window && rJson.observation_window.sensor) ? rJson.observation_window.sensor : "Sentinel-2 Level-2A";
-
-    const formattedDate = new Date(rJson.generated_at || Date.now()).toLocaleString('en-US', {
-        dateStyle: 'medium', timeStyle: 'short'
-    });
-
-    const recs = rJson.recommendations || [
-        "[P0] Prioritize ground verification in core affected zone (Severity Index: 65.0/100 - Moderate band).",
-        "[P1] Cross-examine estimated population exposure (~12,500 people) against local district census records."
-    ];
-
-    let recsHtml = recs.map(r => `<li>${r}</li>`).join("");
-
-    const markdownText = reportData.report_markdown || rJson.markdown_report || "";
-
-    let simpleHtml = markdownText
-        .replace(/^# (.*$)/gim, '<h2 style="color: #60a5fa; margin-top: 15px;">$1</h2>')
-        .replace(/^## (.*$)/gim, '<h3 style="color: #93c5fd; margin-top: 15px;">$1</h3>')
-        .replace(/^### (.*$)/gim, '<h4 style="color: #cbd5e1; margin-top: 10px;">$1</h4>')
-        .replace(/^\- (.*$)/gim, '<li style="margin-left: 15px;">$1</li>')
-        .replace(/`([^`]+)`/g, '<code style="background: rgba(30, 41, 59, 0.8); padding: 2px 6px; border-radius: 4px; color: #fde68a;">$1</code>')
-        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n\n/g, '<br><br>');
-
-    container.innerHTML = `
-        <div id="sitrepDocument" class="sitrep-document">
-            <div class="sitrep-letterhead">
-                <div class="letterhead-brand">
-                    <span class="brand-logo">◒</span>
-                    <div>
-                        <h2>NIRVAAN EMERGENCY SITREP</h2>
-                        <p>Satellite Disaster Monitoring & Intelligence System</p>
-                    </div>
-                </div>
-                <div class="letterhead-meta">
-                    <span class="pill ${provBadgeClass}">${provLabel}</span>
-                    <span class="meta-date">Generated in ${elapsedMs} ms | ${formattedDate}</span>
-                </div>
-            </div>
-
-            <div class="sitrep-title-box">
-                <h1>${title}</h1>
-                <div class="sitrep-pills">
-                    <span class="pill pill-type">TYPE: ${disasterType}</span>
-                    <span class="pill pill-loc">AOI: ${location}</span>
-                    <span class="pill pill-sev ${sevClass}">SEVERITY INDEX: ${sevScore}/100 (${sevBand})</span>
-                </div>
-            </div>
-
-            <div class="sitrep-metrics-grid">
-                <div class="metric-card">
-                    <span class="metric-label">Affected Area</span>
-                    <span class="metric-val">${affectedArea} km²</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Population Exposure</span>
-                    <span class="metric-val">~${popEst} people</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Impacted Infrastructure</span>
-                    <span class="metric-val">${infraCount} facilities</span>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Source Platform</span>
-                    <span class="metric-val" style="font-size: 15px; font-weight: 600;">${sensorName}</span>
-                </div>
-            </div>
-
-            <div class="sitrep-section">
-                <h3>📋 Priority Responder Recommendations</h3>
-                <ul class="recommendation-list">
-                    ${recsHtml}
-                </ul>
-            </div>
-
-            <div class="sitrep-section">
-                <h3>📄 Grounded Situation Narrative</h3>
-                <div class="markdown-body">
-                    ${simpleHtml}
-                </div>
-            </div>
-
-            <div class="sitrep-toolbar no-print">
-                <button onclick="window.print()" class="primary-btn" style="background: #2563eb; font-weight: 700;">
-                    🖨️ Print / Save as PDF
-                </button>
-                <button onclick="downloadSitrepMarkdown()" class="secondary-btn">
-                    📥 Download Markdown
-                </button>
-                <button onclick="copySitrepToClipboard()" class="secondary-btn" id="copySitrepBtn">
-                    📋 Copy to Clipboard
-                </button>
-            </div>
-        </div>
-    `;
-}
-
-function downloadSitrepMarkdown() {
-    if (!currentSitrepData) return;
-    const text = currentSitrepData.report_markdown || "";
-    const blob = new Blob([text], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `NIRVAAN_SITREP_${Date.now()}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-function copySitrepToClipboard() {
-    if (!currentSitrepData) return;
-    const text = currentSitrepData.report_markdown || "";
-    navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById("copySitrepBtn");
-        if (btn) {
-            btn.innerHTML = "✅ Copied!";
-            setTimeout(() => { btn.innerHTML = "📋 Copy to Clipboard"; }, 2000);
-        }
-    }).catch(err => {
-        alert("Clipboard copy failed: " + err);
-    });
-}
 
 
 /* =========================================================
@@ -1553,7 +1383,6 @@ function copySitrepToClipboard() {
 async function showHistory() {
 
     const disasters = await getDisasterHistory();
-    updateProvenanceBanner(disasters && disasters[0]);
 
     setPageContent(`
 
@@ -1675,112 +1504,73 @@ function showSettings() {
 
     setPageContent(`
 
-        <h1 class="page-title">
-            Settings
+        <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
+            System Settings & Controls
         </h1>
 
-        <p class="page-subtitle">
-            Configure Nirvaan monitoring preferences
+        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">
+            Manage satellite telemetry streams, automated early warning triggers, and operational permissions
         </p>
 
-
-        <div class="settings-list">
-
-
-            <div class="setting-item">
-
-                <div>
-
-                    <strong>
-                        Real-time Monitoring
-                    </strong>
-
-                    <p>
-                        Continuously monitor new satellite data
-                    </p>
-
-                </div>
-
-                <div class="toggle"></div>
-
+        <!-- CATEGORY 1: SYSTEM OPERATIONS -->
+        <div class="settings-card-panel">
+            <div class="settings-card-header">
+                <h3 class="settings-card-title">
+                    <span>🎛️</span> Core Operations & Live Ingestion
+                </h3>
+                <span style="font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.15); padding: 4px 10px; border-radius: 6px;">
+                    Operational Status: ACTIVE
+                </span>
             </div>
 
-
-
-            <div class="setting-item">
-
-                <div>
-
-                    <strong>
-                        Disaster Alerts
-                    </strong>
-
-                    <p>
-                        Receive alerts when disasters are detected
-                    </p>
-
+            <div class="settings-list">
+                <div class="setting-item">
+                    <div>
+                        <strong>📡 Real-Time Satellite Telemetry Monitoring</strong>
+                        <p>Continuously poll and process incoming orbital imagery from ESA Sentinel & USGS Landsat hubs</p>
+                    </div>
+                    <label class="setting-switch">
+                        <input type="checkbox" checked onchange="alert('Real-time monitoring toggle updated.')">
+                        <span class="setting-switch-slider"></span>
+                    </label>
                 </div>
 
-                <div class="toggle"></div>
-
-            </div>
-
-
-
-            <div class="setting-item">
-
-                <div>
-
-                    <strong>
-                        AI Analysis
-                    </strong>
-
-                    <p>
-                        Automatically analyze incoming imagery
-                    </p>
-
+                <div class="setting-item">
+                    <div>
+                        <strong>🤖 Automated AI Neural Segmentation Engine</strong>
+                        <p>Automatically run U-Net NDWI & SAR inundation inference on incoming satellite passes</p>
+                    </div>
+                    <label class="setting-switch">
+                        <input type="checkbox" checked onchange="alert('Automated AI Analysis toggle updated.')">
+                        <span class="setting-switch-slider"></span>
+                    </label>
                 </div>
 
-                <div class="toggle"></div>
-
-            </div>
-
-
-
-            <div class="setting-item">
-
-                <div>
-
-                    <strong>
-                        Automatic Reports
-                    </strong>
-
-                    <p>
-                        Generate reports after disaster detection
-                    </p>
-
+                <div class="setting-item">
+                    <div>
+                        <strong>📄 Automated SITREP Report Generation</strong>
+                        <p>Generate GeoJSON hazard maps and PDF situational briefs immediately post-detection</p>
+                    </div>
+                    <label class="setting-switch">
+                        <input type="checkbox" checked onchange="alert('Automated SITREP Reports toggle updated.')">
+                        <span class="setting-switch-slider"></span>
+                    </label>
                 </div>
-
-                <div class="toggle"></div>
-
             </div>
-
         </div>
 
-        <!-- OPERATIONAL PERMISSIONS & DATA SECURITY PANEL -->
-        <div class="panel" style="margin-top: 24px; padding: 24px;">
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
-                <h3 style="font-size: 16px; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+        <!-- CATEGORY 2: OPERATIONAL PERMISSIONS -->
+        <div class="settings-card-panel">
+            <div class="settings-card-header">
+                <h3 class="settings-card-title">
                     <span>🛡️</span> Disaster Access & Operational Permissions
                 </h3>
-                <span style="font-size: 11px; color: #a1a1aa; background: rgba(56, 189, 248, 0.15); padding: 4px 10px; border-radius: 6px;">
+                <span style="font-size: 11px; color: #a1a1aa; background: rgba(255, 255, 255, 0.05); padding: 4px 10px; border-radius: 6px;">
                     Role: Commander / Response Lead
                 </span>
             </div>
 
             <div class="settings-list">
-
                 <div class="setting-item">
                     <div>
                         <strong>🛰️ Satellite Stream Ingestion Permission (Sentinel / Landsat)</strong>
@@ -1835,9 +1625,7 @@ function showSettings() {
                         <span class="setting-switch-slider"></span>
                     </label>
                 </div>
-
             </div>
-
         </div>
 
     `);
@@ -1848,6 +1636,7 @@ function showSettings() {
 
 /* =========================================================
    SATELLITE REFRESH
+========================================================= */
 
 async function refreshSatellite() {
 
@@ -1879,6 +1668,10 @@ async function refreshSatellite() {
 
 }
 
+
+/* =========================================================
+   ABOUT PAGE
+========================================================= */
 
 /* =========================================================
    ABOUT PAGE
