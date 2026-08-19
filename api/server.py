@@ -238,17 +238,21 @@ def handle_analyze_endpoint(payload: Optional[Dict[str, Any]]) -> Dict[str, Any]
 def handle_report_endpoint(payload: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     """POST /api/v1/report endpoint handler."""
     if not isinstance(payload, dict):
-        return _create_json_response(400, {
-            "error": "BAD_REQUEST",
-            "message": sanitize_log_message("Payload must be a valid JSON object.")
-        })
+        return create_json_error_response(
+            400, "BAD_REQUEST", "Payload must be a valid JSON object."
+        )
 
-    force_offline = payload.get("force_offline", True)
-    report_result = generate_situation_report(payload, force_offline=force_offline)
-    if isinstance(report_result, dict) and "data_provenance" not in report_result:
-        report_result["data_provenance"] = payload.get("data_provenance", "SYNTHETIC_FALLBACK")
+    try:
+        force_offline = payload.get("force_offline", True)
+        report_result = generate_situation_report(payload, force_offline=force_offline)
+        if isinstance(report_result, dict) and "data_provenance" not in report_result:
+            report_result["data_provenance"] = payload.get("data_provenance", "SYNTHETIC_FALLBACK")
 
-    return _create_json_response(200, report_result)
+        return _create_json_response(200, report_result)
+    except Exception as e:
+        return create_json_error_response(
+            500, "INTERNAL_ERROR", f"Situation report generation failed: {sanitize_log_message(str(e))}"
+        )
 
 
 def handle_disaster_latest_endpoint() -> Dict[str, Any]:
