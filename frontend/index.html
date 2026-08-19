@@ -12,6 +12,10 @@
 
     <title>Nirvaan | Disaster Monitoring</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <link
         rel="stylesheet"
         href="style.css"
@@ -38,15 +42,15 @@
         <div class="brand">
 
             <div class="brand-logo">
-                ◒
+                🛰️
             </div>
 
             <div>
 
-                <h2>Nirvaan</h2>
+                <h2 class="nirvaan-title">NIRVAAN</h2>
 
                 <p>
-                    Satellite Based Disaster Monitoring
+                    Satellite Disaster Intelligence
                 </p>
 
             </div>
@@ -58,6 +62,39 @@
         <!-- NAVIGATION -->
 
         <nav class="sidebar-nav">
+
+
+            <!-- THEME SWITCHER AT TOP OF NAVIGATION -->
+
+            <div class="sidebar-theme-section">
+
+                <span class="theme-section-label">THEME</span>
+
+                <div class="theme-toggle-pill">
+
+                    <button
+                        type="button"
+                        class="theme-pill-btn dark-btn active"
+                        data-theme-set="dark"
+                        title="Dark Mode"
+                    >
+                        <span>🌙</span>
+                        <span>Dark</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="theme-pill-btn light-btn"
+                        data-theme-set="light"
+                        title="Light Mode"
+                    >
+                        <span>☀️</span>
+                        <span>Light</span>
+                    </button>
+
+                </div>
+
+            </div>
 
 
             <button
@@ -229,19 +266,142 @@
     <section class="main-area">
 
 
-        <!-- TOP BAR -->
+        <!-- TOP BAR / HEADER NAVBAR -->
 
         <header class="topbar">
 
 
+            <!-- LEFT: 3-LINE MENU BUTTON & NIRVAAN BRAND -->
+
             <div class="topbar-left">
 
-                <span class="mobile-menu">
-                    ☰
-                </span>
+                <!-- 3-LINE MENU DROPDOWN (CONTAINS ALL SECTIONS) -->
+
+                <div class="menu-dropdown-wrapper">
+
+                    <button
+                        class="topbar-menu-btn"
+                        id="topbarMenuBtn"
+                        aria-label="Menu"
+                        title="Toggle Navigation Menu"
+                    >
+                        ☰
+                    </button>
+
+                    <div
+                        class="menu-dropdown left-dropdown"
+                        id="menuDropdown"
+                    >
+
+                        <button
+                            class="menu-dropdown-item active"
+                            data-page="dashboard"
+                        >
+                            <span class="menu-icon">⌂</span>
+                            <span>Dashboard</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="satellite"
+                        >
+                            <span class="menu-icon">◇</span>
+                            <span>Satellite Monitor</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="detection"
+                        >
+                            <span class="menu-icon">△</span>
+                            <span>Disaster Detection</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="risk"
+                        >
+                            <span class="menu-icon">♢</span>
+                            <span>Risk Map</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="alerts"
+                        >
+                            <span class="menu-icon">♧</span>
+                            <span>Alerts</span>
+                            <span class="alert-count-badge">3</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="reports"
+                        >
+                            <span class="menu-icon">▤</span>
+                            <span>Reports</span>
+                        </button>
+
+                        <div class="dropdown-divider"></div>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="settings"
+                        >
+                            <span class="menu-icon">⚙</span>
+                            <span>Settings</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="about"
+                        >
+                            <span class="menu-icon">ℹ</span>
+                            <span>About</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="history"
+                        >
+                            <span class="menu-icon">◷</span>
+                            <span>History</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="faq"
+                        >
+                            <span class="menu-icon">❓</span>
+                            <span>FAQ</span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="topbar-brand">
+
+                    <div class="topbar-brand-logo">
+                        <span class="brand-logo-icon">🛰️</span>
+                    </div>
+
+                    <div class="topbar-brand-text">
+
+                        <h2 class="nirvaan-title">NIRVAAN</h2>
+
+                        <p class="nirvaan-tagline">
+                            Satellite Disaster Intelligence
+                        </p>
+
+                    </div>
+
+                </div>
 
             </div>
 
+
+            <!-- RIGHT: ALERT ICON BUTTON & THEME SWITCHER -->
 
             <div class="topbar-right">
 
@@ -251,16 +411,30 @@
                     <span class="mode-badge" id="modeBadge">DEFAULT</span>
                 </div>
 
-                <span class="notification">
-                    ♧
-                </span>
+                <!-- ALERT BELL ICON BUTTON -->
+                <button
+                    class="topbar-icon-btn alert-icon-btn"
+                    data-page="alerts"
+                    title="Disaster Alerts (3 Active)"
+                    aria-label="Disaster Alerts"
+                >
+                    <span class="icon-bell">🔔</span>
+                    <span class="alert-count-badge">3</span>
+                </button>
 
-                <div class="system-status">
-
-                    <span class="status-dot"></span>
-
-                    System Online
-
+                <!-- ATTRACIVE SLIDING THEME SWITCHER -->
+                <div class="theme-switch-wrapper" id="themeSwitchWrapper" title="Switch Theme (Light / Dark)">
+                    <span class="theme-switch-icon sun-icon">☀️</span>
+                    <button
+                        id="themeToggleBtn"
+                        class="theme-switch-track"
+                        type="button"
+                        role="switch"
+                        aria-label="Toggle light and dark theme"
+                    >
+                        <span class="theme-switch-thumb"></span>
+                    </button>
+                    <span class="theme-switch-icon moon-icon">🌙</span>
                 </div>
 
             </div>
