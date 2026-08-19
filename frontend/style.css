@@ -1927,13 +1927,13 @@ html[data-theme="light"] .theme-pill-btn.active {
 .menu-dropdown {
     position: absolute;
     right: 0;
-    top: calc(100% + 10px);
-    width: 200px;
-    background: #0d1a2d;
-    border: 1px solid #223752;
-    border-radius: 12px;
+    top: calc(100% + 12px);
+    width: 230px;
+    background: #09090b;
+    border: 1px solid #27272a;
+    border-radius: 14px;
     padding: 8px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
     display: none;
     flex-direction: column;
     gap: 4px;
@@ -1941,8 +1941,19 @@ html[data-theme="light"] .theme-pill-btn.active {
     animation: fadeInDropdown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.menu-dropdown.left-dropdown {
+    right: auto;
+    left: 0;
+}
+
 .menu-dropdown.show {
     display: flex;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: #27272a;
+    margin: 4px 6px;
 }
 
 @keyframes fadeInDropdown {
@@ -1960,7 +1971,7 @@ html[data-theme="light"] .theme-pill-btn.active {
     width: 100%;
     border: none;
     background: transparent;
-    color: #cbd5e1;
+    color: #a1a1aa;
     padding: 10px 14px;
     border-radius: 8px;
     font-size: 13px;
@@ -1974,8 +1985,14 @@ html[data-theme="light"] .theme-pill-btn.active {
 }
 
 .menu-dropdown-item:hover {
-    background: #192d47;
+    background: #18181b;
     color: #ffffff;
+}
+
+.menu-dropdown-item.active {
+    background: #18181b;
+    color: #38bdf8;
+    font-weight: 700;
 }
 
 .menu-dropdown-item .menu-icon {

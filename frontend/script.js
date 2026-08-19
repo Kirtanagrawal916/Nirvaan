@@ -71,12 +71,13 @@ function navigateToPage(page) {
         }
     });
 
-    // Sync topbar
-    topbarNavLinks.forEach(link => {
-        if (link.dataset.page === page) {
-            link.classList.add("active");
+    // Sync menu dropdown items
+    const menuItems = document.querySelectorAll(".menu-dropdown-item");
+    menuItems.forEach(item => {
+        if (item.dataset.page === page) {
+            item.classList.add("active");
         } else {
-            link.classList.remove("active");
+            item.classList.remove("active");
         }
     });
 

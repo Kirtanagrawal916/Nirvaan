@@ -271,9 +271,124 @@
         <header class="topbar">
 
 
-            <!-- LEFT: NIRVAAN BRAND & NEW STYLISH LOGO -->
+            <!-- LEFT: 3-LINE MENU BUTTON & NIRVAAN BRAND -->
 
             <div class="topbar-left">
+
+                <!-- 3-LINE MENU DROPDOWN (CONTAINS ALL SECTIONS) -->
+
+                <div class="menu-dropdown-wrapper">
+
+                    <button
+                        class="topbar-menu-btn"
+                        id="topbarMenuBtn"
+                        aria-label="Menu"
+                        title="Toggle Navigation Menu"
+                    >
+                        ☰
+                    </button>
+
+                    <div
+                        class="menu-dropdown left-dropdown"
+                        id="menuDropdown"
+                    >
+
+                        <button
+                            class="menu-dropdown-item active"
+                            data-page="dashboard"
+                        >
+                            <span class="menu-icon">⌂</span>
+                            <span>Dashboard</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="satellite"
+                        >
+                            <span class="menu-icon">◇</span>
+                            <span>Satellite Monitor</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="detection"
+                        >
+                            <span class="menu-icon">△</span>
+                            <span>Disaster Detection</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="risk"
+                        >
+                            <span class="menu-icon">♢</span>
+                            <span>Risk Map</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="alerts"
+                        >
+                            <span class="menu-icon">♧</span>
+                            <span>Alerts</span>
+                            <span class="alert-count-badge">3</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="reports"
+                        >
+                            <span class="menu-icon">▤</span>
+                            <span>Reports</span>
+                        </button>
+
+                        <div class="dropdown-divider"></div>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="settings"
+                        >
+                            <span class="menu-icon">⚙</span>
+                            <span>Settings</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="about"
+                        >
+                            <span class="menu-icon">ℹ</span>
+                            <span>About</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="history"
+                        >
+                            <span class="menu-icon">◷</span>
+                            <span>History</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="faq"
+                        >
+                            <span class="menu-icon">❓</span>
+                            <span>FAQ</span>
+                        </button>
+
+                        <div class="dropdown-divider"></div>
+
+                        <button
+                            class="menu-dropdown-item"
+                            id="menuLoginItem"
+                        >
+                            <span class="menu-icon">🔑</span>
+                            <span id="menuLoginText">Login / Account</span>
+                        </button>
+
+                    </div>
+
+                </div>
 
                 <div class="topbar-brand">
 
@@ -296,58 +411,11 @@
             </div>
 
 
-            <!-- CENTER: NIRVAAN TOP NAVIGATION SECTIONS -->
-
-            <nav class="topbar-center-nav">
-
-                <button
-                    class="topbar-nav-link active"
-                    data-page="dashboard"
-                >
-                    <span class="nav-icon">⌂</span>
-                    <span>Dashboard</span>
-                </button>
-
-                <button
-                    class="topbar-nav-link"
-                    data-page="satellite"
-                >
-                    <span class="nav-icon">◇</span>
-                    <span>Satellite Monitor</span>
-                </button>
-
-                <button
-                    class="topbar-nav-link"
-                    data-page="detection"
-                >
-                    <span class="nav-icon">△</span>
-                    <span>Disaster Detection</span>
-                </button>
-
-                <button
-                    class="topbar-nav-link"
-                    data-page="risk"
-                >
-                    <span class="nav-icon">♢</span>
-                    <span>Risk Map</span>
-                </button>
-
-                <button
-                    class="topbar-nav-link"
-                    data-page="reports"
-                >
-                    <span class="nav-icon">▤</span>
-                    <span>Reports</span>
-                </button>
-
-            </nav>
-
-
-            <!-- RIGHT: ALERT ICON BUTTON, THEME SWITCHER, SIGN OUT & 3-LINE MENU -->
+            <!-- RIGHT: ALERT ICON BUTTON, THEME SWITCHER, LOGIN & SIGN OUT -->
 
             <div class="topbar-right">
 
-                <!-- ALERT BELL ICON BUTTON (PERFORMS SAME TASK AS ALERTS) -->
+                <!-- ALERT BELL ICON BUTTON -->
 
                 <button
                     class="topbar-icon-btn alert-icon-btn"
@@ -393,68 +461,6 @@
                 >
                     Sign Out
                 </button>
-
-                <!-- 3-LINE MENU WITH SETTINGS, ABOUT, HISTORY, FAQ, LOGIN -->
-
-                <div class="menu-dropdown-wrapper">
-
-                    <button
-                        class="topbar-menu-btn"
-                        id="topbarMenuBtn"
-                        aria-label="Menu"
-                        title="Toggle Menu"
-                    >
-                        ☰
-                    </button>
-
-                    <div
-                        class="menu-dropdown"
-                        id="menuDropdown"
-                    >
-
-                        <button
-                            class="menu-dropdown-item"
-                            id="menuLoginItem"
-                        >
-                            <span class="menu-icon">🔑</span>
-                            <span id="menuLoginText">Login / Account</span>
-                        </button>
-
-                        <button
-                            class="menu-dropdown-item"
-                            data-page="settings"
-                        >
-                            <span class="menu-icon">⚙</span>
-                            <span>Settings</span>
-                        </button>
-
-                        <button
-                            class="menu-dropdown-item"
-                            data-page="about"
-                        >
-                            <span class="menu-icon">ℹ</span>
-                            <span>About</span>
-                        </button>
-
-                        <button
-                            class="menu-dropdown-item"
-                            data-page="history"
-                        >
-                            <span class="menu-icon">◷</span>
-                            <span>History</span>
-                        </button>
-
-                        <button
-                            class="menu-dropdown-item"
-                            data-page="faq"
-                        >
-                            <span class="menu-icon">❓</span>
-                            <span>FAQ</span>
-                        </button>
-
-                    </div>
-
-                </div>
 
             </div>
 
