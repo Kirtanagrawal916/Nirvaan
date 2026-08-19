@@ -60,6 +60,39 @@
         <nav class="sidebar-nav">
 
 
+            <!-- THEME SWITCHER AT TOP OF NAVIGATION -->
+
+            <div class="sidebar-theme-section">
+
+                <span class="theme-section-label">THEME</span>
+
+                <div class="theme-toggle-pill">
+
+                    <button
+                        type="button"
+                        class="theme-pill-btn dark-btn active"
+                        data-theme-set="dark"
+                        title="Dark Mode"
+                    >
+                        <span>🌙</span>
+                        <span>Dark</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="theme-pill-btn light-btn"
+                        data-theme-set="light"
+                        title="Light Mode"
+                    >
+                        <span>☀️</span>
+                        <span>Light</span>
+                    </button>
+
+                </div>
+
+            </div>
+
+
             <button
                 class="nav-item active"
                 data-page="dashboard"
@@ -229,31 +262,166 @@
     <section class="main-area">
 
 
-        <!-- TOP BAR -->
+        <!-- TOP BAR / HEADER NAVBAR -->
 
         <header class="topbar">
 
 
+            <!-- LEFT: NIRVAAN BRAND -->
+
             <div class="topbar-left">
 
-                <span class="mobile-menu">
-                    ☰
-                </span>
+                <div class="topbar-brand">
+
+                    <div class="topbar-brand-logo">
+                        ◒
+                    </div>
+
+                    <div class="topbar-brand-text">
+
+                        <h2>Nirvaan</h2>
+
+                        <p>
+                            Satellite Based Disaster Monitoring
+                        </p>
+
+                    </div>
+
+                </div>
 
             </div>
 
 
+            <!-- CENTER: NIRVAAN TOP NAVIGATION SECTIONS -->
+
+            <nav class="topbar-center-nav">
+
+                <button
+                    class="topbar-nav-link active"
+                    data-page="dashboard"
+                >
+                    <span class="nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </button>
+
+                <button
+                    class="topbar-nav-link"
+                    data-page="satellite"
+                >
+                    <span class="nav-icon">◇</span>
+                    <span>Satellite Monitor</span>
+                </button>
+
+                <button
+                    class="topbar-nav-link"
+                    data-page="detection"
+                >
+                    <span class="nav-icon">△</span>
+                    <span>Disaster Detection</span>
+                </button>
+
+                <button
+                    class="topbar-nav-link"
+                    data-page="risk"
+                >
+                    <span class="nav-icon">♢</span>
+                    <span>Risk Map</span>
+                </button>
+
+                <button
+                    class="topbar-nav-link"
+                    data-page="alerts"
+                >
+                    <span class="nav-icon">♧</span>
+                    <span>Alerts</span>
+                    <span class="alert-count-badge">3</span>
+                </button>
+
+                <button
+                    class="topbar-nav-link"
+                    data-page="reports"
+                >
+                    <span class="nav-icon">▤</span>
+                    <span>Reports</span>
+                </button>
+
+            </nav>
+
+
+            <!-- RIGHT: THEME SWITCHER, SIGN OUT & 3-LINE MENU DROPDOWN -->
+
             <div class="topbar-right">
 
-                <span class="notification">
-                    ♧
-                </span>
+                <button
+                    id="themeToggleBtn"
+                    class="theme-toggle-btn"
+                    type="button"
+                    aria-label="Toggle light and dark theme"
+                    title="Toggle Theme"
+                >
+                    <span class="theme-icon dark-icon">☀️</span>
+                    <span class="theme-icon light-icon">🌙</span>
+                    <span id="themeToggleText" class="theme-label">Light Mode</span>
+                </button>
 
-                <div class="system-status">
+                <button
+                    class="topbar-signout-btn"
+                    id="signOutBtn"
+                >
+                    Sign Out
+                </button>
 
-                    <span class="status-dot"></span>
+                <!-- 3-LINE MENU WITH SETTINGS, ABOUT, HISTORY, FAQ -->
 
-                    System Online
+                <div class="menu-dropdown-wrapper">
+
+                    <button
+                        class="topbar-menu-btn"
+                        id="topbarMenuBtn"
+                        aria-label="Menu"
+                        title="Toggle Menu"
+                    >
+                        ☰
+                    </button>
+
+                    <div
+                        class="menu-dropdown"
+                        id="menuDropdown"
+                    >
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="settings"
+                        >
+                            <span class="menu-icon">⚙</span>
+                            <span>Settings</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="about"
+                        >
+                            <span class="menu-icon">ℹ</span>
+                            <span>About</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="history"
+                        >
+                            <span class="menu-icon">◷</span>
+                            <span>History</span>
+                        </button>
+
+                        <button
+                            class="menu-dropdown-item"
+                            data-page="faq"
+                        >
+                            <span class="menu-icon">❓</span>
+                            <span>FAQ</span>
+                        </button>
+
+                    </div>
 
                 </div>
 
