@@ -86,13 +86,46 @@ def generate_severity_legend_html() -> str:
     return legend_html
 
 
+def generate_provenance_watermark_html(data_provenance: str = "SYNTHETIC_FALLBACK") -> str:
+    """Generate accessible HTML watermark badge disclosing map data provenance."""
+    if data_provenance == "REAL_SATELLITE_DATA":
+        bg_color = "rgba(46, 204, 113, 0.95)"
+        border_color = "#27ae60"
+        label = "🛰️ REAL SATELLITE DATA (Sentinel-2)"
+    else:
+        bg_color = "rgba(230, 126, 34, 0.95)"
+        border_color = "#d35400"
+        label = "⚠️ DEMO MODE: SYNTHETIC DATA"
+
+    return f"""
+    <div style="
+        position: fixed; 
+        top: 25px; 
+        right: 25px; 
+        background-color: {bg_color};
+        color: #ffffff;
+        border: 1px solid {border_color};
+        border-radius: 6px;
+        padding: 8px 14px;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        font-weight: bold;
+        z-index: 9999;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    " aria-label="Data Provenance Watermark" role="region">
+        {label}
+    </div>
+    """
+
+
 def build_folium_map(
     event_location: Optional[Dict[str, Any]] = None,
     affected_polygons: Optional[List[Dict[str, Any]]] = None,
     hotspots: Optional[List[Dict[str, Any]]] = None,
     severity_level: Optional[str] = "High",
     default_center: Tuple[float, float] = (20.0, 0.0),
-    zoom_start: int = 10
+    zoom_start: int = 10,
+    data_provenance: str = "SYNTHETIC_FALLBACK"
 ) -> Any:
     """
     Construct a Folium Map with layers for:
@@ -100,6 +133,7 @@ def build_folium_map(
     - Affected Polygons (styled by severity)
     - Hotspots / Hotspot Clusters
     - Accessible HTML Severity Legend
+    - Data Provenance Watermark
     
     Fits map bounds automatically if valid geospatial coordinates exist.
     If geospatial metadata is missing or invalid, renders a default fallback map with a warning popup.
@@ -238,8 +272,9 @@ def build_folium_map(
             icon=folium.Icon(color="orange", icon="warning-sign", prefix="glyphicon")
         ).add_to(m)
 
-    # 5. Add Legend and Layer Control
+    # 5. Add Legend, Watermark, and Layer Control
     folium.LayerControl(position="topright").add_to(m)
     m.get_root().html.add_child(folium.Element(generate_severity_legend_html()))
+    m.get_root().html.add_child(folium.Element(generate_provenance_watermark_html(data_provenance)))
 
     return m
