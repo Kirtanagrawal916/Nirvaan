@@ -90,19 +90,161 @@ navItems.forEach(item => {
     });
 });
 
-topbarNavLinks.forEach(link => {
-    link.addEventListener("click", () => {
-        const page = link.dataset.page;
-        if (page) navigateToPage(page);
-    });
-});
+/* =========================================================
+   AUTHENTICATION & LOGIN SYSTEM
+========================================================= */
 
-// Topbar Sign Out button
-const signOutBtn = document.getElementById("signOutBtn");
-if (signOutBtn) {
-    signOutBtn.addEventListener("click", () => {
-        alert("You have signed out successfully.");
-    });
+function initAuth() {
+    const loginBtn = document.getElementById("loginBtn");
+    const menuLoginItem = document.getElementById("menuLoginItem");
+    const loginModalOverlay = document.getElementById("loginModalOverlay");
+    const closeLoginModalBtn = document.getElementById("closeLoginModalBtn");
+    const loginForm = document.getElementById("loginForm");
+    const signOutBtn = document.getElementById("signOutBtn");
+    const userProfileBadge = document.getElementById("userProfileBadge");
+    const userNameText = document.getElementById("userNameText");
+    const userRoleText = document.getElementById("userRoleText");
+    const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+    const loginPassword = document.getElementById("loginPassword");
+    const tabSignin = document.getElementById("tabSignin");
+    const tabRegister = document.getElementById("tabRegister");
+    const nameGroup = document.getElementById("nameGroup");
+    const authSubmitText = document.getElementById("authSubmitText");
+    const googleSSOBtn = document.getElementById("googleSSOBtn");
+    const govSSOBtn = document.getElementById("govSSOBtn");
+
+    let savedUser = localStorage.getItem("nirvaan_user");
+    let currentUser = savedUser ? JSON.parse(savedUser) : null;
+
+    function updateAuthUI() {
+        if (currentUser && currentUser.isLoggedIn) {
+            if (loginBtn) loginBtn.style.display = "none";
+            if (signOutBtn) signOutBtn.style.display = "inline-flex";
+            if (userProfileBadge) {
+                userProfileBadge.classList.add("logged-in");
+                if (userNameText) userNameText.textContent = currentUser.name || "Cmdr. Yashi";
+                if (userRoleText) userRoleText.textContent = currentUser.role || "Manager";
+            }
+            const menuLoginText = document.getElementById("menuLoginText");
+            if (menuLoginText) menuLoginText.textContent = `Account (${(currentUser.name || 'User').split(' ')[0]})`;
+        } else {
+            if (loginBtn) loginBtn.style.display = "inline-flex";
+            if (signOutBtn) signOutBtn.style.display = "none";
+            if (userProfileBadge) userProfileBadge.classList.remove("logged-in");
+            const menuLoginText = document.getElementById("menuLoginText");
+            if (menuLoginText) menuLoginText.textContent = "Login / Account";
+        }
+    }
+
+    function openModal() {
+        if (loginModalOverlay) loginModalOverlay.classList.add("show");
+    }
+
+    function closeModal() {
+        if (loginModalOverlay) loginModalOverlay.classList.remove("show");
+    }
+
+    if (loginBtn) loginBtn.addEventListener("click", openModal);
+    if (menuLoginItem) menuLoginItem.addEventListener("click", openModal);
+    if (closeLoginModalBtn) closeLoginModalBtn.addEventListener("click", closeModal);
+
+    if (loginModalOverlay) {
+        loginModalOverlay.addEventListener("click", (e) => {
+            if (e.target === loginModalOverlay) closeModal();
+        });
+    }
+
+    if (togglePasswordBtn && loginPassword) {
+        togglePasswordBtn.addEventListener("click", () => {
+            const type = loginPassword.type === "password" ? "text" : "password";
+            loginPassword.type = type;
+            togglePasswordBtn.textContent = type === "password" ? "👁️" : "🙈";
+        });
+    }
+
+    if (tabSignin && tabRegister) {
+        tabSignin.addEventListener("click", () => {
+            tabSignin.classList.add("active");
+            tabRegister.classList.remove("active");
+            if (nameGroup) nameGroup.style.display = "none";
+            if (authSubmitText) authSubmitText.textContent = "Authenticate & Launch Portal";
+        });
+
+        tabRegister.addEventListener("click", () => {
+            tabRegister.classList.add("active");
+            tabSignin.classList.remove("active");
+            if (nameGroup) nameGroup.style.display = "flex";
+            if (authSubmitText) authSubmitText.textContent = "Create Account & Register";
+        });
+    }
+
+    if (loginForm) {
+        loginForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const email = document.getElementById("loginEmail").value;
+            const role = document.getElementById("loginRole").value;
+            const regName = document.getElementById("regName").value;
+            
+            currentUser = {
+                isLoggedIn: true,
+                name: regName || email.split("@")[0].replace(".", " ").toUpperCase() || "Cmdr. Yashi",
+                email: email,
+                role: role
+            };
+
+            localStorage.setItem("nirvaan_user", JSON.stringify(currentUser));
+            updateAuthUI();
+            closeModal();
+            alert(`Welcome back, ${currentUser.name}!\nAuthenticated as ${currentUser.role}.`);
+        });
+    }
+
+    if (signOutBtn) {
+        signOutBtn.addEventListener("click", () => {
+            currentUser = null;
+            localStorage.removeItem("nirvaan_user");
+            updateAuthUI();
+            alert("Signed out successfully.");
+        });
+    }
+
+    if (googleSSOBtn) {
+        googleSSOBtn.addEventListener("click", () => {
+            currentUser = {
+                isLoggedIn: true,
+                name: "Cmdr. Yashi (Google)",
+                email: "yashi@google.com",
+                role: "Disaster Response Manager"
+            };
+            localStorage.setItem("nirvaan_user", JSON.stringify(currentUser));
+            updateAuthUI();
+            closeModal();
+            alert("Google SSO Authentication successful!");
+        });
+    }
+
+    if (govSSOBtn) {
+        govSSOBtn.addEventListener("click", () => {
+            currentUser = {
+                isLoggedIn: true,
+                name: "Cmdr. Yashi (Gov Net)",
+                email: "yashi@ndma.gov.in",
+                role: "Disaster Response Manager"
+            };
+            localStorage.setItem("nirvaan_user", JSON.stringify(currentUser));
+            updateAuthUI();
+            closeModal();
+            alert("Government Disaster Network Authentication successful!");
+        });
+    }
+
+    updateAuthUI();
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAuth);
+} else {
+    initAuth();
 }
 
 // 3-Line Menu Dropdown (Settings, About, History, FAQ)
