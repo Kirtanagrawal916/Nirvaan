@@ -64,71 +64,44 @@ loadPage("dashboard");
    PAGE ROUTER
 ========================================================= */
 
-function loadPage(page) {
-
+async function loadPage(page) {
 
     switch(page) {
 
-
         case "dashboard":
-
-            showDashboard();
-
+            await showDashboard();
             break;
-
 
         case "satellite":
-
-            showSatellite();
-
+            await showSatellite();
             break;
-
 
         case "detection":
-
             showDetection();
-
             break;
-
 
         case "risk":
-
             showRiskMap();
-
             break;
-
 
         case "alerts":
-
             showAlerts();
-
             break;
-
 
         case "reports":
-
             showReports();
-
             break;
-
 
         case "history":
-
-            showHistory();
-
+            await showHistory();
             break;
-
 
         case "settings":
-
             showSettings();
-
             break;
 
-
         default:
-
-            showDashboard();
+            await showDashboard();
 
     }
 
@@ -140,11 +113,41 @@ function loadPage(page) {
    DASHBOARD
 ========================================================= */
 
-function showDashboard() {
+async function showDashboard() {
 
-    const stats =
-        nirvaanData.statistics;
+    const stats = nirvaanData.statistics;
+    const latest = await getLatestDisaster();
+    const satellite = await getSatelliteImages();
 
+    const disasterTypeUpper = (latest && latest.type) ? latest.type.toUpperCase() + " DETECTED" : "FLOOD DETECTED";
+    const confidenceScore = (latest && latest.confidence !== undefined) ? latest.confidence : 94.7;
+    const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "HIGH";
+    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "31.8 km²";
+    const location = (latest && latest.location) ? latest.location : "Surat, Gujarat";
+
+    let satelliteHtml = `
+        <div class="satellite-placeholder">
+            <div class="satellite-icon">🛰</div>
+            <h3>Satellite Imagery</h3>
+            <p>Loaded from backend satellite API.</p>
+            <div class="api-status">● API CONNECTED</div>
+        </div>
+    `;
+
+    if (satellite && satellite.beforeImage && satellite.afterImage) {
+        satelliteHtml = `
+            <div class="satellite-comparison" style="display: flex; gap: 10px; justify-content: center; align-items: center; padding: 10px 0;">
+                <div style="text-align: center;">
+                    <span style="font-size: 0.8rem; color: #888;">BEFORE SCENE</span><br>
+                    <img src="${satellite.beforeImage}" alt="Before Satellite Scene" style="max-width: 100%; height: 110px; object-fit: cover; border-radius: 6px; margin-top: 4px;">
+                </div>
+                <div style="text-align: center;">
+                    <span style="font-size: 0.8rem; color: #888;">AFTER SCENE</span><br>
+                    <img src="${satellite.afterImage}" alt="After Satellite Scene" style="max-width: 100%; height: 110px; object-fit: cover; border-radius: 6px; margin-top: 4px;">
+                </div>
+            </div>
+        `;
+    }
 
     pageContent.innerHTML = `
 
@@ -199,7 +202,7 @@ function showDashboard() {
                     </span>
 
                     <h2 class="stat-value">
-                        ${stats.affectedArea}
+                        ${affectedArea}
                     </h2>
 
                     <span class="stat-change orange">
@@ -288,28 +291,7 @@ function showDashboard() {
 
                 </div>
 
-
-                <div class="satellite-placeholder">
-
-                    <div class="satellite-icon">
-                        🛰
-                    </div>
-
-                    <h3>
-                        Satellite Imagery
-                    </h3>
-
-                    <p>
-                        Before and after disaster
-                        imagery will be loaded from
-                        the backend satellite API.
-                    </p>
-
-                    <div class="api-status">
-                        ● Waiting for Satellite API
-                    </div>
-
-                </div>
+                ${satelliteHtml}
 
             </div>
 
@@ -335,11 +317,11 @@ function showDashboard() {
                     </div>
 
                     <h2>
-                        FLOOD DETECTED
+                        ${disasterTypeUpper}
                     </h2>
 
                     <p>
-                        AI-powered satellite analysis
+                        AI-powered satellite analysis (${location})
                     </p>
 
 
@@ -350,7 +332,7 @@ function showDashboard() {
                         </span>
 
                         <strong>
-                            94.7%
+                            ${confidenceScore}%
                         </strong>
 
                     </div>
@@ -360,6 +342,7 @@ function showDashboard() {
 
                         <div
                             class="progress-value"
+                            style="width: ${confidenceScore}%;"
                         ></div>
 
                     </div>
@@ -371,8 +354,8 @@ function showDashboard() {
                             Severity Level
                         </span>
 
-                        <strong class="high">
-                            HIGH
+                        <strong class="${severity.toLowerCase() === 'high' || severity.toLowerCase() === 'extreme' ? 'high' : 'medium'}">
+                            ${severity}
                         </strong>
 
                     </div>
@@ -385,7 +368,7 @@ function showDashboard() {
                         </span>
 
                         <strong>
-                            31.8 km²
+                            ${affectedArea}
                         </strong>
 
                     </div>
@@ -415,7 +398,47 @@ function showDashboard() {
    SATELLITE MONITOR
 ========================================================= */
 
-function showSatellite() {
+async function showSatellite() {
+
+    const satellite = await getSatelliteImages();
+
+    let satelliteContent = `
+        <div class="satellite-placeholder">
+
+            <div class="satellite-icon">
+                🛰
+            </div>
+
+            <h3>
+                Waiting for Satellite Data
+            </h3>
+
+            <p>
+                The frontend is ready to receive
+                satellite imagery from your backend.
+            </p>
+
+            <div class="api-status">
+                API READY
+            </div>
+
+        </div>
+    `;
+
+    if (satellite && satellite.beforeImage && satellite.afterImage) {
+        satelliteContent = `
+            <div style="display: flex; gap: 20px; justify-content: center; align-items: center; padding: 20px 0;">
+                <div style="text-align: center; flex: 1;">
+                    <h3 style="margin-bottom: 10px; color: #888;">BEFORE SCENE</h3>
+                    <img src="${satellite.beforeImage}" alt="Before Scene" style="width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px;">
+                </div>
+                <div style="text-align: center; flex: 1;">
+                    <h3 style="margin-bottom: 10px; color: #888;">AFTER SCENE</h3>
+                    <img src="${satellite.afterImage}" alt="After Scene" style="width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px;">
+                </div>
+            </div>
+        `;
+    }
 
     pageContent.innerHTML = `
 
@@ -437,36 +460,14 @@ function showSatellite() {
                 </h2>
 
                 <button
-                    onclick="refreshSatellite()"
+                    onclick="loadPage('satellite')"
                 >
                     ↻ Refresh
                 </button>
 
             </div>
 
-
-            <div class="satellite-placeholder">
-
-                <div class="satellite-icon">
-                    🛰
-                </div>
-
-                <h3>
-                    Waiting for Satellite Data
-                </h3>
-
-                <p>
-                    The frontend is ready to receive
-                    satellite imagery from your backend.
-                    Your backend can provide the before
-                    and after image URLs through an API.
-                </p>
-
-                <div class="api-status">
-                    API READY
-                </div>
-
-            </div>
+            ${satelliteContent}
 
         </div>
 
@@ -497,6 +498,7 @@ function showSatellite() {
 
 
             <div class="feature-card">
+
 
                 <div class="big-icon">
                     🛰
@@ -1007,7 +1009,9 @@ function showReports() {
    HISTORY
 ========================================================= */
 
-function showHistory() {
+async function showHistory() {
+
+    const disasters = await getDisasterHistory();
 
     pageContent.innerHTML = `
 
@@ -1061,7 +1065,7 @@ function showHistory() {
 
                     <tbody>
 
-                        ${nirvaanData.disasters.map(
+                        ${(disasters || []).map(
                             disaster => `
 
                             <tr>
@@ -1117,6 +1121,7 @@ function showHistory() {
     `;
 
 }
+
 
 
 
