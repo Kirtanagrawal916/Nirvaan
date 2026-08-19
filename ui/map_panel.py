@@ -8,7 +8,10 @@ Includes fallback handling when outside an active Streamlit app session.
 from typing import Any, Dict, List, Optional
 import folium
 
-from mapping.map_builder import build_folium_map
+try:
+    from mapping.map_builder import build_folium_map
+except ImportError:
+    from ..mapping.map_builder import build_folium_map
 
 
 def render_map_panel(
@@ -17,7 +20,9 @@ def render_map_panel(
     hotspots: Optional[List[Dict[str, Any]]] = None,
     severity_level: Optional[str] = "High",
     height: int = 500,
-    returned_objects: Optional[List[str]] = None
+    returned_objects: Optional[List[str]] = None,
+    map_key: Optional[str] = None,
+    use_container_width: bool = True
 ) -> Any:
     """
     Build and render the interactive Folium map in Streamlit.
@@ -37,13 +42,12 @@ def render_map_panel(
         # Only use streamlit rendering if running inside an active Streamlit server runtime
         if st.runtime.exists():
             from streamlit_folium import st_folium
-            st.subheader("🗺️ Interactive Disaster Map")
             return st_folium(
                 folium_map,
-                width="100%",
+                use_container_width=use_container_width,
                 height=height,
                 returned_objects=returned_objects or [],
-                key="nirvaan_disaster_map"
+                key=map_key or "nirvaan_disaster_map"
             )
     except (ImportError, Exception):
         pass
