@@ -387,240 +387,244 @@ async function showDashboard() {
 
     pageContent.innerHTML = `
 
-        <h1 class="page-title">
-            Dashboard
-        </h1>
+        <section class="dashboard-section">
 
-        <p class="page-subtitle">
-            Real-time overview of disaster monitoring and analysis
-        </p>
+            <h1 class="page-title">
+                Dashboard
+            </h1>
 
+            <p class="page-subtitle">
+                Real-time overview of disaster monitoring and analysis
+            </p>
 
-        <section class="stats-grid">
 
+            <section class="stats-grid">
 
-            <div class="stat-card">
 
-                <div class="stat-icon">
-                    ⚠
-                </div>
+                <div class="stat-card">
 
-                <div>
-
-                    <span class="stat-label">
-                        Active Disasters
-                    </span>
-
-                    <h2 class="stat-value">
-                        ${stats.activeDisasters}
-                    </h2>
-
-                    <span class="stat-change red">
-                        2 High Risk
-                    </span>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    📍
-                </div>
-
-                <div>
-
-                    <span class="stat-label">
-                        Affected Area
-                    </span>
-
-                    <h2 class="stat-value">
-                        ${affectedArea}
-                    </h2>
-
-                    <span class="stat-change orange">
-                        ↑ 12.6% vs yesterday
-                    </span>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    👥
-                </div>
-
-                <div>
-
-                    <span class="stat-label">
-                        Population at Risk
-                    </span>
-
-                    <h2 class="stat-value">
-                        ${stats.populationAtRisk}
-                    </h2>
-
-                    <span class="stat-change">
-                        ↑ 8.4% vs yesterday
-                    </span>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    ◎
-                </div>
-
-                <div>
-
-                    <span class="stat-label">
-                        Detection Accuracy
-                    </span>
-
-                    <h2 class="stat-value">
-                        ${stats.detectionAccuracy}
-                    </h2>
-
-                    <span class="stat-change">
-                        ↑ 3.2% vs yesterday
-                    </span>
-
-                </div>
-
-            </div>
-
-
-        </section>
-
-
-
-        <section class="dashboard-grid">
-
-
-            <!-- SATELLITE -->
-
-            <div class="panel">
-
-                <div class="panel-header">
-
-                    <h2>
-                        ⌁ Satellite Image Comparison
-                    </h2>
-
-                    <button
-                        onclick="loadPage('satellite')"
-                    >
-                        View Fullscreen
-                    </button>
-
-                </div>
-
-                ${satelliteHtml}
-
-            </div>
-
-
-
-            <!-- DETECTION -->
-
-            <div class="panel">
-
-                <div class="panel-header">
-
-                    <h2>
-                        ⚠ Disaster Detection
-                    </h2>
-
-                </div>
-
-
-                <div class="detection">
-
-                    <div class="detection-icon">
-                        ≋
+                    <div class="stat-icon">
+                        ⚠
                     </div>
 
-                    <h2>
-                        ${disasterTypeUpper}
-                    </h2>
+                    <div>
 
-                    <p>
-                        AI-powered satellite analysis (${location})
-                    </p>
-
-
-                    <div class="confidence-row">
-
-                        <span>
-                            Confidence Score
+                        <span class="stat-label">
+                            Active Disasters
                         </span>
 
-                        <strong>
-                            ${confidenceScore}%
-                        </strong>
+                        <h2 class="stat-value">
+                            ${stats.activeDisasters}
+                        </h2>
 
-                    </div>
-
-
-                    <div class="progress">
-
-                        <div
-                            class="progress-value"
-                            style="width: ${confidenceScore}%;"
-                        ></div>
-
-                    </div>
-
-
-                    <div class="detail">
-
-                        <span>
-                            Severity Level
+                        <span class="stat-change red">
+                            2 High Risk
                         </span>
 
-                        <strong class="${severity.toLowerCase() === 'high' || severity.toLowerCase() === 'extreme' ? 'high' : 'medium'}">
-                            ${severity}
-                        </strong>
-
                     </div>
 
+                </div>
 
-                    <div class="detail">
 
-                        <span>
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📍
+                    </div>
+
+                    <div>
+
+                        <span class="stat-label">
                             Affected Area
                         </span>
 
-                        <strong>
+                        <h2 class="stat-value">
                             ${affectedArea}
-                        </strong>
+                        </h2>
+
+                        <span class="stat-change orange">
+                            ↑ 12.6% vs yesterday
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        👥
+                    </div>
+
+                    <div>
+
+                        <span class="stat-label">
+                            Population at Risk
+                        </span>
+
+                        <h2 class="stat-value">
+                            ${stats.populationAtRisk}
+                        </h2>
+
+                        <span class="stat-change">
+                            ↑ 8.4% vs yesterday
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        ◎
+                    </div>
+
+                    <div>
+
+                        <span class="stat-label">
+                            Detection Accuracy
+                        </span>
+
+                        <h2 class="stat-value">
+                            ${stats.detectionAccuracy}
+                        </h2>
+
+                        <span class="stat-change">
+                            ↑ 3.2% vs yesterday
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+
+            <section class="dashboard-grid">
+
+
+                <!-- SATELLITE -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h2>
+                            ⌁ Satellite Image Comparison
+                        </h2>
+
+                        <button
+                            onclick="loadPage('satellite')"
+                        >
+                            View Fullscreen
+                        </button>
+
+                    </div>
+
+                    ${satelliteHtml}
+
+                </div>
+
+
+
+                <!-- DETECTION -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h2>
+                            ⚠ Disaster Detection
+                        </h2>
 
                     </div>
 
 
-                    <button
-                        class="primary-btn full-btn"
-                        onclick="loadPage('detection')"
-                    >
-                        View Detailed Analysis
-                    </button>
+                    <div class="detection">
+
+                        <div class="detection-icon">
+                            ≋
+                        </div>
+
+                        <h2>
+                            ${disasterTypeUpper}
+                        </h2>
+
+                        <p>
+                            AI-powered satellite analysis (${location})
+                        </p>
+
+
+                        <div class="confidence-row">
+
+                            <span>
+                                Confidence Score
+                            </span>
+
+                            <strong>
+                                ${confidenceScore}%
+                            </strong>
+
+                        </div>
+
+
+                        <div class="progress">
+
+                            <div
+                                class="progress-value"
+                                style="width: ${confidenceScore}%;"
+                            ></div>
+
+                        </div>
+
+
+                        <div class="detail">
+
+                            <span>
+                                Severity Level
+                            </span>
+
+                            <strong class="${severity.toLowerCase() === 'high' || severity.toLowerCase() === 'extreme' ? 'high' : 'medium'}">
+                                ${severity}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail">
+
+                            <span>
+                                Affected Area
+                            </span>
+
+                            <strong>
+                                ${affectedArea}
+                            </strong>
+
+                        </div>
+
+
+                        <button
+                            class="primary-btn full-btn"
+                            onclick="loadPage('detection')"
+                        >
+                            View Detailed Analysis
+                        </button>
+
+                    </div>
 
                 </div>
 
-            </div>
 
+            </section>
 
         </section>
 
