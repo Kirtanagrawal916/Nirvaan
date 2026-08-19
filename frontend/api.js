@@ -69,7 +69,9 @@ async function getLatestDisaster() {
 
             beforeImage: "assets/before.jpg",
 
-            afterImage: "assets/after.jpg"
+            afterImage: "assets/after.jpg",
+
+            data_provenance: "SYNTHETIC_FALLBACK"
 
         };
 
@@ -113,9 +115,10 @@ async function getDisasterHistory() {
             error
         );
 
-        return (typeof nirvaanData !== "undefined" && nirvaanData.disasters)
+        const list = (typeof nirvaanData !== "undefined" && nirvaanData.disasters)
             ? nirvaanData.disasters
             : [];
+        return list.map(item => Object.assign({ data_provenance: "SYNTHETIC_FALLBACK" }, item));
 
     }
 
@@ -161,7 +164,9 @@ async function getSatelliteImages() {
 
             beforeImage: "assets/before.jpg",
 
-            afterImage: "assets/after.jpg"
+            afterImage: "assets/after.jpg",
+
+            data_provenance: "SYNTHETIC_FALLBACK"
 
         };
 

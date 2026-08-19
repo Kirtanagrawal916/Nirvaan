@@ -214,6 +214,9 @@ class DetectionPipeline:
             "category_labels": mask_obj.category_labels,
         }
 
+        data_prov = getattr(event, "data_provenance", "SYNTHETIC_FALLBACK")
+        event_meta["data_provenance"] = data_prov
+
         # Return validated DetectionResultContract
         return DetectionResultContract(
             event_id=event_id,
@@ -227,6 +230,7 @@ class DetectionPipeline:
             hotspots=hotspot_res.to_dict()["hotspots"],
             mask_reference=mask_ref,
             provenance=change_res.provenance,
+            data_provenance=data_prov,
             warnings=warnings,
             limitations=limitations,
         )
@@ -240,18 +244,21 @@ class DetectionPipeline:
         event_metadata: Optional[Dict[str, Any]] = None,
     ) -> DetectionResultContract:
         """Constructs a structured failed DetectionResultContract."""
+        meta = event_metadata or {}
+        data_prov = meta.get("data_provenance", "SYNTHETIC_FALLBACK")
         return DetectionResultContract(
             event_id=event_id,
             disaster_type=disaster_type if disaster_type in {"flood", "wildfire"} else "flood",
             status="failed",
             timestamp=datetime.now(timezone.utc).isoformat(),
-            event_metadata=event_metadata or {},
+            event_metadata=meta,
             detection_summary={"failed_stage": stage},
             affected_area={},
             severity={},
             hotspots=[],
             mask_reference={},
             provenance={},
+            data_provenance=data_prov,
             warnings=[f"Pipeline failed at stage '{stage}': {error_msg}"],
             limitations=["Pipeline execution unfulfilled due to error."],
         )

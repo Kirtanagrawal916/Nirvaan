@@ -2,6 +2,30 @@
    NIRVAAN FRONTEND
 ========================================================= */
 
+function updateProvenanceBanner(dataOrProvenance) {
+    const banner = document.getElementById("provenanceBanner");
+    if (!banner) return;
+
+    let prov = "SYNTHETIC_FALLBACK";
+    if (typeof dataOrProvenance === "string") {
+        prov = dataOrProvenance;
+    } else if (dataOrProvenance && typeof dataOrProvenance === "object") {
+        prov = dataOrProvenance.data_provenance ||
+               (dataOrProvenance.provenance && dataOrProvenance.provenance.data_provenance) ||
+               (dataOrProvenance.event_metadata && dataOrProvenance.event_metadata.data_provenance) ||
+               "SYNTHETIC_FALLBACK";
+    }
+
+    if (prov === "REAL_SATELLITE_DATA") {
+        banner.className = "provenance-banner real-mode";
+        banner.innerHTML = `<span class="banner-icon">🛰️</span><span class="banner-text"><strong>REAL SATELLITE DATA</strong> — Processing genuine Sentinel-2 Level-2A surface reflectance imagery.</span>`;
+        banner.style.display = "flex";
+    } else {
+        banner.className = "provenance-banner synthetic-mode";
+        banner.innerHTML = `<span class="banner-icon">⚠️</span><span class="banner-text"><strong>DEMO MODE: SYNTHETIC DATA</strong> — This view displays simulated/synthetic placeholder satellite data for demonstration purposes.</span>`;
+        banner.style.display = "flex";
+    }
+}
 
 const pageContent =
     document.getElementById(
@@ -118,6 +142,8 @@ async function showDashboard() {
     const stats = nirvaanData.statistics;
     const latest = await getLatestDisaster();
     const satellite = await getSatelliteImages();
+
+    updateProvenanceBanner(latest || satellite);
 
     const disasterTypeUpper = (latest && latest.type) ? latest.type.toUpperCase() + " DETECTED" : "FLOOD DETECTED";
     const confidenceScore = (latest && latest.confidence !== undefined) ? latest.confidence : 94.7;
@@ -401,6 +427,7 @@ async function showDashboard() {
 async function showSatellite() {
 
     const satellite = await getSatelliteImages();
+    updateProvenanceBanner(satellite);
 
     let satelliteContent = `
         <div class="satellite-placeholder">
@@ -549,6 +576,7 @@ async function showSatellite() {
 async function showDetection() {
 
     const latest = await getLatestDisaster();
+    updateProvenanceBanner(latest);
     const disasterTypeUpper = (latest && latest.type) ? latest.type.toUpperCase() + " DETECTED" : "FLOOD DETECTED";
     const confidenceScore = (latest && latest.confidence !== undefined) ? latest.confidence : 94.7;
     const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "LOW";
@@ -734,6 +762,7 @@ async function showDetection() {
 async function showRiskMap() {
 
     const latest = await getLatestDisaster();
+    updateProvenanceBanner(latest);
     const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
     pageContent.innerHTML = `
@@ -794,6 +823,7 @@ async function showRiskMap() {
 async function showAlerts() {
 
     const disasters = await getDisasterHistory();
+    updateProvenanceBanner(disasters && disasters[0]);
 
     pageContent.innerHTML = `
 
@@ -894,6 +924,7 @@ async function showAlerts() {
 async function showReports() {
 
     const latest = await getLatestDisaster();
+    updateProvenanceBanner(latest);
     const location = (latest && latest.location) ? latest.location : "Emilia-Romagna, Italy";
 
     pageContent.innerHTML = `
@@ -1003,6 +1034,7 @@ async function showReports() {
 async function showHistory() {
 
     const disasters = await getDisasterHistory();
+    updateProvenanceBanner(disasters && disasters[0]);
 
     pageContent.innerHTML = `
 

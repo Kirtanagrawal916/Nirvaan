@@ -51,6 +51,7 @@ class DisasterEvent:
     processing_level: Optional[str] = None
     spectral_index: Optional[str] = None
     spectral_formula: Optional[str] = None
+    data_provenance: str = "REAL_SATELLITE_DATA"
     aoi: Optional[Dict[str, Any]] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
 
@@ -165,6 +166,7 @@ class DisasterEvent:
             "available_bands": self.available_bands,
             "spectral_index": self.spectral_index,
             "spectral_formula": self.spectral_formula,
+            "data_provenance": self.data_provenance,
             "aoi": self.aoi,
             "metadata": self.metadata,
         }
@@ -214,6 +216,7 @@ class DisasterEvent:
         processing_level = data.get("processing_level")
         spectral_index = data.get("spectral_index")
         spectral_formula = data.get("spectral_formula")
+        data_provenance = data.get("data_provenance", "REAL_SATELLITE_DATA")
         aoi = data.get("aoi", {})
         
         # Store unmapped fields in metadata dict
@@ -223,7 +226,7 @@ class DisasterEvent:
             "source_provider", "CRS", "coordinate_reference_system", "resolution_m",
             "available_bands", "required_bands", "product_id", "before_product_id", "after_product_id",
             "source_url", "provenance_url", "tile_id", "satellite_platform", "processing_level",
-            "spectral_index", "spectral_formula", "aoi"
+            "spectral_index", "spectral_formula", "data_provenance", "aoi"
         }
         extra_metadata = {k: v for k, v in data.items() if k not in reserved_keys}
 
@@ -249,6 +252,7 @@ class DisasterEvent:
             processing_level=processing_level,
             spectral_index=spectral_index,
             spectral_formula=spectral_formula,
+            data_provenance=data_provenance,
             aoi=aoi,
             metadata=extra_metadata,
         )

@@ -1329,3 +1329,44 @@ td {
     }
 
 }
+
+
+/* =========================================================
+   PROVENANCE BANNER
+========================================================= */
+
+.provenance-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    margin: 15px 25px 0 25px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    z-index: 100;
+    transition: all 0.2s ease-in-out;
+}
+
+.provenance-banner.synthetic-mode {
+    background: linear-gradient(135deg, rgba(230, 126, 34, 0.25), rgba(211, 84, 0, 0.35));
+    border: 1px solid #e67e22;
+    color: #ffd8a8;
+}
+
+.provenance-banner.real-mode {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(39, 174, 96, 0.3));
+    border: 1px solid #2ecc71;
+    color: #b2f2bb;
+}
+
+.banner-icon {
+    font-size: 18px;
+}
+
+.banner-text strong {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}

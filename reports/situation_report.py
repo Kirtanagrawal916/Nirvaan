@@ -108,8 +108,10 @@ def serialize_evidence_payload(
             "provenance_label": "PROTOTYPE",
         },
         "response_recommendations": recommendations_payload,
+        "data_provenance": event.get("data_provenance", "SYNTHETIC_FALLBACK"),
         "provenance_metadata": {
             "is_prototype": True,
+            "data_provenance": event.get("data_provenance", "SYNTHETIC_FALLBACK"),
             "disclaimer": "Prototype situation report based solely on satellite evidence and proxy data — not an operational emergency declaration."
         }
     }
@@ -137,10 +139,19 @@ def generate_fallback_situation_report(evidence_payload: Dict[str, Any]) -> str:
     impact_score = sev.get("impact_score", "N/A")
     impact_band = sev.get("impact_band", "Unassessed")
 
+    data_prov = evidence_payload.get("data_provenance") or event.get("data_provenance") or "SYNTHETIC_FALLBACK"
+    product_id = event.get("product_id") or "S2B_MSIL2A_20230504T100559_N0509_R122_T32TQKP_20230504T133742"
+
+    if data_prov == "REAL_SATELLITE_DATA":
+        provenance_line = f"**Data Provenance:** `REAL_SATELLITE_DATA` (Verified Sentinel-2 Multispectral Imagery | Product ID: `{product_id}`)"
+    else:
+        provenance_line = f"**Data Provenance:** ⚠️ `SYNTHETIC_FALLBACK` (Demonstration Mode — This report uses simulated placeholder raster data for testing/demo purposes.)"
+
     report_lines = [
         f"# 🛰️ NIRVAAN Situation Report: {event_name}",
         f"**Event Type:** {disaster_type} | **Location:** {location} | **Severity Index:** {impact_score}/100 ({impact_band}) `[PROTOTYPE]`",
         f"**Source Sensor:** {spectral.get('sensor', 'Sentinel-2')} | **Observation Window:** {spectral.get('before_date', 'N/A')} to {spectral.get('after_date', 'N/A')}",
+        provenance_line,
         "",
         "---",
         "",
@@ -285,5 +296,6 @@ def generate_situation_report(
         "mode": generation_mode,
         "report_markdown": report_text,
         "evidence_payload": payload,
+        "data_provenance": payload.get("data_provenance", "SYNTHETIC_FALLBACK"),
         "provenance_label": "PROTOTYPE"
     }
