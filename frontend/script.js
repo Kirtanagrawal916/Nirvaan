@@ -1,55 +1,137 @@
 /* =========================================================
-   NIRVAAN FRONTEND
+   THEME TOGGLE SYSTEM
 ========================================================= */
 
+function initTheme() {
+    const savedTheme = localStorage.getItem("nirvaan_theme") || "dark";
+    applyTheme(savedTheme);
 
-const pageContent =
-    document.getElementById(
-        "pageContent"
-    );
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener("click", () => {
+            const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            applyTheme(newTheme);
+            localStorage.setItem("nirvaan_theme", newTheme);
+        });
+    }
 
+    const themePillBtns = document.querySelectorAll(".theme-pill-btn");
+    themePillBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const targetTheme = btn.dataset.themeSet;
+            if (targetTheme) {
+                applyTheme(targetTheme);
+                localStorage.setItem("nirvaan_theme", targetTheme);
+            }
+        });
+    });
+}
 
-const navItems =
-    document.querySelectorAll(
-        ".nav-item"
-    );
+function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    
+    const themeText = document.getElementById("themeToggleText");
+    if (themeText) {
+        themeText.textContent = theme === "dark" ? "Light Mode" : "Dark Mode";
+    }
+
+    const themePillBtns = document.querySelectorAll(".theme-pill-btn");
+    themePillBtns.forEach(btn => {
+        if (btn.dataset.themeSet === theme) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    });
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initTheme);
+} else {
+    initTheme();
+}
 
 
 /* =========================================================
-   NAVIGATION
+   NAVIGATION (SIDEBAR & TOPBAR NAVBAR)
 ========================================================= */
 
-navItems.forEach(
-    item => {
+const pageContent = document.getElementById("pageContent");
+const navItems = document.querySelectorAll(".nav-item");
+const topbarNavLinks = document.querySelectorAll(".topbar-nav-link, .topbar-learn-btn");
 
-        item.addEventListener(
-            "click",
-            () => {
+function navigateToPage(page) {
+    // Sync sidebar
+    navItems.forEach(nav => {
+        if (nav.dataset.page === page) {
+            nav.classList.add("active");
+        } else {
+            nav.classList.remove("active");
+        }
+    });
 
-                navItems.forEach(
-                    nav =>
-                        nav.classList.remove(
-                            "active"
-                        )
-                );
+    // Sync topbar
+    topbarNavLinks.forEach(link => {
+        if (link.dataset.page === page) {
+            link.classList.add("active");
+        } else {
+            link.classList.remove("active");
+        }
+    });
 
+    loadPage(page);
+}
 
-                item.classList.add(
-                    "active"
-                );
+navItems.forEach(item => {
+    item.addEventListener("click", () => {
+        const page = item.dataset.page;
+        if (page) navigateToPage(page);
+    });
+});
 
+topbarNavLinks.forEach(link => {
+    link.addEventListener("click", () => {
+        const page = link.dataset.page;
+        if (page) navigateToPage(page);
+    });
+});
 
-                const page =
-                    item.dataset.page;
+// Topbar Sign Out button
+const signOutBtn = document.getElementById("signOutBtn");
+if (signOutBtn) {
+    signOutBtn.addEventListener("click", () => {
+        alert("You have signed out successfully.");
+    });
+}
 
+// 3-Line Menu Dropdown (Settings, About, History, FAQ)
+const topbarMenuBtn = document.getElementById("topbarMenuBtn");
+const menuDropdown = document.getElementById("menuDropdown");
 
-                loadPage(page);
+if (topbarMenuBtn && menuDropdown) {
+    topbarMenuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        menuDropdown.classList.toggle("show");
+    });
 
+    document.addEventListener("click", (e) => {
+        if (!menuDropdown.contains(e.target) && e.target !== topbarMenuBtn) {
+            menuDropdown.classList.remove("show");
+        }
+    });
+
+    const menuItems = menuDropdown.querySelectorAll(".menu-dropdown-item");
+    menuItems.forEach(item => {
+        item.addEventListener("click", () => {
+            const page = item.dataset.page;
+            if (page) {
+                navigateToPage(page);
             }
-        );
-
-    }
-);
+            menuDropdown.classList.remove("show");
+        });
+    });
+}
 
 
 /* =========================================================
@@ -98,6 +180,14 @@ async function loadPage(page) {
 
         case "settings":
             showSettings();
+            break;
+
+        case "about":
+            showAbout();
+            break;
+
+        case "faq":
+            showFAQ();
             break;
 
         default:
@@ -1264,4 +1354,80 @@ async function refreshSatellite() {
 
     }
 
+}
+
+
+/* =========================================================
+   ABOUT PAGE
+========================================================= */
+
+function showAbout() {
+    pageContent.innerHTML = `
+        <h1 class="page-title">About Nirvaan</h1>
+        <p class="page-subtitle">Satellite-Based AI Disaster Monitoring & Rapid Intelligence Platform</p>
+
+        <div class="panel" style="padding: 28px; line-height: 1.8;">
+            <h2 style="margin-bottom: 12px; color: #38bdf8; font-size: 18px;">Platform Overview</h2>
+            <p style="margin-bottom: 20px; font-size: 14px;">
+                Nirvaan leverages multi-spectral satellite imagery (Sentinel-2, Landsat-9) and deep learning models to perform rapid disaster detection, inundated area mapping, damage assessment, and real-time situational reporting for emergency response teams.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 24px;">
+                <div class="card" style="padding: 20px; border-radius: 10px;">
+                    <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">🛰 Multi-Spectral Analysis</h3>
+                    <p style="font-size: 13px; opacity: 0.85;">Automated NDWI, dNBR, and SAR mask extraction for flood & fire boundaries.</p>
+                </div>
+                <div class="card" style="padding: 20px; border-radius: 10px;">
+                    <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">⚡ Rapid Early Warning</h3>
+                    <p style="font-size: 13px; opacity: 0.85;">Sub-hour processing pipeline converting raw satellite swaths into vector risk maps.</p>
+                </div>
+                <div class="card" style="padding: 20px; border-radius: 10px;">
+                    <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">📊 Population Impact</h3>
+                    <p style="font-size: 13px; opacity: 0.85;">Spatial overlay estimation of affected populations, infrastructure, and roads.</p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   FAQ PAGE
+========================================================= */
+
+function showFAQ() {
+    pageContent.innerHTML = `
+        <h1 class="page-title">Frequently Asked Questions</h1>
+        <p class="page-subtitle">Learn more about Nirvaan satellite intelligence, metrics, and workflows.</p>
+
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="panel" style="padding: 22px;">
+                <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">Q1: How does Nirvaan detect disaster affected zones?</h3>
+                <p style="font-size: 14px; line-height: 1.6; opacity: 0.88;">
+                    Nirvaan compares pre-event and post-event satellite imagery using optical spectral indices (NDWI for floods, dNBR for burn severity) and synthetic aperture radar (SAR) to identify flooded surfaces and burnt terrain regardless of cloud cover.
+                </p>
+            </div>
+
+            <div class="panel" style="padding: 22px;">
+                <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">Q2: What satellite constellations are supported?</h3>
+                <p style="font-size: 14px; line-height: 1.6; opacity: 0.88;">
+                    Currently supports Copernicus Sentinel-2 (Optical), Sentinel-1 (C-Band SAR), USGS Landsat-8/9, and custom high-resolution commercial imagery feeds via REST API endpoints.
+                </p>
+            </div>
+
+            <div class="panel" style="padding: 22px;">
+                <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">Q3: How frequently is the disaster map updated?</h3>
+                <p style="font-size: 14px; line-height: 1.6; opacity: 0.88;">
+                    Automated backend jobs ingest new satellite passes as soon as they become public (typically 12 to 24 hours revisit time), triggering instant risk updates and automated alert dispatches.
+                </p>
+            </div>
+
+            <div class="panel" style="padding: 22px;">
+                <h3 style="margin-bottom: 8px; color: #38bdf8; font-size: 15px;">Q4: Can SITREP situational reports be exported?</h3>
+                <p style="font-size: 14px; line-height: 1.6; opacity: 0.88;">
+                    Yes, under the <strong>Reports</strong> tab, you can export JSON metadata, GeoJSON impact boundaries, or formatted PDF situation reports for disaster management authorities.
+                </p>
+            </div>
+        </div>
+    `;
 }
