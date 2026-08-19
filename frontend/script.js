@@ -1123,110 +1123,143 @@ function showAlerts() {
 
     setPageContent(`
 
-        <h1 class="page-title">
-            Alerts
+        <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
+            Emergency Disaster Alerts
         </h1>
 
-        <p class="page-subtitle">
-            Active disaster warnings and emergency notifications
+        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">
+            Real-time disaster warnings, satellite telemetry alerts, and responder dispatches
         </p>
 
+        <div class="alerts-grid">
 
-        <div class="panel">
+            <!-- ALERT BOX 1: FLOOD -->
+            <div class="alert-box-card critical">
+                <div class="alert-box-header">
+                    <div class="alert-title">
+                        <span>🌊</span>
+                        <span>Flood Inundation Warning — Surat, Gujarat (Tapi Basin)</span>
+                    </div>
+                    <span class="alert-badge critical">CRITICAL ALERT</span>
+                </div>
 
-            <div class="table-container">
+                <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin-bottom: 12px;">
+                    Sentinel-2 SAR imagery detected <strong>31.8 km² river overflow</strong> breaching Tapi embankment walls. Sub-surface flooding threatens urban residential sectors.
+                </p>
 
-                <table>
+                <div class="alert-metrics-grid">
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Inundation Extent</span>
+                        <span class="alert-metric-value">31.8 km²</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Population in Hazard</span>
+                        <span class="alert-metric-value">128,400 People</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Spectral NDWI Score</span>
+                        <span class="alert-metric-value" style="color: #ef4444;">0.84 (Critical)</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Alert Timestamp</span>
+                        <span class="alert-metric-value" style="color: #a1a1aa;">10:28 AM (Active)</span>
+                    </div>
+                </div>
 
-                    <thead>
+                <div class="alert-actions">
+                    <button class="run-detection-btn" style="max-width: 220px; font-size: 13px; padding: 10px 16px;" onclick="alert('Dispatching emergency NDRF flood response team to Surat Tapi Basin...')">
+                        🚨 Dispatch Responders
+                    </button>
+                    <button class="map-layer-btn active" style="font-size: 13px; padding: 10px 16px;" onclick="navigateToPage('risk')">
+                        📍 Open Geo Map
+                    </button>
+                </div>
+            </div>
 
-                        <tr>
+            <!-- ALERT BOX 2: SEISMIC EARTHQUAKE -->
+            <div class="alert-box-card high">
+                <div class="alert-box-header">
+                    <div class="alert-title">
+                        <span>⚡</span>
+                        <span>Seismic Fault Line Rupture — Bhuj, Kutch (Gujarat)</span>
+                    </div>
+                    <span class="alert-badge high">HIGH ALERT</span>
+                </div>
 
-                            <th>
-                                Alert
-                            </th>
+                <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin-bottom: 12px;">
+                    Seismic SAR interferometry detected <strong>4.2 cm ground rift displacement</strong> along the Kutch Fault Line. Structural integrity advisory issued for nearby settlements.
+                </p>
 
-                            <th>
-                                Location
-                            </th>
+                <div class="alert-metrics-grid">
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Seismic Rift Displacement</span>
+                        <span class="alert-metric-value">4.2 cm SAR Shift</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Population at Risk</span>
+                        <span class="alert-metric-value">98,200 People</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Rift Magnitude</span>
+                        <span class="alert-metric-value" style="color: #f97316;">5.4 Mw Equivalent</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Alert Timestamp</span>
+                        <span class="alert-metric-value" style="color: #a1a1aa;">09:15 AM (Active)</span>
+                    </div>
+                </div>
 
-                            <th>
-                                Severity
-                            </th>
+                <div class="alert-actions">
+                    <button class="run-detection-btn" style="max-width: 220px; font-size: 13px; padding: 10px 16px;" onclick="alert('Dispatching seismic inspection units to Bhuj Fault Zone...')">
+                        🚨 Dispatch Responders
+                    </button>
+                    <button class="map-layer-btn active" style="font-size: 13px; padding: 10px 16px;" onclick="navigateToPage('risk')">
+                        📍 Open Geo Map
+                    </button>
+                </div>
+            </div>
 
-                            <th>
-                                Time
-                            </th>
+            <!-- ALERT BOX 3: TSUNAMI WATCH -->
+            <div class="alert-box-card warning">
+                <div class="alert-box-header">
+                    <div class="alert-title">
+                        <span>🏖️</span>
+                        <span>Tsunami Coastal Surge Watch — Chennai Coastline</span>
+                    </div>
+                    <span class="alert-badge warning">COASTAL WATCH</span>
+                </div>
 
-                            <th>
-                                Status
-                            </th>
+                <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin-bottom: 12px;">
+                    Deep-sea buoy telemetry and PlanetScope satellite imagery identified a <strong>2.8m ocean surge wave</strong> approaching the coastal harbor region.
+                </p>
 
-                        </tr>
+                <div class="alert-metrics-grid">
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Coastal Surge Wave</span>
+                        <span class="alert-metric-value">2.8m Amplitude</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Coastal Population</span>
+                        <span class="alert-metric-value">215,000 People</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Surge Hazard Index</span>
+                        <span class="alert-metric-value" style="color: #eab308;">0.92 (Elevated)</span>
+                    </div>
+                    <div class="alert-metric-item">
+                        <span class="alert-metric-label">Alert Timestamp</span>
+                        <span class="alert-metric-value" style="color: #a1a1aa;">08:40 AM (Monitoring)</span>
+                    </div>
+                </div>
 
-                    </thead>
-
-
-                    <tbody>
-
-                        <tr>
-
-                            <td>
-                                Flood detected
-                            </td>
-
-                            <td>
-                                Surat, Gujarat
-                            </td>
-
-                            <td>
-                                <span class="status high">
-                                    HIGH
-                                </span>
-                            </td>
-
-                            <td>
-                                10:28 AM
-                            </td>
-
-                            <td>
-                                Active
-                            </td>
-
-                        </tr>
-
-
-                        <tr>
-
-                            <td>
-                                Wildfire detected
-                            </td>
-
-                            <td>
-                                Ahmedabad
-                            </td>
-
-                            <td>
-                                <span class="status medium">
-                                    MEDIUM
-                                </span>
-                            </td>
-
-                            <td>
-                                09:15 AM
-                            </td>
-
-                            <td>
-                                Active
-                            </td>
-
-                        </tr>
-
-
-                    </tbody>
-
-                </table>
-
+                <div class="alert-actions">
+                    <button class="run-detection-btn" style="max-width: 220px; font-size: 13px; padding: 10px 16px;" onclick="alert('Activating coastal evacuation siren alert network...')">
+                        🚨 Issue Siren Alert
+                    </button>
+                    <button class="map-layer-btn active" style="font-size: 13px; padding: 10px 16px;" onclick="navigateToPage('risk')">
+                        📍 Open Geo Map
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -1471,112 +1504,73 @@ function showSettings() {
 
     setPageContent(`
 
-        <h1 class="page-title">
-            Settings
+        <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
+            System Settings & Controls
         </h1>
 
-        <p class="page-subtitle">
-            Configure Nirvaan monitoring preferences
+        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">
+            Manage satellite telemetry streams, automated early warning triggers, and operational permissions
         </p>
 
-
-        <div class="settings-list">
-
-
-            <div class="setting-item">
-
-                <div>
-
-                    <strong>
-                        Real-time Monitoring
-                    </strong>
-
-                    <p>
-                        Continuously monitor new satellite data
-                    </p>
-
-                </div>
-
-                <div class="toggle"></div>
-
+        <!-- CATEGORY 1: SYSTEM OPERATIONS -->
+        <div class="settings-card-panel">
+            <div class="settings-card-header">
+                <h3 class="settings-card-title">
+                    <span>🎛️</span> Core Operations & Live Ingestion
+                </h3>
+                <span style="font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.15); padding: 4px 10px; border-radius: 6px;">
+                    Operational Status: ACTIVE
+                </span>
             </div>
 
-
-
-            <div class="setting-item">
-
-                <div>
-
-                    <strong>
-                        Disaster Alerts
-                    </strong>
-
-                    <p>
-                        Receive alerts when disasters are detected
-                    </p>
-
+            <div class="settings-list">
+                <div class="setting-item">
+                    <div>
+                        <strong>📡 Real-Time Satellite Telemetry Monitoring</strong>
+                        <p>Continuously poll and process incoming orbital imagery from ESA Sentinel & USGS Landsat hubs</p>
+                    </div>
+                    <label class="setting-switch">
+                        <input type="checkbox" checked onchange="alert('Real-time monitoring toggle updated.')">
+                        <span class="setting-switch-slider"></span>
+                    </label>
                 </div>
 
-                <div class="toggle"></div>
-
-            </div>
-
-
-
-            <div class="setting-item">
-
-                <div>
-
-                    <strong>
-                        AI Analysis
-                    </strong>
-
-                    <p>
-                        Automatically analyze incoming imagery
-                    </p>
-
+                <div class="setting-item">
+                    <div>
+                        <strong>🤖 Automated AI Neural Segmentation Engine</strong>
+                        <p>Automatically run U-Net NDWI & SAR inundation inference on incoming satellite passes</p>
+                    </div>
+                    <label class="setting-switch">
+                        <input type="checkbox" checked onchange="alert('Automated AI Analysis toggle updated.')">
+                        <span class="setting-switch-slider"></span>
+                    </label>
                 </div>
 
-                <div class="toggle"></div>
-
-            </div>
-
-
-
-            <div class="setting-item">
-
-                <div>
-
-                    <strong>
-                        Automatic Reports
-                    </strong>
-
-                    <p>
-                        Generate reports after disaster detection
-                    </p>
-
+                <div class="setting-item">
+                    <div>
+                        <strong>📄 Automated SITREP Report Generation</strong>
+                        <p>Generate GeoJSON hazard maps and PDF situational briefs immediately post-detection</p>
+                    </div>
+                    <label class="setting-switch">
+                        <input type="checkbox" checked onchange="alert('Automated SITREP Reports toggle updated.')">
+                        <span class="setting-switch-slider"></span>
+                    </label>
                 </div>
-
-                <div class="toggle"></div>
-
             </div>
-
         </div>
 
-        <!-- OPERATIONAL PERMISSIONS & DATA SECURITY PANEL -->
-        <div class="panel" style="margin-top: 24px; padding: 24px;">
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
-                <h3 style="font-size: 16px; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+        <!-- CATEGORY 2: OPERATIONAL PERMISSIONS -->
+        <div class="settings-card-panel">
+            <div class="settings-card-header">
+                <h3 class="settings-card-title">
                     <span>🛡️</span> Disaster Access & Operational Permissions
                 </h3>
-                <span style="font-size: 11px; color: #a1a1aa; background: rgba(56, 189, 248, 0.15); padding: 4px 10px; border-radius: 6px;">
+                <span style="font-size: 11px; color: #a1a1aa; background: rgba(255, 255, 255, 0.05); padding: 4px 10px; border-radius: 6px;">
                     Role: Commander / Response Lead
                 </span>
             </div>
 
             <div class="settings-list">
-
                 <div class="setting-item">
                     <div>
                         <strong>🛰️ Satellite Stream Ingestion Permission (Sentinel / Landsat)</strong>
@@ -1631,9 +1625,7 @@ function showSettings() {
                         <span class="setting-switch-slider"></span>
                     </label>
                 </div>
-
             </div>
-
         </div>
 
     `);

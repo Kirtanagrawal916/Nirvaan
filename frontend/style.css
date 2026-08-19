@@ -2859,6 +2859,192 @@ html[data-theme="light"] .input-field-group input[type="text"] {
 }
 
 
+/* =========================================================
+   ATTRACTIVE EMERGENCY ALERT BOX CARDS
+========================================================= */
+
+.alerts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.alert-box-card {
+    background: #181b22;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4px solid #ef4444;
+    border-radius: 14px;
+    padding: 22px 26px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    transition: all 0.25s ease;
+}
+
+.alert-box-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    border-color: rgba(56, 189, 248, 0.25);
+}
+
+.alert-box-card.critical {
+    border-left-color: #ef4444;
+}
+
+.alert-box-card.high {
+    border-left-color: #f97316;
+}
+
+.alert-box-card.warning {
+    border-left-color: #eab308;
+}
+
+.alert-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.alert-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alert-badge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.alert-badge.critical {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.alert-badge.high {
+    background: rgba(249, 115, 22, 0.2);
+    color: #f97316;
+    border: 1px solid rgba(249, 115, 22, 0.4);
+}
+
+.alert-badge.warning {
+    background: rgba(234, 179, 8, 0.2);
+    color: #eab308;
+    border: 1px solid rgba(234, 179, 8, 0.4);
+}
+
+.alert-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+    background: #11141b;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.alert-metric-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.alert-metric-label {
+    font-size: 11px;
+    color: #a1a1aa;
+}
+
+.alert-metric-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: #38bdf8;
+}
+
+.alert-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+/* =========================================================
+   SETTINGS OVERHAUL — RICH DARK STYLING (NO PLAIN BLACK)
+========================================================= */
+
+.settings-card-panel {
+    background: #181b22;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 26px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.settings-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.settings-card-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.setting-item {
+    background: #1e222d;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.setting-item:hover {
+    border-color: rgba(56, 189, 248, 0.25);
+    background: #232835;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.setting-item strong {
+    font-size: 15px;
+    color: #ffffff;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.setting-item p {
+    font-size: 13px;
+    color: #a1a1aa;
+    margin: 0;
+}
+
+
+
 
 
 
