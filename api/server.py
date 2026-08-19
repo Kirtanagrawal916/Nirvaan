@@ -41,6 +41,24 @@ def _create_json_response(status_code: int, data: Dict[str, Any]) -> Dict[str, A
     }
 
 
+def create_json_error_response(
+    status_code: int,
+    code: str,
+    message: str,
+    details: Optional[Any] = None
+) -> Dict[str, Any]:
+    """
+    Standardized NIRVAAN Backend Error Response Wrapper (BH-03).
+    """
+    return _create_json_response(status_code, {
+        "status": "error",
+        "code": code,
+        "error": code,
+        "message": sanitize_log_message(message),
+        "details": details if details is not None else {}
+    })
+
+
 def handle_health_check() -> Dict[str, Any]:
     """GET /api/v1/health endpoint handler."""
     return _create_json_response(200, {
@@ -59,30 +77,25 @@ def handle_health_check() -> Dict[str, Any]:
 def handle_detect_endpoint(payload: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     """POST /api/v1/detect endpoint handler."""
     if not isinstance(payload, dict):
-        return _create_json_response(400, {
-            "error": "BAD_REQUEST",
-            "message": sanitize_log_message("Payload must be a valid JSON object.")
-        })
+        return create_json_error_response(
+            400, "INVALID_REQUEST", "Payload must be a valid JSON object."
+        )
 
     # Validate event metadata
     event_info = payload.get("event", {})
     is_valid_meta, meta_errors = validate_event_metadata(event_info)
     if not is_valid_meta:
-        return _create_json_response(422, {
-            "error": "UNPROCESSABLE_ENTITY",
-            "message": "Invalid event metadata.",
-            "details": [sanitize_log_message(e) for e in meta_errors]
-        })
+        return create_json_error_response(
+            422, "UNPROCESSABLE_ENTITY", "Invalid event metadata.", details=[sanitize_log_message(e) for e in meta_errors]
+        )
 
     # Validate threshold configuration
     thresholds = payload.get("thresholds", {})
     is_valid_thresh, thresh_errors = validate_thresholds(thresholds)
     if not is_valid_thresh:
-        return _create_json_response(422, {
-            "error": "UNPROCESSABLE_ENTITY",
-            "message": "Invalid threshold configuration.",
-            "details": [sanitize_log_message(e) for e in thresh_errors]
-        })
+        return create_json_error_response(
+            422, "VALIDATION_ERROR", "Invalid threshold configuration.", details=[sanitize_log_message(e) for e in thresh_errors]
+        )
 
     # Extract mask/polygon detection data
     mask_grid = payload.get("mask")
@@ -322,14 +335,11 @@ def handle_api_request(endpoint: str, method: str = "POST", payload: Optional[Di
         elif clean_endpoint == "/api/v1/report" and clean_method == "POST":
             return handle_report_endpoint(payload)
         else:
-            return _create_json_response(404, {
-                "error": "NOT_FOUND",
-                "message": f"Endpoint '{clean_endpoint}' [{clean_method}] not found."
-            })
+            return create_json_error_response(
+                404, "NOT_FOUND", f"Endpoint '{clean_endpoint}' [{clean_method}] not found."
+            )
     except Exception as exc:
         safe_msg = sanitize_log_message(str(exc))
-        return _create_json_response(500, {
-            "error": "INTERNAL_SERVER_ERROR",
-            "message": "An unexpected error occurred during API processing.",
-            "details": safe_msg
-        })
+        return create_json_error_response(
+            500, "INTERNAL_ERROR", "An unexpected error occurred during API processing.", details=safe_msg
+        )
