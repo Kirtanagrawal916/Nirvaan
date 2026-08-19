@@ -808,150 +808,155 @@ function showDetection() {
             </p>
 
 
-            <!-- INTERACTIVE FLOOD DETECTION USER INPUT FORM -->
-            <div class="detection-input-card">
+            <!-- FLOOD DETECTION BOX (CONSISTS OF 65-70% TOTAL HORIZONTAL AREA) -->
+            <div class="flood-detection-box-container">
 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
-                    <h3 style="font-size: 16px; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                        <span>🎛️</span> AI Flood Detection Input Parameters
-                    </h3>
-                    <span style="font-size: 11px; color: #a1a1aa; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px;">
-                        Model: Nirvaan Sentinel-NET v4.2
-                    </span>
-                </div>
+                <!-- INTERACTIVE FLOOD DETECTION USER INPUT FORM -->
+                <div class="detection-input-card">
 
-                <form id="floodDetectionForm" onsubmit="event.preventDefault(); runLiveDetection();">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                        <h3 style="font-size: 16px; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                            <span>🎛️</span> AI Flood Detection Input Parameters
+                        </h3>
+                        <span style="font-size: 11px; color: #a1a1aa; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px;">
+                            Model: Nirvaan Sentinel-NET v4.2
+                        </span>
+                    </div>
 
-                    <div class="detection-input-grid">
+                    <form id="floodDetectionForm" onsubmit="event.preventDefault(); runLiveDetection();">
 
-                        <div class="input-field-group">
-                            <label for="detectRegion">
-                                <span>Target Region / Location</span>
-                                <span>📍</span>
-                            </label>
-                            <select id="detectRegion">
-                                <option value="Surat, Gujarat (Tapi Basin)" selected>Surat, Gujarat (Tapi Basin)</option>
-                                <option value="Guwahati, Assam (Brahmaputra)">Guwahati, Assam (Brahmaputra)</option>
-                                <option value="Kochi, Kerala (Periyar Basin)">Kochi, Kerala (Periyar Basin)</option>
-                                <option value="Patna, Bihar (Ganges Basin)">Patna, Bihar (Ganges Basin)</option>
-                                <option value="Custom Coordinates">Custom Coordinates...</option>
-                            </select>
-                        </div>
+                        <div class="detection-input-grid">
 
-                        <div class="input-field-group">
-                            <label for="satSource">
-                                <span>Satellite Constellation</span>
-                                <span>🛰️</span>
-                            </label>
-                            <select id="satSource">
-                                <option value="Sentinel-2 L2A (10m SAR+Optical)" selected>Sentinel-2 L2A (10m SAR+Optical)</option>
-                                <option value="Landsat-9 OLI-2 (15m Thermal)">Landsat-9 OLI-2 (15m Thermal)</option>
-                                <option value="PlanetScope Constellation (3m High-Res)">PlanetScope Constellation (3m)</option>
-                                <option value="RISAT-1A Synthetic Aperture Radar">RISAT-1A SAR Radar</option>
-                            </select>
-                        </div>
-
-                        <div class="input-field-group">
-                            <label for="thresholdSlider">
-                                <span>NDWI Water Index Sensitivity</span>
-                                <span class="slider-val-badge" id="sliderValBadge">85%</span>
-                            </label>
-                            <div class="range-slider-wrapper">
-                                <span style="font-size: 11px; opacity: 0.6;">50%</span>
-                                <input
-                                    type="range"
-                                    id="thresholdSlider"
-                                    min="50"
-                                    max="99"
-                                    value="85"
-                                    oninput="document.getElementById('sliderValBadge').textContent = this.value + '%'"
-                                >
-                                <span style="font-size: 11px; opacity: 0.6;">99%</span>
+                            <div class="input-field-group">
+                                <label for="detectRegion">
+                                    <span>Target Region / Location</span>
+                                    <span>📍</span>
+                                </label>
+                                <select id="detectRegion">
+                                    <option value="Surat, Gujarat (Tapi Basin)" selected>Surat, Gujarat (Tapi Basin)</option>
+                                    <option value="Guwahati, Assam (Brahmaputra)">Guwahati, Assam (Brahmaputra)</option>
+                                    <option value="Kochi, Kerala (Periyar Basin)">Kochi, Kerala (Periyar Basin)</option>
+                                    <option value="Patna, Bihar (Ganges Basin)">Patna, Bihar (Ganges Basin)</option>
+                                    <option value="Custom Coordinates">Custom Coordinates...</option>
+                                </select>
                             </div>
+
+                            <div class="input-field-group">
+                                <label for="satSource">
+                                    <span>Satellite Constellation</span>
+                                    <span>🛰️</span>
+                                </label>
+                                <select id="satSource">
+                                    <option value="Sentinel-2 L2A (10m SAR+Optical)" selected>Sentinel-2 L2A (10m SAR+Optical)</option>
+                                    <option value="Landsat-9 OLI-2 (15m Thermal)">Landsat-9 OLI-2 (15m Thermal)</option>
+                                    <option value="PlanetScope Constellation (3m High-Res)">PlanetScope Constellation (3m)</option>
+                                    <option value="RISAT-1A Synthetic Aperture Radar">RISAT-1A SAR Radar</option>
+                                </select>
+                            </div>
+
+                            <div class="input-field-group">
+                                <label for="thresholdSlider">
+                                    <span>NDWI Water Index Sensitivity</span>
+                                    <span class="slider-val-badge" id="sliderValBadge">85%</span>
+                                </label>
+                                <div class="range-slider-wrapper">
+                                    <span style="font-size: 11px; opacity: 0.6;">50%</span>
+                                    <input
+                                        type="range"
+                                        id="thresholdSlider"
+                                        min="50"
+                                        max="99"
+                                        value="85"
+                                        oninput="document.getElementById('sliderValBadge').textContent = this.value + '%'"
+                                    >
+                                    <span style="font-size: 11px; opacity: 0.6;">99%</span>
+                                </div>
+                            </div>
+
+                            <div class="input-field-group">
+                                <label for="customSatImage">
+                                    <span>Upload Satellite Scene (Optional)</span>
+                                    <span>📁</span>
+                                </label>
+                                <input type="file" id="customSatImage" accept="image/*,.tif,.tiff">
+                            </div>
+
                         </div>
 
-                        <div class="input-field-group">
-                            <label for="customSatImage">
-                                <span>Upload Satellite Scene (Optional)</span>
-                                <span>📁</span>
-                            </label>
-                            <input type="file" id="customSatImage" accept="image/*,.tif,.tiff">
-                        </div>
+                        <button type="submit" class="run-detection-btn" id="runDetectBtn">
+                            <span>⚡ Run AI Flood Detection Analysis</span>
+                            <span>→</span>
+                        </button>
 
-                    </div>
+                    </form>
 
-                    <button type="submit" class="run-detection-btn" id="runDetectBtn">
-                        <span>⚡ Run AI Flood Detection Analysis</span>
-                        <span>→</span>
-                    </button>
-
-                </form>
-
-            </div>
-
-
-            <!-- AI MODEL DETECTION RESULTS -->
-
-            <div class="panel" style="width: 100%;">
-
-                <div class="panel-header">
-                    <h2>
-                        ⚠ Live AI Disaster Analysis Output
-                    </h2>
-                    <span style="font-size: 12px; color: #38bdf8; font-weight: 600;" id="detectStatusText">
-                        ● READY FOR ANALYSIS
-                    </span>
                 </div>
 
-                <div class="detection" style="max-width: 100%; padding: 24px;">
 
-                    <div class="detection-icon" id="detectIcon">
-                        ≋
+                <!-- AI MODEL DETECTION RESULTS -->
+
+                <div class="panel" style="width: 100%;">
+
+                    <div class="panel-header">
+                        <h2>
+                            ⚠ Live AI Disaster Analysis Output
+                        </h2>
+                        <span style="font-size: 12px; color: #38bdf8; font-weight: 600;" id="detectStatusText">
+                            ● READY FOR ANALYSIS
+                        </span>
                     </div>
 
-                    <h2 id="detectResultTitle" style="font-size: 22px;">
-                        FLOOD INUNDATION DETECTED
-                    </h2>
+                    <div class="detection" style="max-width: 100%; padding: 24px;">
 
-                    <p id="detectResultLoc" style="font-size: 14px; opacity: 0.8; margin-bottom: 20px;">
-                        Target: Surat, Gujarat (Tapi Basin) — Sentinel-2 L2A Pass
-                    </p>
-
-
-                    <div class="confidence-row">
-                        <span>AI Confidence Score</span>
-                        <strong id="detectConfidenceVal">94.7%</strong>
-                    </div>
-
-                    <div class="progress">
-                        <div
-                            class="progress-value"
-                            id="detectProgressBar"
-                            style="width: 94.7%;"
-                        ></div>
-                    </div>
-
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; width: 100%; margin-top: 20px;">
-
-                        <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
-                            <span>Severity Level</span>
-                            <strong class="high" id="detectSeverityVal">HIGH</strong>
+                        <div class="detection-icon" id="detectIcon">
+                            ≋
                         </div>
 
-                        <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
-                            <span>Inundated Area</span>
-                            <strong id="detectAreaVal">31.8 km²</strong>
+                        <h2 id="detectResultTitle" style="font-size: 22px;">
+                            FLOOD INUNDATION DETECTED
+                        </h2>
+
+                        <p id="detectResultLoc" style="font-size: 14px; opacity: 0.8; margin-bottom: 20px;">
+                            Target: Surat, Gujarat (Tapi Basin) — Sentinel-2 L2A Pass
+                        </p>
+
+
+                        <div class="confidence-row">
+                            <span>AI Confidence Score</span>
+                            <strong id="detectConfidenceVal">94.7%</strong>
                         </div>
 
-                        <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
-                            <span>Population at Risk</span>
-                            <strong id="detectPopVal">128,400 people</strong>
+                        <div class="progress">
+                            <div
+                                class="progress-value"
+                                id="detectProgressBar"
+                                style="width: 94.7%;"
+                            ></div>
                         </div>
 
-                        <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
-                            <span>Spectral NDWI Index</span>
-                            <strong style="color: #38bdf8;" id="detectNdwiVal">0.84 (Critical)</strong>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; width: 100%; margin-top: 20px;">
+
+                            <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
+                                <span>Severity Level</span>
+                                <strong class="high" id="detectSeverityVal">HIGH</strong>
+                            </div>
+
+                            <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
+                                <span>Inundated Area</span>
+                                <strong id="detectAreaVal">31.8 km²</strong>
+                            </div>
+
+                            <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
+                                <span>Population at Risk</span>
+                                <strong id="detectPopVal">128,400 people</strong>
+                            </div>
+
+                            <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
+                                <span>Spectral NDWI Index</span>
+                                <strong style="color: #38bdf8;" id="detectNdwiVal">0.84 (Critical)</strong>
+                            </div>
+
                         </div>
 
                     </div>
