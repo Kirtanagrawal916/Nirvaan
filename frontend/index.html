@@ -12,6 +12,10 @@
 
     <title>Nirvaan | Disaster Monitoring</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <link
         rel="stylesheet"
         href="style.css"
@@ -38,15 +42,15 @@
         <div class="brand">
 
             <div class="brand-logo">
-                ◒
+                🛰️
             </div>
 
             <div>
 
-                <h2>Nirvaan</h2>
+                <h2 class="nirvaan-title">NIRVAAN</h2>
 
                 <p>
-                    Satellite Based Disaster Monitoring
+                    Satellite Disaster Intelligence
                 </p>
 
             </div>
@@ -267,22 +271,22 @@
         <header class="topbar">
 
 
-            <!-- LEFT: NIRVAAN BRAND -->
+            <!-- LEFT: NIRVAAN BRAND & NEW STYLISH LOGO -->
 
             <div class="topbar-left">
 
                 <div class="topbar-brand">
 
                     <div class="topbar-brand-logo">
-                        ◒
+                        <span class="brand-logo-icon">🛰️</span>
                     </div>
 
                     <div class="topbar-brand-text">
 
-                        <h2>Nirvaan</h2>
+                        <h2 class="nirvaan-title">NIRVAAN</h2>
 
-                        <p>
-                            Satellite Based Disaster Monitoring
+                        <p class="nirvaan-tagline">
+                            Satellite Disaster Intelligence
                         </p>
 
                     </div>
@@ -330,15 +334,6 @@
 
                 <button
                     class="topbar-nav-link"
-                    data-page="alerts"
-                >
-                    <span class="nav-icon">♧</span>
-                    <span>Alerts</span>
-                    <span class="alert-count-badge">3</span>
-                </button>
-
-                <button
-                    class="topbar-nav-link"
                     data-page="reports"
                 >
                     <span class="nav-icon">▤</span>
@@ -348,9 +343,21 @@
             </nav>
 
 
-            <!-- RIGHT: THEME SWITCHER, SIGN OUT & 3-LINE MENU DROPDOWN -->
+            <!-- RIGHT: ALERT ICON BUTTON, THEME SWITCHER, SIGN OUT & 3-LINE MENU -->
 
             <div class="topbar-right">
+
+                <!-- ALERT BELL ICON BUTTON (PERFORMS SAME TASK AS ALERTS) -->
+
+                <button
+                    class="topbar-icon-btn alert-icon-btn"
+                    data-page="alerts"
+                    title="Disaster Alerts (3 Active)"
+                    aria-label="Disaster Alerts"
+                >
+                    <span class="icon-bell">🔔</span>
+                    <span class="alert-count-badge">3</span>
+                </button>
 
                 <button
                     id="themeToggleBtn"
