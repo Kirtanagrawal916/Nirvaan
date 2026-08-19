@@ -60,6 +60,13 @@ class TestAnalysisModeController(unittest.TestCase):
         contract = execute_mode_analysis("flood-emilia-romagna-2023", mode="INSTANT_DEMO")
         self.assertEqual(contract.status, "success")
 
+    def test_live_analysis_timeout_raises_error(self):
+        """Verify live analysis with 0.00001s timeout raises AnalysisTimeoutError."""
+        from detection.mode_controller import AnalysisTimeoutError
+        controller = AnalysisModeController(timeout_sec=0.00001)
+        with self.assertRaises(AnalysisTimeoutError):
+            controller.run_analysis("flood-emilia-romagna-2023", mode="LIVE_ANALYZE")
+
 
 if __name__ == "__main__":
     unittest.main()
