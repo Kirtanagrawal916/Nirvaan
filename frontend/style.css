@@ -652,6 +652,7 @@ html[data-theme="light"] .topbar-menu-btn:hover {
     color: #0f172a;
 }
 
+.system-status {
     color: #7f91a6;
 
     font-size: 12px;

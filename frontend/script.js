@@ -441,6 +441,7 @@ async function showDashboard() {
         </div>
     `;
 
+    pageContent.innerHTML = `
         <section class="dashboard-section">
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -452,7 +453,7 @@ async function showDashboard() {
                         Real-time overview of disaster monitoring and analysis
                     </p>
                 </div>
-                <button class="primary-btn" onclick="loadPage('reports'); setTimeout(() => executeSitrepGeneration('${(latest && latest.event_id) ? latest.event_id : "flood-emilia-romagna-2023"}'), 150);" style="padding: 10px 20px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);">
+                <button class="primary-btn" id="dashboardGenerateSitrepBtn" style="padding: 10px 20px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);">
                     ⚡ Generate SITREP
                 </button>
             </div>
@@ -689,6 +690,15 @@ async function showDashboard() {
         </section>
 
     `;
+
+    const sitrepBtn = document.getElementById("dashboardGenerateSitrepBtn");
+    if (sitrepBtn) {
+        const targetEventId = (latest && latest.event_id) ? latest.event_id : "flood-emilia-romagna-2023";
+        sitrepBtn.addEventListener("click", () => {
+            loadPage("reports");
+            setTimeout(() => executeSitrepGeneration(targetEventId), 150);
+        });
+    }
 
 }
 
@@ -1219,7 +1229,7 @@ async function showReports() {
                 <h1 class="page-title" style="margin-bottom: 4px;">Emergency Situation Reports</h1>
                 <p class="page-subtitle">One-click responder SITREP generation powered by satellite observation & spatial analytics</p>
             </div>
-            <button class="primary-btn" onclick="executeSitrepGeneration('${activeEventId}')" style="padding: 12px 24px; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);">
+            <button class="primary-btn" id="headerGenerateSitrepBtn" style="padding: 12px 24px; font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);">
                 ⚡ Generate Live SITREP
             </button>
         </div>
@@ -1265,6 +1275,13 @@ async function showReports() {
             </div>
         </div>
     `;
+
+    const headerBtn = document.getElementById("headerGenerateSitrepBtn");
+    if (headerBtn) {
+        headerBtn.addEventListener("click", () => {
+            executeSitrepGeneration(activeEventId);
+        });
+    }
 }
 
 async function executeSitrepGeneration(eventId) {
@@ -1457,9 +1474,6 @@ function copySitrepToClipboard() {
         alert("Clipboard copy failed: " + err);
     });
 }
-
-}
-
 
 
 /* =========================================================
