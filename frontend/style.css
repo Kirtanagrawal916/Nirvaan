@@ -2507,6 +2507,30 @@ html[data-theme="light"] .sat-meta {
 }
 
 
+/* =========================================================
+   ATTRACTIVE DASHBOARD BACKGROUND SECTION
+========================================================= */
+
+.dashboard-section {
+    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(9, 9, 11, 0.88) 100%), url('assets/dashboard-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    padding: 30px;
+    border-radius: 16px;
+    border: 1px solid #27272a;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    margin-bottom: 30px;
+}
+
+html[data-theme="light"] .dashboard-section {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 252, 0.95) 100%), url('assets/dashboard-bg.jpg');
+    border-color: #cbd5e1;
+}
+
+
+
 
 
 

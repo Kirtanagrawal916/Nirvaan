@@ -376,16 +376,6 @@
                             <span>FAQ</span>
                         </button>
 
-                        <div class="dropdown-divider"></div>
-
-                        <button
-                            class="menu-dropdown-item"
-                            id="menuLoginItem"
-                        >
-                            <span class="menu-icon">🔑</span>
-                            <span id="menuLoginText">Login / Account</span>
-                        </button>
-
                     </div>
 
                 </div>
@@ -411,7 +401,7 @@
             </div>
 
 
-            <!-- RIGHT: ALERT ICON BUTTON, THEME SWITCHER, LOGIN & SIGN OUT -->
+            <!-- RIGHT: ALERT ICON BUTTON & THEME SWITCHER -->
 
             <div class="topbar-right">
 
@@ -439,29 +429,6 @@
                     <span id="themeToggleText" class="theme-label">Light Mode</span>
                 </button>
 
-                <!-- USER PROFILE BADGE (WHEN LOGGED IN) -->
-                <div class="user-profile-badge" id="userProfileBadge">
-                    <span class="user-avatar">👤</span>
-                    <div class="user-info">
-                        <span class="user-name" id="userNameText">Cmdr. Yashi</span>
-                        <span class="user-role" id="userRoleText">Manager</span>
-                    </div>
-                </div>
-
-                <button
-                    class="topbar-login-btn"
-                    id="loginBtn"
-                >
-                    🔑 Log In
-                </button>
-
-                <button
-                    class="topbar-signout-btn"
-                    id="signOutBtn"
-                >
-                    Sign Out
-                </button>
-
             </div>
 
 
@@ -483,115 +450,6 @@
 
     </section>
 
-
-</div>
-
-
-
-<!-- =========================================================
-     LOGIN MODAL OVERLAY
-========================================================= -->
-
-<div class="modal-overlay" id="loginModalOverlay">
-
-    <div class="modal-card login-modal-card">
-
-        <button
-            class="modal-close-btn"
-            id="closeLoginModalBtn"
-            aria-label="Close Modal"
-        >&times;</button>
-
-        <div class="login-header">
-            <div class="login-logo-badge">
-                🛰️
-            </div>
-            <h2>NIRVAAN AUTHENTICATION</h2>
-            <p>Access Satellite Intelligence & Command Center</p>
-        </div>
-
-        <!-- AUTH TABS -->
-        <div class="auth-tabs">
-            <button class="auth-tab-btn active" id="tabSignin">Sign In</button>
-            <button class="auth-tab-btn" id="tabRegister">Create Account</button>
-        </div>
-
-        <!-- AUTH FORM -->
-        <form id="loginForm" class="auth-form">
-
-            <div class="form-group" id="nameGroup" style="display: none;">
-                <label for="regName">Full Name</label>
-                <input type="text" id="regName" placeholder="e.g. Commander Yashi Aadarsh">
-            </div>
-
-            <div class="form-group">
-                <label for="loginEmail">Email Address or Operator ID</label>
-                <input
-                    type="email"
-                    id="loginEmail"
-                    placeholder="operator@nirvaan.gov.in"
-                    required
-                    value="yashi@nirvaan.gov.in"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="loginPassword">Password</label>
-                <div class="password-input-wrapper">
-                    <input
-                        type="password"
-                        id="loginPassword"
-                        placeholder="••••••••••••"
-                        required
-                        value="nirvaan2026"
-                    >
-                    <button
-                        type="button"
-                        class="toggle-password-btn"
-                        id="togglePasswordBtn"
-                    >👁️</button>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="loginRole">Operational Role</label>
-                <select id="loginRole">
-                    <option value="Disaster Response Manager">Disaster Response Manager</option>
-                    <option value="Satellite Data Analyst">Satellite Data Analyst</option>
-                    <option value="First Responder Lead">First Responder Lead</option>
-                    <option value="Public Administrator">Public Administrator</option>
-                </select>
-            </div>
-
-            <div class="form-options">
-                <label class="remember-me">
-                    <input type="checkbox" id="rememberMe" checked>
-                    <span>Remember active session</span>
-                </label>
-                <a href="#" class="forgot-pass-link" id="forgotPassLink">Forgot password?</a>
-            </div>
-
-            <button type="submit" class="auth-submit-btn">
-                <span id="authSubmitText">Authenticate & Launch Portal</span>
-                <span class="btn-arrow">→</span>
-            </button>
-
-        </form>
-
-        <div class="social-auth-divider">
-            <span>OR AUTHENTICATE VIA</span>
-        </div>
-
-        <div class="social-auth-buttons">
-            <button type="button" class="social-btn google-btn" id="googleSSOBtn">
-                <span>🌐 Google SSO</span>
-            </button>
-            <button type="button" class="social-btn gov-btn" id="govSSOBtn">
-                <span>🛡️ Gov Network</span>
-            </button>
-        </div>
-
-    </div>
 
 </div>
 
