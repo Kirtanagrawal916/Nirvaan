@@ -77,9 +77,26 @@ def handle_health_check() -> Dict[str, Any]:
 def handle_readiness_check() -> Dict[str, Any]:
     """GET /api/v1/ready endpoint handler (BH-05). Performs lightweight readiness checks."""
     from pathlib import Path
+    from data.loader import DatasetLoader, list_canonical_events
     base_dir = Path(__file__).resolve().parent.parent
     catalog_exists = (base_dir / "data" / "catalog.json").exists()
     precomputed_exists = (base_dir / "data" / "precomputed" / "flood-emilia-romagna-2023.json").exists()
+
+    events_backing = {}
+    try:
+        loader = DatasetLoader()
+        for evt in list_canonical_events():
+            evt_id = evt["event_id"]
+            try:
+                loaded = loader.load_event(evt_id)
+                events_backing[evt_id] = loaded.data_provenance
+            except Exception:
+                events_backing[evt_id] = "SYNTHETIC_FALLBACK"
+    except Exception:
+        events_backing = {
+            "flood-emilia-romagna-2023": "SYNTHETIC_FALLBACK",
+            "wildfire-rhodes-2023": "SYNTHETIC_FALLBACK"
+        }
 
     checks = {
         "catalog_data": "OK" if catalog_exists else "MISSING",
@@ -93,6 +110,7 @@ def handle_readiness_check() -> Dict[str, Any]:
     return _create_json_response(status_code, {
         "status": "READY" if is_ready else "NOT_READY",
         "checks": checks,
+        "canonical_events_backing": events_backing,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     })
 
@@ -151,10 +169,12 @@ def handle_detect_endpoint(payload: Optional[Dict[str, Any]]) -> Dict[str, Any]:
         bands_used=payload.get("bands_used", ["B03", "B08", "B12"]),
         thresholds=thresholds or {"ndwi": 0.3, "dnbr": 0.2}
     )
+    prov_record["data_provenance"] = payload.get("data_provenance", "SYNTHETIC_FALLBACK")
 
     response_data = {
         "status": "SUCCESS",
         "event_id": event_info.get("event_id"),
+        "data_provenance": payload.get("data_provenance", "SYNTHETIC_FALLBACK"),
         "detection_polygons_count": len(detected_polygons),
         "geojson": {
             "type": "FeatureCollection",
@@ -180,6 +200,7 @@ def handle_analyze_endpoint(payload: Optional[Dict[str, Any]]) -> Dict[str, Any]
     infra_data = payload.get("infrastructure_data")
     hotspots = payload.get("hotspots", [])
     spectral_sev = payload.get("spectral_severity", "High")
+    data_prov = payload.get("data_provenance", "SYNTHETIC_FALLBACK")
 
     # Generate spatial risk zones
     risk_zones = generate_risk_zones(polygons)
@@ -203,6 +224,7 @@ def handle_analyze_endpoint(payload: Optional[Dict[str, Any]]) -> Dict[str, Any]
 
     response_data = {
         "status": "SUCCESS",
+        "data_provenance": data_prov,
         "risk_zones_geojson": to_geojson_risk_zones(risk_zones),
         "population_exposure": pop_impact,
         "infrastructure_proximity": infra_impact,
@@ -216,15 +238,21 @@ def handle_analyze_endpoint(payload: Optional[Dict[str, Any]]) -> Dict[str, Any]
 def handle_report_endpoint(payload: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     """POST /api/v1/report endpoint handler."""
     if not isinstance(payload, dict):
-        return _create_json_response(400, {
-            "error": "BAD_REQUEST",
-            "message": sanitize_log_message("Payload must be a valid JSON object.")
-        })
+        return create_json_error_response(
+            400, "BAD_REQUEST", "Payload must be a valid JSON object."
+        )
 
-    force_offline = payload.get("force_offline", True)
-    report_result = generate_situation_report(payload, force_offline=force_offline)
+    try:
+        force_offline = payload.get("force_offline", True)
+        report_result = generate_situation_report(payload, force_offline=force_offline)
+        if isinstance(report_result, dict) and "data_provenance" not in report_result:
+            report_result["data_provenance"] = payload.get("data_provenance", "SYNTHETIC_FALLBACK")
 
-    return _create_json_response(200, report_result)
+        return _create_json_response(200, report_result)
+    except Exception as e:
+        return create_json_error_response(
+            500, "INTERNAL_ERROR", f"Situation report generation failed: {sanitize_log_message(str(e))}"
+        )
 
 
 def handle_disaster_latest_endpoint() -> Dict[str, Any]:
@@ -249,6 +277,8 @@ def handle_disaster_latest_endpoint() -> Dict[str, Any]:
         confidence_info = contract_dict.get("confidence", {})
         conf_val = confidence_info.get("confidence_score", 94.7) if isinstance(confidence_info, dict) else 94.7
 
+        data_prov = contract_dict.get("data_provenance", "SYNTHETIC_FALLBACK")
+
         result_data = {
             "type": disaster_type,
             "location": location,
@@ -257,6 +287,7 @@ def handle_disaster_latest_endpoint() -> Dict[str, Any]:
             "affectedArea": affected_area_str,
             "beforeImage": "assets/before.jpg",
             "afterImage": "assets/after.jpg",
+            "data_provenance": data_prov,
         }
         return _create_json_response(200, result_data)
     except Exception:
@@ -268,6 +299,7 @@ def handle_disaster_latest_endpoint() -> Dict[str, Any]:
             "affectedArea": "0.0 km²",
             "beforeImage": "assets/before.jpg",
             "afterImage": "assets/after.jpg",
+            "data_provenance": "SYNTHETIC_FALLBACK",
         }
         return _create_json_response(200, fallback_data)
 
@@ -285,6 +317,7 @@ def handle_disasters_history_endpoint() -> Dict[str, Any]:
             area = contract.get("affected_area", {})
             conf = contract.get("confidence", {})
             conf_score = conf.get("confidence_score", 94.7 if idx == 1 else 88.2) if isinstance(conf, dict) else (94.7 if idx == 1 else 88.2)
+            data_prov = contract.get("data_provenance", "SYNTHETIC_FALLBACK")
 
             disasters_list.append({
                 "id": f"NV-00{idx}",
@@ -295,6 +328,7 @@ def handle_disasters_history_endpoint() -> Dict[str, Any]:
                 "area": f"{area.get('affected_area_km2', 0.0):.1f} km²",
                 "date": meta.get("after_date") or evt_summary.get("after_date", "2023-05-19"),
                 "status": "Active",
+                "data_provenance": data_prov,
             })
         return _create_json_response(200, disasters_list)
     except Exception:
@@ -309,6 +343,7 @@ def handle_disasters_history_endpoint() -> Dict[str, Any]:
                 "area": "0.0 km²",
                 "date": e.get("after_date", "2023-05-19"),
                 "status": "Active",
+                "data_provenance": "SYNTHETIC_FALLBACK",
             }
             for i, e in enumerate(events)
         ]
@@ -320,17 +355,20 @@ def handle_satellite_latest_endpoint() -> Dict[str, Any]:
     try:
         events = list_canonical_events()
         primary_evt = events[0] if events else {}
+        data_prov = primary_evt.get("data_provenance", "SYNTHETIC_FALLBACK")
         return _create_json_response(200, {
             "beforeImage": "assets/before.jpg",
             "afterImage": "assets/after.jpg",
             "event_id": primary_evt.get("event_id", "flood-emilia-romagna-2023"),
             "acquisitionDateBefore": primary_evt.get("before_date", "2023-05-04"),
-            "acquisitionDateAfter": primary_evt.get("after_date", "2023-05-19")
+            "acquisitionDateAfter": primary_evt.get("after_date", "2023-05-19"),
+            "data_provenance": data_prov,
         })
     except Exception:
         return _create_json_response(200, {
             "beforeImage": "assets/before.jpg",
-            "afterImage": "assets/after.jpg"
+            "afterImage": "assets/after.jpg",
+            "data_provenance": "SYNTHETIC_FALLBACK",
         })
 
 

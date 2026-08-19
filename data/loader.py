@@ -6,14 +6,17 @@ Exposes a clean public interface for downstream modules.
 """
 
 import json
+import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from data.event_schema import (
     DisasterEvent,
     EventValidationError,
     UnsupportedDisasterTypeError,
 )
+
+logger = logging.getLogger("nirvaan.loader")
 
 
 class DatasetCatalogError(FileNotFoundError):
@@ -143,6 +146,18 @@ class DatasetLoader:
                 after_path = self.base_dir / after_path
             event_dict["after_image"] = after_path
 
+        # Check whether real raster image files exist
+        is_real, missing_reasons = self._check_real_imagery_exists(event_dict)
+        if is_real:
+            event_dict["data_provenance"] = "REAL_SATELLITE_DATA"
+        else:
+            event_dict["data_provenance"] = "SYNTHETIC_FALLBACK"
+            logger.warning(
+                "Synthetic fallback triggered for event '%s': %s",
+                event_id,
+                "; ".join(missing_reasons)
+            )
+
         # Instantiate & validate schema
         event = DisasterEvent.from_dict(event_dict)
 
@@ -151,6 +166,30 @@ class DatasetLoader:
             self._verify_event_files(event)
 
         return event
+
+    def _check_real_imagery_exists(self, event_dict: Dict[str, Any]) -> Tuple[bool, List[str]]:
+        """Checks if real raster band image files exist in local directories."""
+        missing_reasons: List[str] = []
+        valid_exts = {".tif", ".tiff", ".png", ".jpg", ".jpeg"}
+
+        for key in ["before_image", "after_image"]:
+            p = event_dict.get(key)
+            if not p:
+                missing_reasons.append(f"Missing '{key}' path configuration")
+                continue
+            path = Path(p)
+            if not path.exists():
+                missing_reasons.append(f"Path '{path}' does not exist")
+                continue
+            if path.is_dir():
+                image_files = [f for f in path.glob("*") if f.is_file() and f.suffix.lower() in valid_exts]
+                if not image_files:
+                    missing_reasons.append(f"No valid satellite raster band files (.tif, .tiff, .png, .jpg) found in directory '{path}'")
+            elif path.is_file():
+                if path.suffix.lower() not in valid_exts:
+                    missing_reasons.append(f"File '{path}' does not have a recognized satellite image extension")
+
+        return len(missing_reasons) == 0, missing_reasons
 
     def _verify_event_files(self, event: DisasterEvent) -> None:
         """Verifies that resolved local paths exist on disk."""

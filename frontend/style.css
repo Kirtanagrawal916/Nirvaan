@@ -652,6 +652,7 @@ html[data-theme="light"] .topbar-menu-btn:hover {
     color: #0f172a;
 }
 
+.system-status {
     color: #7f91a6;
 
     font-size: 12px;
@@ -2856,6 +2857,380 @@ html[data-theme="light"] .input-field-group input[type="text"] {
 
 .setting-switch input:checked + .setting-switch-slider:before {
     transform: translateX(20px);
+}
+
+
+/* =========================================================
+   PROVENANCE BANNER
+========================================================= */
+
+.provenance-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    margin: 15px 25px 0 25px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    z-index: 100;
+    transition: all 0.2s ease-in-out;
+}
+
+.provenance-banner.synthetic-mode {
+    background: linear-gradient(135deg, rgba(230, 126, 34, 0.25), rgba(211, 84, 0, 0.35));
+    border: 1px solid #e67e22;
+    color: #ffd8a8;
+}
+
+.provenance-banner.real-mode {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(39, 174, 96, 0.3));
+    border: 1px solid #2ecc71;
+    color: #b2f2bb;
+}
+
+.banner-icon {
+    font-size: 18px;
+}
+
+.banner-text strong {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+/* =========================================================
+   SITREP DOCUMENT & PRINT STYLES
+========================================================= */
+
+.sitrep-document {
+    background: #0b1728;
+    border: 1px solid #1e3046;
+    border-radius: 12px;
+    padding: 30px;
+    margin-top: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    color: #e2e8f0;
+}
+
+.sitrep-letterhead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #1e3046;
+    padding-bottom: 20px;
+    margin-bottom: 25px;
+}
+
+.letterhead-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.letterhead-brand .brand-logo {
+    font-size: 32px;
+    color: #3b82f6;
+}
+
+.letterhead-brand h2 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin: 0;
+    color: #f8fafc;
+}
+
+.letterhead-brand p {
+    margin: 3px 0 0 0;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.letterhead-meta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-end;
+}
+
+.meta-date {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.sitrep-title-box {
+    margin-bottom: 25px;
+}
+
+.sitrep-title-box h1 {
+    font-size: 24px;
+    margin: 0 0 12px 0;
+    color: #ffffff;
+}
+
+.sitrep-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pill-type {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid #3b82f6;
+    color: #93c5fd;
+}
+
+.pill-loc {
+    background: rgba(148, 163, 184, 0.2);
+    border: 1px solid #64748b;
+    color: #cbd5e1;
+}
+
+.pill-sev.high, .pill-sev.extreme {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid #ef4444;
+    color: #fca5a5;
+}
+
+.pill-sev.moderate {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid #f59e0b;
+    color: #fde68a;
+}
+
+.pill-sev.low {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid #22c55e;
+    color: #86efac;
+}
+
+.sitrep-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+}
+
+.metric-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.sitrep-section {
+    margin-bottom: 30px;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.sitrep-section h3 {
+    font-size: 16px;
+    margin: 0 0 15px 0;
+    color: #60a5fa;
+    border-bottom: 1px solid #1e293b;
+    padding-bottom: 8px;
+}
+
+.recommendation-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.recommendation-list li {
+    background: rgba(30, 41, 59, 0.5);
+    padding: 12px 16px;
+    border-radius: 6px;
+    border-left: 3px solid #3b82f6;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.markdown-body {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3 {
+    color: #f8fafc;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.markdown-body hr {
+    border: 0;
+    border-top: 1px solid #334155;
+    margin: 20px 0;
+}
+
+.markdown-body ul {
+    padding-left: 20px;
+}
+
+.sitrep-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #1e293b;
+}
+
+.secondary-btn {
+    background: #1e293b;
+    color: #f8fafc;
+    border: 1px solid #334155;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.secondary-btn:hover {
+    background: #334155;
+}
+
+.sitrep-loading {
+    text-align: center;
+    padding: 50px 20px;
+    background: #0b1728;
+    border: 1px solid #1e3046;
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+.spinner {
+    width: 44px;
+    height: 44px;
+    border: 4px solid rgba(59, 130, 246, 0.2);
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* =========================================================
+   ALWAYS-VISIBLE MODE INDICATOR & FLEX TOGGLE
+========================================================= */
+.mode-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.mode-indicator.instant-mode {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(29, 78, 216, 0.35));
+    border: 1px solid #3b82f6;
+    color: #93c5fd;
+}
+
+.mode-indicator.instant-mode:hover {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.4), rgba(29, 78, 216, 0.5));
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.mode-indicator.live-mode {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(126, 34, 206, 0.35));
+    border: 1px solid #a855f7;
+    color: #e9d5ff;
+}
+
+.mode-indicator.live-mode:hover {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(126, 34, 206, 0.5));
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+}
+
+.mode-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* =========================================================
+   PRINT MEDIA MEDIA QUERY
+========================================================= */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .no-print, .sidebar, .topbar, .provenance-banner, .sidebar-nav {
+        display: none !important;
+    }
+    .sitrep-document, .sitrep-document * {
+        visibility: visible;
+    }
+    .sitrep-document {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 20px;
+        background: #ffffff !important;
+        color: #111111 !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .sitrep-letterhead h2, .sitrep-title-box h1, .sitrep-section h3, .metric-val {
+        color: #000000 !important;
+    }
+    .metric-card, .sitrep-section, .recommendation-list li {
+        background: #f8fafc !important;
+        color: #111111 !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    .markdown-body {
+        color: #111111 !important;
+    }
 }
 
 

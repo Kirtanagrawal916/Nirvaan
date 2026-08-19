@@ -42,12 +42,27 @@ class DetectionResultContract:
     hotspots: List[Dict[str, Any]]
     mask_reference: Dict[str, Any]
     provenance: Dict[str, Any]
+    data_provenance: str = "REAL_SATELLITE_DATA"
     warnings: List[str] = field(default_factory=list)
     limitations: List[str] = field(default_factory=list)
     contract_version: str = "1.0.0"
 
     def __post_init__(self):
-        """Validates contract structure and values."""
+        """Validates contract structure and values, auto-attaching provenance disclosure warnings."""
+        synthetic_disclosure = "This result uses synthetic placeholder data, not real satellite imagery. For demonstration purposes only."
+        if self.data_provenance == "SYNTHETIC_FALLBACK":
+            if synthetic_disclosure not in self.warnings:
+                self.warnings.append(synthetic_disclosure)
+            if isinstance(self.event_metadata, dict):
+                self.event_metadata["data_provenance"] = "SYNTHETIC_FALLBACK"
+            if isinstance(self.provenance, dict):
+                self.provenance["data_provenance"] = "SYNTHETIC_FALLBACK"
+        else:
+            if isinstance(self.event_metadata, dict) and "data_provenance" not in self.event_metadata:
+                self.event_metadata["data_provenance"] = self.data_provenance
+            if isinstance(self.provenance, dict) and "data_provenance" not in self.provenance:
+                self.provenance["data_provenance"] = self.data_provenance
+
         self.validate()
 
     def validate(self):
@@ -93,6 +108,7 @@ class DetectionResultContract:
             "hotspots": self.hotspots,
             "mask_reference": self.mask_reference,
             "provenance": self.provenance,
+            "data_provenance": self.data_provenance,
             "warnings": self.warnings,
             "limitations": self.limitations,
         }
@@ -104,6 +120,12 @@ class DetectionResultContract:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "DetectionResultContract":
         """Constructs and validates a DetectionResultContract from a dictionary."""
+        prov_val = (
+            data.get("data_provenance")
+            or data.get("provenance", {}).get("data_provenance")
+            or data.get("event_metadata", {}).get("data_provenance")
+            or "REAL_SATELLITE_DATA"
+        )
         return cls(
             contract_version=data.get("contract_version", "1.0.0"),
             event_id=data.get("event_id", ""),
@@ -117,6 +139,7 @@ class DetectionResultContract:
             hotspots=data.get("hotspots", []),
             mask_reference=data.get("mask_reference", {}),
             provenance=data.get("provenance", {}),
+            data_provenance=prov_val,
             warnings=data.get("warnings", []),
             limitations=data.get("limitations", []),
         )
