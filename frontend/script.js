@@ -348,10 +348,11 @@ function initSatelliteOrbitBackground(targetCanvasId) {
             ctx.fill();
         });
 
-        // EARTH CURVATURE AT BOTTOM-RIGHT (VIVID ILLUMINATED)
-        const earthX = width * 0.82;
-        const earthY = height * 1.12;
-        const earthRadius = Math.min(width, height) * 0.68;
+        // EARTH CURVATURE AT BOTTOM-RIGHT (NON-OBSCURING CORNER PLACEMENT)
+        const isFullscreenCanvas = !targetCanvasId || targetCanvasId === "satelliteOrbitCanvas";
+        const earthX = isFullscreenCanvas ? width * 0.92 : width * 0.82;
+        const earthY = isFullscreenCanvas ? height * 1.25 : height * 1.12;
+        const earthRadius = isFullscreenCanvas ? Math.min(width, height) * 0.52 : Math.min(width, height) * 0.68;
 
         // EARTH ATMOSPHERE INTENSE OUTER GLOW
         const atmGlow = ctx.createRadialGradient(earthX, earthY, earthRadius * 0.88, earthX, earthY, earthRadius * 1.25);
