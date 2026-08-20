@@ -1693,25 +1693,37 @@ html[data-theme="light"] .settings-card-panel {
 }
 
 html[data-theme="light"] .settings-card-title {
-    color: #0A0A0A !important;
+    color: #000000 !important;
     font-size: 19px !important;
     font-weight: 800 !important;
 }
 
 html[data-theme="light"] .setting-item {
-    border-bottom: 1px solid #f1f5f9 !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 18px 22px !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+}
+
+html[data-theme="light"] .setting-item:hover {
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
 }
 
 html[data-theme="light"] .setting-item strong {
-    color: #0A0A0A !important;
+    color: #000000 !important;
     font-size: 16.5px !important;
     font-weight: 800 !important;
+    opacity: 1 !important;
 }
 
 html[data-theme="light"] .setting-item p {
     color: #333333 !important;
     font-size: 14.5px !important;
     line-height: 1.6 !important;
+    opacity: 1 !important;
 }
 
 .about-card-item {
@@ -3690,8 +3702,8 @@ html[data-theme="light"] .ai-metric-val {
 }
 
 .setting-item {
-    background: #1e222d;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     padding: 18px 22px;
     display: flex;
@@ -3701,8 +3713,8 @@ html[data-theme="light"] .ai-metric-val {
 }
 
 .setting-item:hover {
-    border-color: rgba(56, 189, 248, 0.25);
-    background: #232835;
+    border-color: rgba(56, 189, 248, 0.3);
+    background: rgba(56, 189, 248, 0.08);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
