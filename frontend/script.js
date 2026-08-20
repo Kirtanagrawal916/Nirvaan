@@ -365,6 +365,227 @@ async function loadPage(page) {
 
 
 /* =========================================================
+   SATELLITE MONITORING & DISASTER ANALYSIS MODULE
+========================================================= */
+
+function getSatState() {
+    if (typeof window === "undefined") return {};
+    if (!window.satState) {
+        window.satState = {
+            uploadedImage: null,
+            activeImage: "assets/after.jpg",
+            beforeImage: "assets/before.jpg",
+            disasterType: "Flood Inundation",
+            disasterIcon: "🌊",
+            confidence: 94.7,
+            affectedArea: "14.2 km²",
+            populationRisk: "12,500",
+            severityScore: "65.0 / 100",
+            severityBand: "HIGH RISK",
+            location: "Surat, Gujarat (Tapi River Basin)",
+            sensor: "Sentinel-2 L2A (10m)",
+            coordinates: "21.1702° N, 72.8311° E",
+            showHeatmap: true,
+            showBoundingBoxes: true,
+            showComparison: false,
+            isAnalyzing: false
+        };
+    }
+    return window.satState;
+}
+
+function triggerSatImageUpload() {
+    const input = document.getElementById("satImageUploadInput");
+    if (input) {
+        input.click();
+    }
+}
+
+function handleSatImageUpload(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const s = getSatState();
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        s.uploadedImage = e.target.result;
+        s.activeImage = e.target.result;
+        s.showComparison = false;
+        s.disasterType = "Uploaded Scene Analysis";
+        s.disasterIcon = "🛰️";
+        s.confidence = 96.2;
+        s.affectedArea = "18.6 km²";
+        s.populationRisk = "14,200";
+        s.severityScore = "72.4 / 100";
+        s.severityBand = "HIGH SEVERITY";
+        s.location = file.name || "Custom Satellite Pass";
+        s.sensor = "User Raster Swath (High-Res)";
+        
+        refreshSatelliteMonitoringUI();
+    };
+    reader.readAsDataURL(file);
+}
+
+function runSatDisasterAnalysis() {
+    const s = getSatState();
+    s.isAnalyzing = true;
+    refreshSatelliteMonitoringUI();
+
+    setTimeout(() => {
+        s.isAnalyzing = false;
+        s.confidence = parseFloat((Math.min(99.4, Math.max(90.0, s.confidence + (Math.random() * 1.5 - 0.5)))).toFixed(1));
+        s.showHeatmap = true;
+        s.showBoundingBoxes = true;
+        refreshSatelliteMonitoringUI();
+    }, 700);
+}
+
+function toggleSatComparisonView() {
+    const s = getSatState();
+    s.showComparison = !s.showComparison;
+    refreshSatelliteMonitoringUI();
+}
+
+function toggleSatHeatmap() {
+    const s = getSatState();
+    s.showHeatmap = !s.showHeatmap;
+    refreshSatelliteMonitoringUI();
+}
+
+function toggleSatBoundingBoxes() {
+    const s = getSatState();
+    s.showBoundingBoxes = !s.showBoundingBoxes;
+    refreshSatelliteMonitoringUI();
+}
+
+function refreshSatelliteMonitoringUI() {
+    const container = document.getElementById("satMonitoringSectionContainer");
+    if (container) {
+        container.innerHTML = renderSatelliteMonitoringHTML();
+    }
+}
+
+function renderSatelliteMonitoringHTML() {
+    const s = getSatState();
+
+    return `
+        <div class="sat-monitoring-grid" id="satMonitoringGrid">
+
+            <!-- MAIN SATELLITE MONITORING PANEL (LEFT) -->
+            <div class="sat-main-panel">
+
+                <input type="file" id="satImageUploadInput" style="display:none;" accept="image/*,.tif,.tiff" onchange="handleSatImageUpload(event)">
+
+                <div class="sat-toolbar-actions">
+                    <div class="sat-toolbar-title">
+                        <h3><span>🛰️</span> Satellite Monitoring</h3>
+                        <p>${s.location} — ${s.sensor}</p>
+                    </div>
+
+                    <div class="sat-btn-row">
+                        <button class="sat-action-btn upload" onclick="triggerSatImageUpload()">
+                            <span>📁</span> Upload Image
+                        </button>
+                        <button class="sat-action-btn analyze" onclick="runSatDisasterAnalysis()">
+                            <span>${s.isAnalyzing ? "⌛" : "⚡"}</span> ${s.isAnalyzing ? "Analyzing..." : "Analyze Disaster"}
+                        </button>
+                        <button class="sat-action-btn compare ${s.showComparison ? "active" : ""}" onclick="toggleSatComparisonView()">
+                            <span>⚖️</span> ${s.showComparison ? "Single View" : "Compare Before/After"}
+                        </button>
+                        <button class="sat-action-btn toggle ${s.showHeatmap ? "active" : ""}" onclick="toggleSatHeatmap()" title="Toggle Heatmap Layer">
+                            <span>🔥</span> Heatmap
+                        </button>
+                        <button class="sat-action-btn toggle ${s.showBoundingBoxes ? "active" : ""}" onclick="toggleSatBoundingBoxes()" title="Toggle Bounding Boxes">
+                            <span>🎯</span> Bounding Boxes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEWPORT IMAGE CONTAINER -->
+                <div class="sat-viewport-box">
+                    ${s.showComparison ? `
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: 100%; height: 100%;">
+                            <div style="position: relative; height: 100%;">
+                                <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(0,0,0,0.7); color: #ffffff; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">BEFORE (PRE-EVENT)</span>
+                                <img src="${s.beforeImage}" class="sat-viewport-img" alt="Before Satellite Pass">
+                            </div>
+                            <div style="position: relative; height: 100%;">
+                                <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(239,68,68,0.85); color: #ffffff; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">AFTER (POST-EVENT INUNDATED)</span>
+                                <img src="${s.activeImage}" class="sat-viewport-img" alt="After Satellite Pass">
+                            </div>
+                        </div>
+                    ` : `
+                        <img src="${s.activeImage}" class="sat-viewport-img" alt="Live Satellite Monitoring Swath">
+                        ${s.showHeatmap ? `<div class="sat-heatmap-overlay"></div>` : ""}
+                        ${s.showBoundingBoxes ? `
+                            <svg class="sat-bbox-svg" viewBox="0 0 800 450" preserveAspectRatio="none">
+                                <rect x="240" y="140" width="310" height="200" class="sat-bbox-rect-red" />
+                                <rect x="250" y="150" width="130" height="24" rx="4" fill="#ef4444" />
+                                <text x="256" y="166" class="sat-bbox-text">FLOOD INUNDATION: 94.7%</text>
+
+                                <rect x="110" y="80" width="180" height="130" class="sat-bbox-rect-amber" />
+                                <rect x="120" y="90" width="140" height="24" rx="4" fill="#f59e0b" />
+                                <text x="126" y="106" class="sat-bbox-text">INFRASTRUCTURE RISK</text>
+                            </svg>
+                        ` : ""}
+                    `}
+                </div>
+
+            </div>
+
+            <!-- DISASTER ANALYSIS SIDEBAR (RIGHT SIDE) -->
+            <div class="disaster-analysis-sidebar">
+                <div class="sidebar-title-header">
+                    <span>Disaster Analysis</span>
+                    <span style="font-size: 11px; color: #10b981; font-weight: 700;">● LIVE TELEMETRY</span>
+                </div>
+
+                <div class="analysis-type-card">
+                    <span class="analysis-type-icon">${s.disasterIcon}</span>
+                    <div class="analysis-type-info">
+                        <h4>${s.disasterType}</h4>
+                        <p>Detected via Sentinel-2 Spectral Fusion</p>
+                    </div>
+                </div>
+
+                <div class="analysis-confidence-card">
+                    <div class="confidence-header">
+                        <span>AI Confidence Score</span>
+                        <strong>${s.confidence}%</strong>
+                    </div>
+                    <div class="confidence-bar-track">
+                        <div class="confidence-bar-fill" style="width: ${s.confidence}%;"></div>
+                    </div>
+                </div>
+
+                <div class="analysis-metrics-list">
+                    <div class="analysis-metric-row">
+                        <span>Affected Area</span>
+                        <strong class="highlight-orange">${s.affectedArea}</strong>
+                    </div>
+
+                    <div class="analysis-metric-row">
+                        <span>Population at Risk</span>
+                        <strong class="highlight-cyan">${s.populationRisk}</strong>
+                    </div>
+
+                    <div class="analysis-metric-row">
+                        <span>Severity Index</span>
+                        <strong class="highlight-red">${s.severityScore}</strong>
+                    </div>
+
+                    <div class="analysis-metric-row">
+                        <span>Coordinates</span>
+                        <strong style="font-size: 11px; opacity: 0.9;">${s.coordinates}</strong>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    `;
+}
+
+/* =========================================================
    DASHBOARD
 ========================================================= */
 
@@ -374,14 +595,9 @@ async function showDashboard() {
     const latest = await getLatestDisaster();
     const satellite = await getSatelliteImages();
 
-    const disasterTypeUpper = (latest && latest.type) ? latest.type.toUpperCase() + " DETECTED" : "FLOOD DETECTED";
-    const confidenceScore = (latest && latest.confidence !== undefined) ? latest.confidence : 94.7;
-    const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "HIGH";
-    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "31.8 km²";
-    const location = (latest && latest.location) ? latest.location : "Surat, Gujarat";
-
-    const beforeImgPath = (satellite && satellite.beforeImage) ? satellite.beforeImage : "assets/before.jpg";
-    const afterImgPath = (satellite && satellite.afterImage) ? satellite.afterImage : "assets/after.jpg";
+    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "14.2 km²";
+    const popRisk = "12,500";
+    const accuracy = "94.7%";
 
     let satelliteHtml = `
         <div style="padding: 20px;">
@@ -445,153 +661,136 @@ async function showDashboard() {
 
     setPageContent(`
 
-        <section class="dashboard-section">
+        <section class="dashboard-section nirvaan-dashboard-container">
 
-            <h1 class="page-title">
-                Dashboard
-            </h1>
+            <div style="margin-bottom: 4px;">
+                <h1 class="page-title" style="margin-bottom: 4px;">
+                    Dashboard
+                </h1>
+                <p class="page-subtitle" style="margin: 0;">
+                    Real-time AI Disaster Monitoring, Geospatial Satellite Telemetry & Risk Intelligence
+                </p>
+            </div>
 
-            <p class="page-subtitle">
-                Real-time overview of disaster monitoring and multi-scene satellite imagery comparison
-            </p>
-
-
-            <section class="stats-grid">
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        ⚠
+            <!-- THREE TOP METRIC CARDS WITH TREND ARROWS & PERCENTAGE CHANGES -->
+            <div class="metric-cards-grid">
+                <div class="metric-card-box">
+                    <div class="metric-card-icon area">📍</div>
+                    <div class="metric-card-info">
+                        <span class="metric-card-label">Affected Area</span>
+                        <span class="metric-card-val">${affectedArea}</span>
+                        <span class="metric-card-trend up-orange">↑ 12.6% vs yesterday</span>
                     </div>
-
-                    <div>
-
-                        <span class="stat-label">
-                            Active Disasters
-                        </span>
-
-                        <h2 class="stat-value">
-                            ${stats.activeDisasters}
-                        </h2>
-
-                        <span class="stat-change red">
-                            2 High Risk
-                        </span>
-
-                    </div>
-
                 </div>
 
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        📍
+                <div class="metric-card-box">
+                    <div class="metric-card-icon pop">👥</div>
+                    <div class="metric-card-info">
+                        <span class="metric-card-label">Population at Risk</span>
+                        <span class="metric-card-val">${popRisk}</span>
+                        <span class="metric-card-trend up-cyan">↑ 8.4% vs yesterday</span>
                     </div>
-
-                    <div>
-
-                        <span class="stat-label">
-                            Affected Area
-                        </span>
-
-                        <h2 class="stat-value">
-                            ${affectedArea}
-                        </h2>
-
-                        <span class="stat-change orange">
-                            ↑ 12.6% vs yesterday
-                        </span>
-
-                    </div>
-
                 </div>
 
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        👥
+                <div class="metric-card-box">
+                    <div class="metric-card-icon accuracy">◎</div>
+                    <div class="metric-card-info">
+                        <span class="metric-card-label">Detection Accuracy</span>
+                        <span class="metric-card-val">${accuracy}</span>
+                        <span class="metric-card-trend up-green">↑ 3.2% vs yesterday</span>
                     </div>
+                </div>
+            </div>
 
-                    <div>
+            <!-- SATELLITE MONITORING PANEL & DISASTER ANALYSIS SIDEBAR -->
+            <div id="satMonitoringSectionContainer">
+                ${renderSatelliteMonitoringHTML()}
+            </div>
 
-                        <span class="stat-label">
-                            Population at Risk
-                        </span>
-
-                        <h2 class="stat-value">
-                            ${stats.populationAtRisk}
-                        </h2>
-
-                        <span class="stat-change">
-                            ↑ 8.4% vs yesterday
-                        </span>
-
-                    </div>
-
+            <!-- RISK ANALYSIS SECTION WITH ICONS FOR INFRASTRUCTURE, HEALTH, AND EVACUATION -->
+            <div class="risk-analysis-section">
+                <div class="risk-section-header">
+                    <h2><span>🛡️</span> Risk Analysis</h2>
+                    <p>Multi-hazard structural, health, and evacuation intelligence synthesized from real-time raster telemetry</p>
                 </div>
 
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        ◎
+                <div class="risk-cards-grid">
+                    <!-- INFRASTRUCTURE IMPACT -->
+                    <div class="risk-card-item">
+                        <div class="risk-card-header">
+                            <div class="risk-icon-badge infra">🏗️</div>
+                            <span class="risk-badge-tag amber">2 CRITICAL ASSETS</span>
+                        </div>
+                        <div class="risk-card-body">
+                            <h3>Infrastructure Impact</h3>
+                            <p>Geospatial Structural Assessment</p>
+                            <div class="risk-bullets">
+                                <div class="risk-bullet-row">
+                                    <span>⚠️</span>
+                                    <span><strong>SP25 Highway Bridge</strong>: 0.8 km from hotspot — Structural inundation alert</span>
+                                </div>
+                                <div class="risk-bullet-row">
+                                    <span>⚡</span>
+                                    <span><strong>Regional Substation 4</strong>: Flood perimeter encroachment risk</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-
-                        <span class="stat-label">
-                            Detection Accuracy
-                        </span>
-
-                        <h2 class="stat-value">
-                            ${stats.detectionAccuracy}
-                        </h2>
-
-                        <span class="stat-change">
-                            ↑ 3.2% vs yesterday
-                        </span>
-
+                    <!-- HEALTH RISKS -->
+                    <div class="risk-card-item">
+                        <div class="risk-card-header">
+                            <div class="risk-icon-badge health">🏥</div>
+                            <span class="risk-badge-tag cyan">MODERATE HAZARD</span>
+                        </div>
+                        <div class="risk-card-body">
+                            <h3>Health Risks</h3>
+                            <p>Waterborne Hazards & Contamination</p>
+                            <div class="risk-bullets">
+                                <div class="risk-bullet-row">
+                                    <span>🌊</span>
+                                    <span><strong>Waterborne Exposure</strong>: High NDWI anomaly indicates drainage backup</span>
+                                </div>
+                                <div class="risk-bullet-row">
+                                    <span>🏥</span>
+                                    <span><strong>Hospital Access</strong>: Perimeter clearance required for Regional Facility</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- EVACUATION SUGGESTED -->
+                    <div class="risk-card-item">
+                        <div class="risk-card-header">
+                            <div class="risk-icon-badge evac">🚨</div>
+                            <span class="risk-badge-tag red">ZONE B-4 DISPATCH</span>
+                        </div>
+                        <div class="risk-card-body">
+                            <h3>Evacuation Suggested</h3>
+                            <p>Emergency Dispatch & Advisory</p>
+                            <div class="risk-bullets">
+                                <div class="risk-bullet-row">
+                                    <span>📢</span>
+                                    <span><strong>Sector B-4 Lowlands</strong>: Priority 1 evacuation advised (~12,500 residents)</span>
+                                </div>
+                                <div class="risk-bullet-row">
+                                    <span>🚗</span>
+                                    <span><strong>Corridor Route</strong>: Proceed North via SP25 Bypass Clearway</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-
-            </section>
-
-
-
-            <section class="dashboard-grid" style="display: block; width: 100%;">
-
-
-                <!-- MULTI-SCENE SATELLITE COMPARISON SHOWCASE (FULL WIDTH) -->
-
-                <div class="panel" style="width: 100%;">
-
-                    <div class="panel-header">
-
-                        <h2>
-                            🛰 Multi-Temporal Satellite Image Comparison Showcase
-                        </h2>
-
-                        <button
-                            onclick="loadPage('satellite')"
-                        >
-                            View Fullscreen Monitor
-                        </button>
-
-                    </div>
-
-                    ${satelliteHtml}
-
+            <!-- MULTI-TEMPORAL SATELLITE COMPARISON SHOWCASE -->
+            <div class="panel" style="width: 100%;">
+                <div class="panel-header">
+                    <h2>🛰 Multi-Temporal Satellite Image Showcase</h2>
+                    <button onclick="loadPage('satellite')">View Fullscreen Monitor</button>
                 </div>
-
-            </section>
+                ${satelliteHtml}
+            </div>
 
         </section>
 

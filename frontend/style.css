@@ -3278,11 +3278,601 @@ html[data-theme="light"] .ai-metric-val {
     margin-bottom: 4px;
 }
 
-.setting-item p {
+
+/* =========================================================
+   NIRVAAN MODERN DATA-DRIVEN DASHBOARD & RISK ANALYSIS STYLES
+========================================================= */
+
+.nirvaan-dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    width: 100%;
+}
+
+/* TOP METRIC CARDS WITH TREND ARROWS */
+.metric-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 900px) {
+    .metric-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.metric-card-box {
+    background: linear-gradient(145deg, #131b2e, #0c1220);
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    border-radius: 16px;
+    padding: 22px 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    transition: all 0.25s ease;
+}
+
+.metric-card-box:hover {
+    transform: translateY(-3px);
+    border-color: rgba(56, 189, 248, 0.4);
+    box-shadow: 0 14px 35px rgba(56, 189, 248, 0.15);
+}
+
+.metric-card-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.metric-card-icon.area {
+    background: rgba(249, 115, 22, 0.18);
+    color: #f97316;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.metric-card-icon.pop {
+    background: rgba(56, 189, 248, 0.18);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.metric-card-icon.accuracy {
+    background: rgba(16, 185, 129, 0.18);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.metric-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.metric-card-label {
     font-size: 13px;
-    color: #a1a1aa;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.metric-card-val {
+    font-size: 26px;
+    font-weight: 900;
+    color: #f8fafc;
+    line-height: 1.2;
+}
+
+.metric-card-trend {
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.metric-card-trend.up-orange {
+    color: #f97316;
+}
+
+.metric-card-trend.up-cyan {
+    color: #38bdf8;
+}
+
+.metric-card-trend.up-green {
+    color: #10b981;
+}
+
+/* SATELLITE MONITORING PANEL & DISASTER ANALYSIS SIDEBAR */
+.sat-monitoring-grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 24px;
+}
+
+@media (max-width: 1080px) {
+    .sat-monitoring-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.sat-main-panel {
+    background: #111522;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.sat-toolbar-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sat-toolbar-title h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.sat-toolbar-title p {
+    font-size: 12px;
+    color: #94a3b8;
     margin: 0;
 }
+
+.sat-btn-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sat-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #1e2433;
+    color: #f1f5f9;
+    transition: all 0.2s ease;
+}
+
+.sat-action-btn:hover {
+    background: #283147;
+    border-color: #38bdf8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2);
+}
+
+.sat-action-btn.upload {
+    background: linear-gradient(135deg, #0284c7, #2563eb);
+    border-color: #38bdf8;
+    color: #ffffff;
+}
+
+.sat-action-btn.analyze {
+    background: linear-gradient(135deg, #059669, #10b981);
+    border-color: #34d399;
+    color: #ffffff;
+}
+
+.sat-action-btn.compare.active,
+.sat-action-btn.toggle.active {
+    background: rgba(56, 189, 248, 0.2);
+    border-color: #38bdf8;
+    color: #38bdf8;
+}
+
+/* SATELLITE IMAGE VIEWPORT WITH HEATMAP & BBOX OVERLAYS */
+.sat-viewport-box {
+    position: relative;
+    width: 100%;
+    height: 440px;
+    background: #090b10;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sat-viewport-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.sat-heatmap-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 45% 55%, rgba(239, 68, 68, 0.65) 0%, rgba(249, 115, 22, 0.45) 30%, rgba(56, 189, 248, 0.25) 55%, transparent 75%);
+    mix-blend-mode: color-dodge;
+    opacity: 0.85;
+    animation: heatmapPulse 3s infinite alternate ease-in-out;
+}
+
+.sat-bbox-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.sat-bbox-rect-red {
+    fill: rgba(239, 68, 68, 0.15);
+    stroke: #ef4444;
+    stroke-width: 2.5;
+    stroke-dasharray: 6 3;
+    animation: dashScan 20s linear infinite;
+}
+
+.sat-bbox-rect-amber {
+    fill: rgba(245, 158, 11, 0.12);
+    stroke: #f59e0b;
+    stroke-width: 2.5;
+    stroke-dasharray: 6 3;
+    animation: dashScan 20s linear infinite;
+}
+
+.sat-bbox-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    fill: #ffffff;
+}
+
+/* DISASTER ANALYSIS SIDEBAR PANEL (RIGHT SIDE) */
+.disaster-analysis-sidebar {
+    background: linear-gradient(145deg, #131a2b, #0d121f);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.sidebar-title-header {
+    font-size: 16px;
+    font-weight: 800;
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.analysis-type-card {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.analysis-type-icon {
+    font-size: 28px;
+}
+
+.analysis-type-info h4 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #ef4444;
+    margin: 0 0 2px 0;
+}
+
+.analysis-type-info p {
+    font-size: 11px;
+    color: #94a3b8;
+    margin: 0;
+}
+
+.analysis-confidence-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.confidence-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 6px;
+}
+
+.confidence-header strong {
+    font-size: 18px;
+    color: #10b981;
+}
+
+.confidence-bar-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.confidence-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+
+.analysis-metrics-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.analysis-metric-row {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.analysis-metric-row span {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.analysis-metric-row strong {
+    font-size: 14px;
+    font-weight: 800;
+    color: #f1f5f9;
+}
+
+.analysis-metric-row strong.highlight-orange {
+    color: #f97316;
+}
+
+.analysis-metric-row strong.highlight-cyan {
+    color: #38bdf8;
+}
+
+.analysis-metric-row strong.highlight-red {
+    color: #ef4444;
+}
+
+/* RISK ANALYSIS SECTION STYLES */
+.risk-analysis-section {
+    background: linear-gradient(145deg, #0e1424, #0a0e19);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.risk-section-header {
+    margin-bottom: 20px;
+}
+
+.risk-section-header h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.risk-section-header p {
+    font-size: 13px;
+    color: #94a3b8;
+    margin: 0;
+}
+
+.risk-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 900px) {
+    .risk-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.risk-card-item {
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: all 0.25s ease;
+}
+
+.risk-card-item:hover {
+    transform: translateY(-3px);
+    border-color: rgba(56, 189, 248, 0.35);
+    box-shadow: 0 10px 25px rgba(56, 189, 248, 0.12);
+}
+
+.risk-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.risk-icon-badge {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.risk-icon-badge.infra {
+    background: rgba(245, 158, 11, 0.18);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.risk-icon-badge.health {
+    background: rgba(56, 189, 248, 0.18);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.risk-icon-badge.evac {
+    background: rgba(239, 68, 68, 0.18);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.risk-badge-tag {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 14px;
+}
+
+.risk-badge-tag.amber {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.risk-badge-tag.cyan {
+    background: rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.risk-badge-tag.red {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.risk-card-body h3 {
+    font-size: 16px;
+    font-weight: 800;
+    color: #f8fafc;
+    margin-bottom: 4px;
+}
+
+.risk-card-body p {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 12px;
+}
+
+.risk-bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.risk-bullet-row {
+    font-size: 12px;
+    color: #cbd5e1;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.4;
+}
+
+/* LIGHT THEME OVERRIDES */
+html[data-theme="light"] .metric-card-box {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="light"] .metric-card-val {
+    color: #0f172a;
+}
+
+html[data-theme="light"] .sat-main-panel {
+    background: #ffffff;
+    border-color: #e2e8f0;
+}
+
+html[data-theme="light"] .sat-toolbar-title h3 {
+    color: #0284c7;
+}
+
+html[data-theme="light"] .sat-action-btn {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #1e293b;
+}
+
+html[data-theme="light"] .disaster-analysis-sidebar {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="light"] .risk-analysis-section {
+    background: #ffffff;
+    border-color: #e2e8f0;
+}
+
+html[data-theme="light"] .risk-section-header h2 {
+    color: #0284c7;
+}
+
+html[data-theme="light"] .risk-card-item {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+html[data-theme="light"] .risk-card-body h3 {
+    color: #0f172a;
+}
+
+html[data-theme="light"] .risk-bullet-row {
+    color: #334155;
+}
+
 
 
 
