@@ -294,14 +294,239 @@ if (topbarMenuBtn && menuDropdown) {
 
 
 /* =========================================================
+   DYNAMIC CANVAS SATELLITE ORBIT ANIMATION ENGINE (ENHANCED BRIGHTNESS)
+========================================================= */
+
+function initSatelliteOrbitBackground(targetCanvasId) {
+    if (typeof window === "undefined") return;
+    const canvas = document.getElementById(targetCanvasId || "satelliteOrbitCanvas");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const parent = canvas.parentElement || document.body;
+    let width = (canvas.width = parent.clientWidth || window.innerWidth);
+    let height = (canvas.height = parent.clientHeight || window.innerHeight);
+
+    window.addEventListener("resize", () => {
+        if (canvas && canvas.parentElement) {
+            width = canvas.width = canvas.parentElement.clientWidth || window.innerWidth;
+            height = canvas.height = canvas.parentElement.clientHeight || window.innerHeight;
+        }
+    });
+
+    // STARS IN SPACE WITH SHARPER BRIGHTNESS
+    const stars = Array.from({ length: 160 }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 1.8 + 0.6,
+        alpha: Math.random() * 0.9 + 0.3,
+        speed: Math.random() * 0.05 + 0.01
+    }));
+
+    // VIVID CITY LIGHT CLUSTERS ON EARTH CURVATURE
+    const cityLights = Array.from({ length: 120 }, () => ({
+        angle: Math.random() * Math.PI * 0.65 + Math.PI * 0.9,
+        dist: Math.random() * 95 + 310,
+        size: Math.random() * 2.5 + 1.2,
+        color: Math.random() > 0.35 ? "#fbbf24" : "#38bdf8"
+    }));
+
+    let orbitAngle = 0;
+    let scanPulse = 0;
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+
+        // 1. DEEP SPACE & STARFIELD
+        stars.forEach(s => {
+            s.alpha += Math.sin(Date.now() * 0.002 + s.x) * 0.01;
+            ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.2, Math.min(1.0, s.alpha))})`;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // EARTH CURVATURE AT BOTTOM-RIGHT (VIVID ILLUMINATED)
+        const earthX = width * 0.82;
+        const earthY = height * 1.12;
+        const earthRadius = Math.min(width, height) * 0.68;
+
+        // EARTH ATMOSPHERE INTENSE OUTER GLOW
+        const atmGlow = ctx.createRadialGradient(earthX, earthY, earthRadius * 0.88, earthX, earthY, earthRadius * 1.25);
+        atmGlow.addColorStop(0, "rgba(56, 189, 248, 0.65)");
+        atmGlow.addColorStop(0.4, "rgba(16, 185, 129, 0.35)");
+        atmGlow.addColorStop(0.75, "rgba(56, 189, 248, 0.15)");
+        atmGlow.addColorStop(1, "rgba(56, 189, 248, 0)");
+
+        ctx.fillStyle = atmGlow;
+        ctx.beginPath();
+        ctx.arc(earthX, earthY, earthRadius * 1.25, 0, Math.PI * 2);
+        ctx.fill();
+
+        // EARTH BODY GRADIENT WITH BLUE-GREEN OCEAN ILLUMINATION
+        const earthGrad = ctx.createRadialGradient(earthX - 140, earthY - 140, 40, earthX, earthY, earthRadius);
+        earthGrad.addColorStop(0, "#1e40af");
+        earthGrad.addColorStop(0.35, "#0f766e");
+        earthGrad.addColorStop(0.65, "#0b2a4a");
+        earthGrad.addColorStop(0.9, "#041224");
+        earthGrad.addColorStop(1, "#020712");
+
+        ctx.fillStyle = earthGrad;
+        ctx.beginPath();
+        ctx.arc(earthX, earthY, earthRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // BRIGHT CLOUD & CONTINENTAL CURVATURE ARCS
+        ctx.save();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+        ctx.lineWidth = 14;
+        ctx.beginPath();
+        ctx.arc(earthX, earthY, earthRadius - 20, Math.PI * 1.05, Math.PI * 1.45);
+        ctx.stroke();
+
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.25)";
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.arc(earthX, earthY, earthRadius - 45, Math.PI * 1.15, Math.PI * 1.55);
+        ctx.stroke();
+        ctx.restore();
+
+        // VIVID CITY LIGHTS WITH NEON GLOW
+        cityLights.forEach(cl => {
+            const lx = earthX + Math.cos(cl.angle) * cl.dist;
+            const ly = earthY + Math.sin(cl.angle) * cl.dist;
+            ctx.fillStyle = cl.color;
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = cl.color;
+            ctx.beginPath();
+            ctx.arc(lx, ly, cl.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        });
+
+        // 2. ORBIT TRAJECTORY HIGH-VISIBILITY DASHED LINE
+        orbitAngle += 0.0035;
+        scanPulse = (scanPulse + 0.02) % (Math.PI * 2);
+        const rx = width * 0.44;
+        const ry = height * 0.40;
+        const cx = width * 0.54;
+        const cy = height * 0.50;
+
+        ctx.save();
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.55)";
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "#38bdf8";
+        ctx.setLineDash([10, 6]);
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, -Math.PI / 10, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // 3. ILLUMINATED SATELLITE POSITION CALCULATION
+        const satX = cx + Math.cos(orbitAngle) * rx;
+        const satY = cy + Math.sin(orbitAngle) * ry;
+
+        // VIVID LASER SCAN TELEMETRY BEAM TO EARTH
+        const beamPulse = (Math.sin(scanPulse) + 1) / 2 * 0.4 + 0.4;
+        ctx.save();
+        ctx.strokeStyle = `rgba(56, 189, 248, ${beamPulse})`;
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = "#38bdf8";
+        ctx.beginPath();
+        ctx.moveTo(satX, satY);
+        ctx.lineTo(earthX - earthRadius * 0.28, earthY - earthRadius * 0.42);
+        ctx.stroke();
+
+        // SECONDARY SCAN CONE
+        ctx.fillStyle = `rgba(56, 189, 248, ${beamPulse * 0.15})`;
+        ctx.beginPath();
+        ctx.moveTo(satX, satY);
+        ctx.lineTo(earthX - earthRadius * 0.35, earthY - earthRadius * 0.35);
+        ctx.lineTo(earthX - earthRadius * 0.22, earthY - earthRadius * 0.48);
+        if (ctx.closePath) ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        // ILLUMINATED SATELLITE WITH HIGH-CONTRAST SOLAR PANELS
+        ctx.save();
+        ctx.translate(satX, satY);
+        ctx.rotate(orbitAngle + Math.PI / 4);
+
+        // SOLAR PANEL GLOW
+        ctx.shadowBlur = 16;
+        ctx.shadowColor = "#38bdf8";
+
+        // LEFT EXTENDED SOLAR ARRAY PANEL
+        ctx.fillStyle = "#0284c7";
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 1.5;
+        ctx.fillRect(-46, -8, 32, 16);
+        ctx.strokeRect(-46, -8, 32, 16);
+
+        // RIGHT EXTENDED SOLAR ARRAY PANEL
+        ctx.fillRect(14, -8, 32, 16);
+        ctx.strokeRect(14, -8, 32, 16);
+
+        // SOLAR PANEL PHOTON CELL GRID
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(-35, -8); ctx.lineTo(-35, 8);
+        ctx.moveTo(-24, -8); ctx.lineTo(-24, 8);
+        ctx.moveTo(25, -8); ctx.lineTo(25, 8);
+        ctx.moveTo(36, -8); ctx.lineTo(36, 8);
+        ctx.stroke();
+
+        // MAIN SATELLITE CHASSIS METALLIC GOLD/SILVER BODY
+        ctx.fillStyle = "#f8fafc";
+        ctx.fillRect(-12, -10, 24, 20);
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-12, -10, 24, 20);
+
+        // GOLD THERMAL FOIL STRIP
+        ctx.fillStyle = "#f59e0b";
+        ctx.fillRect(-8, -6, 16, 12);
+
+        // SENSOR APERTURE DISH
+        ctx.fillStyle = "#10b981";
+        ctx.shadowColor = "#10b981";
+        ctx.beginPath();
+        ctx.arc(0, 12, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+
+        // CRISP HIGH-CONTRAST TELEMETRY BADGE TEXT
+        ctx.save();
+        ctx.font = "bold 11px Outfit, sans-serif";
+        ctx.fillStyle = "#38bdf8";
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+        ctx.fillText("🛰 NIRVAAN SAT-1 :: ALT 686 km :: SENSOR SENTINEL-2 L2A", satX + 22, satY - 16);
+        ctx.restore();
+
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+}
+
+/* =========================================================
    INITIAL PAGE
 ========================================================= */
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
+        initSatelliteOrbitBackground();
         loadPage("dashboard");
     });
 } else {
+    initSatelliteOrbitBackground();
     loadPage("dashboard");
 }
 
@@ -365,6 +590,244 @@ async function loadPage(page) {
 
 
 /* =========================================================
+   SATELLITE MONITORING & DISASTER ANALYSIS MODULE
+========================================================= */
+
+function getSatState() {
+    if (typeof window === "undefined") return {};
+    if (!window.satState) {
+        window.satState = {
+            uploadedImage: null,
+            activeImage: "assets/after.jpg",
+            beforeImage: "assets/before.jpg",
+            disasterType: "Flood Inundation",
+            disasterIcon: "🌊",
+            confidence: 94.7,
+            affectedArea: "14.2 km²",
+            populationRisk: "12,500",
+            severityScore: "65.0 / 100",
+            severityBand: "HIGH RISK",
+            location: "Surat, Gujarat (Tapi River Basin)",
+            sensor: "Sentinel-2 L2A (10m)",
+            coordinates: "21.1702° N, 72.8311° E",
+            showHeatmap: true,
+            showBoundingBoxes: true,
+            showComparison: false,
+            isAnalyzing: false
+        };
+    }
+    return window.satState;
+}
+
+function triggerSatImageUpload() {
+    const input = document.getElementById("satImageUploadInput");
+    if (input) {
+        input.click();
+    }
+}
+
+function handleSatImageUpload(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const s = getSatState();
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        s.uploadedImage = e.target.result;
+        s.activeImage = e.target.result;
+        s.showComparison = false;
+        s.disasterType = "Uploaded Scene Analysis";
+        s.disasterIcon = "🛰️";
+        s.confidence = 96.2;
+        s.affectedArea = "18.6 km²";
+        s.populationRisk = "14,200";
+        s.severityScore = "72.4 / 100";
+        s.severityBand = "HIGH SEVERITY";
+        s.location = file.name || "Custom Satellite Pass";
+        s.sensor = "User Raster Swath (High-Res)";
+        
+        refreshSatelliteMonitoringUI();
+    };
+    reader.readAsDataURL(file);
+}
+
+function runSatDisasterAnalysis() {
+    const s = getSatState();
+    s.isAnalyzing = true;
+    refreshSatelliteMonitoringUI();
+
+    setTimeout(() => {
+        s.isAnalyzing = false;
+        s.confidence = parseFloat((Math.min(99.4, Math.max(90.0, s.confidence + (Math.random() * 1.5 - 0.5)))).toFixed(1));
+        s.showHeatmap = true;
+        s.showBoundingBoxes = true;
+        refreshSatelliteMonitoringUI();
+    }, 700);
+}
+
+function toggleSatComparisonView() {
+    const s = getSatState();
+    s.showComparison = !s.showComparison;
+    refreshSatelliteMonitoringUI();
+}
+
+function toggleSatHeatmap() {
+    const s = getSatState();
+    s.showHeatmap = !s.showHeatmap;
+    refreshSatelliteMonitoringUI();
+}
+
+function toggleSatBoundingBoxes() {
+    const s = getSatState();
+    s.showBoundingBoxes = !s.showBoundingBoxes;
+    refreshSatelliteMonitoringUI();
+}
+
+function refreshSatelliteMonitoringUI() {
+    const container = document.getElementById("satMonitoringSectionContainer");
+    if (container) {
+        container.innerHTML = renderSatelliteMonitoringHTML();
+        setTimeout(() => {
+            initSatelliteOrbitBackground("embeddedOrbitCanvas");
+        }, 50);
+    }
+}
+
+function renderSatelliteMonitoringHTML() {
+    const s = getSatState();
+
+    return `
+        <div class="sat-monitoring-grid" id="satMonitoringGrid">
+
+            <!-- MAIN SATELLITE MONITORING PANEL (LEFT) -->
+            <div class="sat-main-panel">
+
+                <input type="file" id="satImageUploadInput" style="display:none;" accept="image/*,.tif,.tiff" onchange="handleSatImageUpload(event)">
+
+                <div class="sat-toolbar-actions">
+                    <!-- TOP ROW: TITLE & SUBTITLE -->
+                    <div class="sat-toolbar-title-row">
+                        <h3><span>🛰️</span> Satellite Monitoring</h3>
+                        <p>${s.location} — ${s.sensor}</p>
+                    </div>
+
+                    <!-- BOTTOM ROW: BUTTON CONTROLS (PRIMARY ACTIONS LEFT, TOGGLES RIGHT) -->
+                    <div class="sat-toolbar-controls-row">
+                        <div class="sat-btn-group-primary">
+                            <button class="sat-action-btn upload" onclick="triggerSatImageUpload()">
+                                <span>📁</span> Upload Image
+                            </button>
+                            <button class="sat-action-btn analyze" onclick="runSatDisasterAnalysis()">
+                                <span>${s.isAnalyzing ? "⌛" : "⚡"}</span> ${s.isAnalyzing ? "Analyzing..." : "Analyze Disaster"}
+                            </button>
+                            <button class="sat-action-btn compare ${s.showComparison ? "active" : ""}" onclick="toggleSatComparisonView()">
+                                <span>⚖️</span> ${s.showComparison ? "Single View" : "Compare Before/After"}
+                            </button>
+                        </div>
+
+                        <div class="sat-btn-group-toggles">
+                            <button class="sat-action-btn toggle ${s.showHeatmap ? "active" : ""}" onclick="toggleSatHeatmap()" title="Toggle Heatmap Layer">
+                                <span>🔥</span> Heatmap
+                            </button>
+                            <button class="sat-action-btn toggle ${s.showBoundingBoxes ? "active" : ""}" onclick="toggleSatBoundingBoxes()" title="Toggle Bounding Boxes">
+                                <span>🎯</span> Bounding Boxes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEWPORT BOX CONTAINING EMBEDDED DYNAMIC SATELLITE ORBIT CANVAS -->
+                <div class="sat-viewport-box">
+                    <div class="embedded-orbit-box-wrapper">
+                        <canvas id="embeddedOrbitCanvas" class="embedded-orbit-canvas"></canvas>
+                        <div class="embedded-orbit-translucent-overlay"></div>
+
+                        <div class="embedded-raster-overlay-content">
+                            ${s.showComparison ? `
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: 100%; height: 100%;">
+                                    <div style="position: relative; height: 100%;">
+                                        <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(0,0,0,0.7); color: #ffffff; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">BEFORE (PRE-EVENT)</span>
+                                        <img src="${s.beforeImage}" class="sat-viewport-img" alt="Before Satellite Pass">
+                                    </div>
+                                    <div style="position: relative; height: 100%;">
+                                        <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(239,68,68,0.85); color: #ffffff; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">AFTER (POST-EVENT INUNDATED)</span>
+                                        <img src="${s.activeImage}" class="sat-viewport-img" alt="After Satellite Pass">
+                                    </div>
+                                </div>
+                            ` : `
+                                <img src="${s.activeImage}" class="sat-viewport-img ${s.showHeatmap ? "with-blend" : ""}" alt="Live Satellite Monitoring Swath">
+                                ${s.showHeatmap ? `<div class="sat-heatmap-overlay"></div>` : ""}
+                                ${s.showBoundingBoxes ? `
+                                    <svg class="sat-bbox-svg" viewBox="0 0 800 450" preserveAspectRatio="none">
+                                        <rect x="240" y="140" width="310" height="200" class="sat-bbox-rect-red" />
+                                        <rect x="250" y="150" width="130" height="24" rx="4" fill="#ef4444" />
+                                        <text x="256" y="166" class="sat-bbox-text">FLOOD INUNDATION: 94.7%</text>
+
+                                        <rect x="110" y="80" width="180" height="130" class="sat-bbox-rect-amber" />
+                                        <rect x="120" y="90" width="140" height="24" rx="4" fill="#f59e0b" />
+                                        <text x="126" y="106" class="sat-bbox-text">INFRASTRUCTURE RISK</text>
+                                    </svg>
+                                ` : ""}
+                            `}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- DISASTER ANALYSIS SIDEBAR (RIGHT SIDE) -->
+            <div class="disaster-analysis-sidebar">
+                <div class="sidebar-title-header">
+                    <span>Disaster Analysis</span>
+                    <span style="font-size: 11px; color: #10b981; font-weight: 700;">● LIVE TELEMETRY</span>
+                </div>
+
+                <div class="analysis-type-card">
+                    <span class="analysis-type-icon">${s.disasterIcon}</span>
+                    <div class="analysis-type-info">
+                        <h4>${s.disasterType}</h4>
+                        <p>Detected via Sentinel-2 Spectral Fusion</p>
+                    </div>
+                </div>
+
+                <div class="analysis-confidence-card">
+                    <div class="confidence-header">
+                        <span>AI Confidence Score</span>
+                        <strong>${s.confidence}%</strong>
+                    </div>
+                    <div class="confidence-bar-track">
+                        <div class="confidence-bar-fill" style="width: ${s.confidence}%;"></div>
+                    </div>
+                </div>
+
+                <div class="analysis-metrics-list">
+                    <div class="analysis-metric-row">
+                        <span>Affected Area</span>
+                        <strong class="highlight-orange">${s.affectedArea}</strong>
+                    </div>
+
+                    <div class="analysis-metric-row">
+                        <span>Population at Risk</span>
+                        <strong class="highlight-cyan">${s.populationRisk}</strong>
+                    </div>
+
+                    <div class="analysis-metric-row">
+                        <span>Severity Index</span>
+                        <strong class="highlight-red">${s.severityScore}</strong>
+                    </div>
+
+                    <div class="analysis-metric-row">
+                        <span>Coordinates</span>
+                        <strong style="font-size: 11px; opacity: 0.9;">${s.coordinates}</strong>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    `;
+}
+
+/* =========================================================
    DASHBOARD
 ========================================================= */
 
@@ -374,14 +837,9 @@ async function showDashboard() {
     const latest = await getLatestDisaster();
     const satellite = await getSatelliteImages();
 
-    const disasterTypeUpper = (latest && latest.type) ? latest.type.toUpperCase() + " DETECTED" : "FLOOD DETECTED";
-    const confidenceScore = (latest && latest.confidence !== undefined) ? latest.confidence : 94.7;
-    const severity = (latest && latest.severity) ? latest.severity.toUpperCase() : "HIGH";
-    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "31.8 km²";
-    const location = (latest && latest.location) ? latest.location : "Surat, Gujarat";
-
-    const beforeImgPath = (satellite && satellite.beforeImage) ? satellite.beforeImage : "assets/before.jpg";
-    const afterImgPath = (satellite && satellite.afterImage) ? satellite.afterImage : "assets/after.jpg";
+    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "14.2 km²";
+    const popRisk = "12,500";
+    const accuracy = "94.7%";
 
     let satelliteHtml = `
         <div style="padding: 20px;">
@@ -445,153 +903,221 @@ async function showDashboard() {
 
     setPageContent(`
 
-        <section class="dashboard-section">
+        <section class="dashboard-section nirvaan-dashboard-container">
 
-            <h1 class="page-title">
-                Dashboard
-            </h1>
+            <div style="margin-bottom: 4px;">
+                <h1 class="page-title" style="margin-bottom: 4px;">
+                    Dashboard
+                </h1>
+                <p class="page-subtitle" style="margin: 0;">
+                    Real-time AI Disaster Monitoring, Geospatial Satellite Telemetry & Risk Intelligence
+                </p>
+            </div>
 
-            <p class="page-subtitle">
-                Real-time overview of disaster monitoring and multi-scene satellite imagery comparison
-            </p>
-
-
-            <section class="stats-grid">
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        ⚠
+            <!-- THREE TOP METRIC CARDS WITH TREND ARROWS & PERCENTAGE CHANGES -->
+            <div class="metric-cards-grid">
+                <div class="metric-card-box">
+                    <div class="metric-card-icon area">📍</div>
+                    <div class="metric-card-info">
+                        <span class="metric-card-label">Affected Area</span>
+                        <span class="metric-card-val">${affectedArea}</span>
+                        <span class="metric-card-trend up-orange">↑ 12.6% vs yesterday</span>
                     </div>
-
-                    <div>
-
-                        <span class="stat-label">
-                            Active Disasters
-                        </span>
-
-                        <h2 class="stat-value">
-                            ${stats.activeDisasters}
-                        </h2>
-
-                        <span class="stat-change red">
-                            2 High Risk
-                        </span>
-
-                    </div>
-
                 </div>
 
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        📍
+                <div class="metric-card-box">
+                    <div class="metric-card-icon pop">👥</div>
+                    <div class="metric-card-info">
+                        <span class="metric-card-label">Population at Risk</span>
+                        <span class="metric-card-val">${popRisk}</span>
+                        <span class="metric-card-trend up-cyan">↑ 8.4% vs yesterday</span>
                     </div>
-
-                    <div>
-
-                        <span class="stat-label">
-                            Affected Area
-                        </span>
-
-                        <h2 class="stat-value">
-                            ${affectedArea}
-                        </h2>
-
-                        <span class="stat-change orange">
-                            ↑ 12.6% vs yesterday
-                        </span>
-
-                    </div>
-
                 </div>
 
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        👥
+                <div class="metric-card-box">
+                    <div class="metric-card-icon accuracy">◎</div>
+                    <div class="metric-card-info">
+                        <span class="metric-card-label">Detection Accuracy</span>
+                        <span class="metric-card-val">${accuracy}</span>
+                        <span class="metric-card-trend up-green">↑ 3.2% vs yesterday</span>
                     </div>
+                </div>
+            </div>
 
-                    <div>
+            <!-- SATELLITE MONITORING PANEL & DISASTER ANALYSIS SIDEBAR -->
+            <div id="satMonitoringSectionContainer">
+                ${renderSatelliteMonitoringHTML()}
+            </div>
 
-                        <span class="stat-label">
-                            Population at Risk
-                        </span>
-
-                        <h2 class="stat-value">
-                            ${stats.populationAtRisk}
-                        </h2>
-
-                        <span class="stat-change">
-                            ↑ 8.4% vs yesterday
-                        </span>
-
-                    </div>
-
+            <!-- RISK ANALYSIS SECTION WITH ICONS FOR INFRASTRUCTURE, HEALTH, AND EVACUATION -->
+            <div class="risk-analysis-section">
+                <div class="risk-section-header">
+                    <h2><span>🛡️</span> Risk Analysis</h2>
+                    <p>Multi-hazard structural, health, and evacuation intelligence synthesized from real-time raster telemetry</p>
                 </div>
 
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        ◎
+                <div class="risk-cards-grid">
+                    <!-- INFRASTRUCTURE IMPACT -->
+                    <div class="risk-card-item">
+                        <div class="risk-card-header">
+                            <div class="risk-icon-badge infra">🏗️</div>
+                            <span class="risk-badge-tag amber">2 CRITICAL ASSETS</span>
+                        </div>
+                        <div class="risk-card-body">
+                            <h3>Infrastructure Impact</h3>
+                            <p>Geospatial Structural Assessment</p>
+                            <div class="risk-bullets">
+                                <div class="risk-bullet-row">
+                                    <span>⚠️</span>
+                                    <span><strong>SP25 Highway Bridge</strong>: 0.8 km from hotspot — Structural inundation alert</span>
+                                </div>
+                                <div class="risk-bullet-row">
+                                    <span>⚡</span>
+                                    <span><strong>Regional Substation 4</strong>: Flood perimeter encroachment risk</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-
-                        <span class="stat-label">
-                            Detection Accuracy
-                        </span>
-
-                        <h2 class="stat-value">
-                            ${stats.detectionAccuracy}
-                        </h2>
-
-                        <span class="stat-change">
-                            ↑ 3.2% vs yesterday
-                        </span>
-
+                    <!-- HEALTH RISKS -->
+                    <div class="risk-card-item">
+                        <div class="risk-card-header">
+                            <div class="risk-icon-badge health">🏥</div>
+                            <span class="risk-badge-tag cyan">MODERATE HAZARD</span>
+                        </div>
+                        <div class="risk-card-body">
+                            <h3>Health Risks</h3>
+                            <p>Waterborne Hazards & Contamination</p>
+                            <div class="risk-bullets">
+                                <div class="risk-bullet-row">
+                                    <span>🌊</span>
+                                    <span><strong>Waterborne Exposure</strong>: High NDWI anomaly indicates drainage backup</span>
+                                </div>
+                                <div class="risk-bullet-row">
+                                    <span>🏥</span>
+                                    <span><strong>Hospital Access</strong>: Perimeter clearance required for Regional Facility</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- EVACUATION SUGGESTED -->
+                    <div class="risk-card-item">
+                        <div class="risk-card-header">
+                            <div class="risk-icon-badge evac">🚨</div>
+                            <span class="risk-badge-tag red">ZONE B-4 DISPATCH</span>
+                        </div>
+                        <div class="risk-card-body">
+                            <h3>Evacuation Suggested</h3>
+                            <p>Emergency Dispatch & Advisory</p>
+                            <div class="risk-bullets">
+                                <div class="risk-bullet-row">
+                                    <span>📢</span>
+                                    <span><strong>Sector B-4 Lowlands</strong>: Priority 1 evacuation advised (~12,500 residents)</span>
+                                </div>
+                                <div class="risk-bullet-row">
+                                    <span>🚗</span>
+                                    <span><strong>Corridor Route</strong>: Proceed North via SP25 Bypass Clearway</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
+            <!-- MULTI-TEMPORAL SATELLITE COMPARISON SHOWCASE -->
+            <div class="panel" style="width: 100%;">
+                <div class="panel-header">
+                    <h2>🛰 Multi-Temporal Satellite Image Showcase</h2>
+                    <button onclick="loadPage('satellite')">View Fullscreen Monitor</button>
+                </div>
+                ${satelliteHtml}
+            </div>
 
-            </section>
+            <!-- ABOUT NIRVAAN SECTION -->
+            <div class="panel" style="width: 100%; padding: 32px; border-radius: 16px; margin-top: 24px; background: rgba(13, 19, 33, 0.72); border: 1px solid rgba(56, 189, 248, 0.28);">
+                <h2 style="margin-bottom: 16px; color: #38bdf8; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+                    <span>🌐</span> About Nirvaan
+                </h2>
+                <p style="font-size: 16px; line-height: 1.8; color: #e0e0e0; margin-bottom: 24px;">
+                    <strong>Nirvaan</strong> is an advanced, satellite-driven disaster intelligence engine engineered to perform <strong>rapid disaster detection</strong>, <strong>inundated area mapping</strong>, and <strong>real-time situational risk assessment</strong>. By fusing multi-spectral satellite imagery (Copernicus Sentinel-2, USGS Landsat-9) with deep learning segmentation neural networks, Nirvaan equips emergency response managers with sub-hour actionable intelligence.
+                </p>
 
-
-
-            <section class="dashboard-grid" style="display: block; width: 100%;">
-
-
-                <!-- MULTI-SCENE SATELLITE COMPARISON SHOWCASE (FULL WIDTH) -->
-
-                <div class="panel" style="width: 100%;">
-
-                    <div class="panel-header">
-
-                        <h2>
-                            🛰 Multi-Temporal Satellite Image Comparison Showcase
-                        </h2>
-
-                        <button
-                            onclick="loadPage('satellite')"
-                        >
-                            View Fullscreen Monitor
-                        </button>
-
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+                    <div class="card" style="padding: 24px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                        <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">🛰 Multi-Spectral Imagery</h3>
+                        <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                            Automated extraction of <strong>NDWI (Water Index)</strong> and <strong>SAR (Synthetic Aperture Radar)</strong> masks to detect flood extent through heavy cloud cover.
+                        </p>
                     </div>
 
-                    ${satelliteHtml}
+                    <div class="card" style="padding: 24px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                        <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">⚡ Rapid Early Warning</h3>
+                        <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                            Sub-hour automated pipeline processing raw satellite swaths into <strong>high-resolution vector risk maps</strong> and automated broadcasts.
+                        </p>
+                    </div>
 
+                    <div class="card" style="padding: 24px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                        <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">📊 Population & Asset Risk</h3>
+                        <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                            Spatial demographic overlay calculating <strong>affected populations</strong>, <strong>submerged roadways</strong>, and <strong>critical infrastructure</strong>.
+                        </p>
+                    </div>
+
+                    <div class="card" style="padding: 24px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                        <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">🛡️ Inter-Agency Interoperability</h3>
+                        <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                            Seamless GIS spatial telemetry exchange with <strong>NDMA</strong>, <strong>ISRO</strong>, and <strong>State Disaster Relief Forces</strong>.
+                        </p>
+                    </div>
                 </div>
+            </div>
 
-            </section>
+            <!-- FREQUENTLY ASKED QUESTIONS (FAQ) SECTION -->
+            <div class="panel" style="width: 100%; padding: 32px; border-radius: 16px; margin-top: 24px; background: rgba(13, 19, 33, 0.72); border: 1px solid rgba(56, 189, 248, 0.28);">
+                <h2 style="margin-bottom: 16px; color: #38bdf8; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+                    <span>❓</span> Frequently Asked Questions (FAQ)
+                </h2>
+                <p style="font-size: 15px; margin-bottom: 24px; color: #94a3b8;">Learn more about Nirvaan satellite intelligence, metrics, and emergency response workflows.</p>
+
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q1: How does Nirvaan detect disaster affected zones?</h4>
+                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                            Nirvaan compares pre-event baseline scenes with post-event satellite imagery using optical spectral indices (<strong>NDWI</strong> for floods, <strong>dNBR</strong> for burn severity) and synthetic aperture radar (<strong>SAR</strong>) to identify flooded surfaces regardless of cloud cover.
+                        </p>
+                    </div>
+
+                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q2: What satellite constellations are supported?</h4>
+                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                            Nirvaan natively ingests <strong>Copernicus Sentinel-2</strong> (Optical), <strong>Sentinel-1</strong> (C-Band Radar), <strong>USGS Landsat-8/9</strong>, and high-resolution <strong>PlanetScope (3m)</strong> imagery feeds via automated REST APIs.
+                        </p>
+                    </div>
+
+                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q3: How frequently is the disaster risk map updated?</h4>
+                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                            Automated background tasks ingest new satellite passes as soon as they become available from orbital feeds (typically <strong>12 to 24-hour revisit cadence</strong>), instantly recalculating hazard boundaries.
+                        </p>
+                    </div>
+
+                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q4: Can SITREP situational reports be exported?</h4>
+                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                            Yes, under the <strong>Reports</strong> tab, response leads can generate and export <strong>JSON metadata</strong>, <strong>GeoJSON impact vector boundaries</strong>, or formatted <strong>SITREP situation reports</strong>.
+                        </p>
+                    </div>
+
+                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q5: How do first responders receive critical warnings?</h4>
+                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                            Whenever the AI neural network detects inundation confidence exceeding <strong>85%</strong>, automated push notifications and SMS warning broadcasts are immediately dispatched to registered emergency commanders.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
         </section>
 
