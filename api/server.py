@@ -2,7 +2,7 @@
 REST/JSON API Service Endpoint Router & Handlers for NIRVAAN
 
 Exposes validated detection, spatial analytics, severity scoring, and reporting endpoints.
-Enforces schema validation, secret sanitization, and safe error responses.
+Enforces schema validation, secret sanitization, authoritative dynamic data flow, and safe error responses.
 """
 
 from datetime import datetime, timezone
