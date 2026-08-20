@@ -4031,6 +4031,10 @@ html[data-theme="light"] .risk-analysis-section {
   z-index: 1;
 }
 
+.demo-label {
+  display: none;
+}
+
 
 
 
