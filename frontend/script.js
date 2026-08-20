@@ -294,7 +294,7 @@ if (topbarMenuBtn && menuDropdown) {
 
 
 /* =========================================================
-   DYNAMIC CANVAS SATELLITE ORBIT ANIMATION ENGINE
+   DYNAMIC CANVAS SATELLITE ORBIT ANIMATION ENGINE (ENHANCED BRIGHTNESS)
 ========================================================= */
 
 function initSatelliteOrbitBackground() {
@@ -313,24 +313,25 @@ function initSatelliteOrbitBackground() {
         height = canvas.height = window.innerHeight;
     });
 
-    // STARS IN SPACE
-    const stars = Array.from({ length: 140 }, () => ({
+    // STARS IN SPACE WITH SHARPER BRIGHTNESS
+    const stars = Array.from({ length: 160 }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: Math.random() * 1.5 + 0.5,
-        alpha: Math.random() * 0.8 + 0.2,
+        radius: Math.random() * 1.8 + 0.6,
+        alpha: Math.random() * 0.9 + 0.3,
         speed: Math.random() * 0.05 + 0.01
     }));
 
-    // CITY LIGHT DOTS ON EARTH CURVATURE
-    const cityLights = Array.from({ length: 90 }, () => ({
-        angle: Math.random() * Math.PI * 0.6 + Math.PI * 0.95,
-        dist: Math.random() * 80 + 320,
-        size: Math.random() * 2 + 1,
-        color: Math.random() > 0.4 ? "#f59e0b" : "#38bdf8"
+    // VIVID CITY LIGHT CLUSTERS ON EARTH CURVATURE
+    const cityLights = Array.from({ length: 120 }, () => ({
+        angle: Math.random() * Math.PI * 0.65 + Math.PI * 0.9,
+        dist: Math.random() * 95 + 310,
+        size: Math.random() * 2.5 + 1.2,
+        color: Math.random() > 0.35 ? "#fbbf24" : "#38bdf8"
     }));
 
     let orbitAngle = 0;
+    let scanPulse = 0;
 
     function draw() {
         ctx.clearRect(0, 0, width, height);
@@ -338,46 +339,63 @@ function initSatelliteOrbitBackground() {
         // 1. DEEP SPACE & STARFIELD
         stars.forEach(s => {
             s.alpha += Math.sin(Date.now() * 0.002 + s.x) * 0.01;
-            ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.1, Math.min(0.9, s.alpha))})`;
+            ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.2, Math.min(1.0, s.alpha))})`;
             ctx.beginPath();
             ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
             ctx.fill();
         });
 
-        // EARTH CURVATURE AT BOTTOM-RIGHT
-        const earthX = width * 0.85;
-        const earthY = height * 1.15;
-        const earthRadius = Math.min(width, height) * 0.65;
+        // EARTH CURVATURE AT BOTTOM-RIGHT (VIVID ILLUMINATED)
+        const earthX = width * 0.82;
+        const earthY = height * 1.12;
+        const earthRadius = Math.min(width, height) * 0.68;
 
-        // EARTH ATMOSPHERE OUTER GLOW
-        const atmGlow = ctx.createRadialGradient(earthX, earthY, earthRadius * 0.9, earthX, earthY, earthRadius * 1.18);
-        atmGlow.addColorStop(0, "rgba(56, 189, 248, 0.4)");
-        atmGlow.addColorStop(0.5, "rgba(16, 185, 129, 0.2)");
+        // EARTH ATMOSPHERE INTENSE OUTER GLOW
+        const atmGlow = ctx.createRadialGradient(earthX, earthY, earthRadius * 0.88, earthX, earthY, earthRadius * 1.25);
+        atmGlow.addColorStop(0, "rgba(56, 189, 248, 0.65)");
+        atmGlow.addColorStop(0.4, "rgba(16, 185, 129, 0.35)");
+        atmGlow.addColorStop(0.75, "rgba(56, 189, 248, 0.15)");
         atmGlow.addColorStop(1, "rgba(56, 189, 248, 0)");
 
         ctx.fillStyle = atmGlow;
         ctx.beginPath();
-        ctx.arc(earthX, earthY, earthRadius * 1.18, 0, Math.PI * 2);
+        ctx.arc(earthX, earthY, earthRadius * 1.25, 0, Math.PI * 2);
         ctx.fill();
 
-        // EARTH BODY GRADIENT
-        const earthGrad = ctx.createRadialGradient(earthX - 100, earthY - 100, 50, earthX, earthY, earthRadius);
-        earthGrad.addColorStop(0, "#0e2a47");
-        earthGrad.addColorStop(0.5, "#091c33");
-        earthGrad.addColorStop(0.85, "#040c17");
-        earthGrad.addColorStop(1, "#02060d");
+        // EARTH BODY GRADIENT WITH BLUE-GREEN OCEAN ILLUMINATION
+        const earthGrad = ctx.createRadialGradient(earthX - 140, earthY - 140, 40, earthX, earthY, earthRadius);
+        earthGrad.addColorStop(0, "#1e40af");
+        earthGrad.addColorStop(0.35, "#0f766e");
+        earthGrad.addColorStop(0.65, "#0b2a4a");
+        earthGrad.addColorStop(0.9, "#041224");
+        earthGrad.addColorStop(1, "#020712");
 
         ctx.fillStyle = earthGrad;
         ctx.beginPath();
         ctx.arc(earthX, earthY, earthRadius, 0, Math.PI * 2);
         ctx.fill();
 
-        // EARTH CITY LIGHTS
+        // BRIGHT CLOUD & CONTINENTAL CURVATURE ARCS
+        ctx.save();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+        ctx.lineWidth = 14;
+        ctx.beginPath();
+        ctx.arc(earthX, earthY, earthRadius - 20, Math.PI * 1.05, Math.PI * 1.45);
+        ctx.stroke();
+
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.25)";
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.arc(earthX, earthY, earthRadius - 45, Math.PI * 1.15, Math.PI * 1.55);
+        ctx.stroke();
+        ctx.restore();
+
+        // VIVID CITY LIGHTS WITH NEON GLOW
         cityLights.forEach(cl => {
             const lx = earthX + Math.cos(cl.angle) * cl.dist;
             const ly = earthY + Math.sin(cl.angle) * cl.dist;
             ctx.fillStyle = cl.color;
-            ctx.shadowBlur = 8;
+            ctx.shadowBlur = 12;
             ctx.shadowColor = cl.color;
             ctx.beginPath();
             ctx.arc(lx, ly, cl.size, 0, Math.PI * 2);
@@ -385,75 +403,109 @@ function initSatelliteOrbitBackground() {
             ctx.shadowBlur = 0;
         });
 
-        // 2. ORBIT TRAJECTORY DASHED LINE
+        // 2. ORBIT TRAJECTORY HIGH-VISIBILITY DASHED LINE
         orbitAngle += 0.0035;
-        const rx = width * 0.42;
-        const ry = height * 0.38;
-        const cx = width * 0.55;
-        const cy = height * 0.52;
+        scanPulse = (scanPulse + 0.02) % (Math.PI * 2);
+        const rx = width * 0.44;
+        const ry = height * 0.40;
+        const cx = width * 0.54;
+        const cy = height * 0.50;
 
         ctx.save();
-        ctx.strokeStyle = "rgba(56, 189, 248, 0.35)";
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([8, 6]);
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.55)";
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "#38bdf8";
+        ctx.setLineDash([10, 6]);
         ctx.beginPath();
         ctx.ellipse(cx, cy, rx, ry, -Math.PI / 10, 0, Math.PI * 2);
         ctx.stroke();
         ctx.restore();
 
-        // 3. SATELLITE POSITION CALCULATION
+        // 3. ILLUMINATED SATELLITE POSITION CALCULATION
         const satX = cx + Math.cos(orbitAngle) * rx;
         const satY = cy + Math.sin(orbitAngle) * ry;
 
-        // TELEMETRY BEAM TO EARTH
-        ctx.strokeStyle = "rgba(56, 189, 248, 0.25)";
-        ctx.lineWidth = 1;
+        // VIVID LASER SCAN TELEMETRY BEAM TO EARTH
+        const beamPulse = (Math.sin(scanPulse) + 1) / 2 * 0.4 + 0.4;
+        ctx.save();
+        ctx.strokeStyle = `rgba(56, 189, 248, ${beamPulse})`;
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = "#38bdf8";
         ctx.beginPath();
         ctx.moveTo(satX, satY);
-        ctx.lineTo(earthX - earthRadius * 0.3, earthY - earthRadius * 0.4);
+        ctx.lineTo(earthX - earthRadius * 0.28, earthY - earthRadius * 0.42);
         ctx.stroke();
 
-        // SATELLITE SOLAR PANELS & MAIN BODY
+        // SECONDARY SCAN CONE
+        ctx.fillStyle = `rgba(56, 189, 248, ${beamPulse * 0.15})`;
+        ctx.beginPath();
+        ctx.moveTo(satX, satY);
+        ctx.lineTo(earthX - earthRadius * 0.35, earthY - earthRadius * 0.35);
+        ctx.lineTo(earthX - earthRadius * 0.22, earthY - earthRadius * 0.48);
+        if (ctx.closePath) ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        // ILLUMINATED SATELLITE WITH HIGH-CONTRAST SOLAR PANELS
         ctx.save();
         ctx.translate(satX, satY);
         ctx.rotate(orbitAngle + Math.PI / 4);
 
-        // LEFT SOLAR ARRAY PANEL
+        // SOLAR PANEL GLOW
+        ctx.shadowBlur = 16;
+        ctx.shadowColor = "#38bdf8";
+
+        // LEFT EXTENDED SOLAR ARRAY PANEL
         ctx.fillStyle = "#0284c7";
         ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 1.5;
+        ctx.fillRect(-46, -8, 32, 16);
+        ctx.strokeRect(-46, -8, 32, 16);
+
+        // RIGHT EXTENDED SOLAR ARRAY PANEL
+        ctx.fillRect(14, -8, 32, 16);
+        ctx.strokeRect(14, -8, 32, 16);
+
+        // SOLAR PANEL PHOTON CELL GRID
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
         ctx.lineWidth = 1;
-        ctx.fillRect(-38, -6, 26, 12);
-        ctx.strokeRect(-38, -6, 26, 12);
-
-        // RIGHT SOLAR ARRAY PANEL
-        ctx.fillRect(12, -6, 26, 12);
-        ctx.strokeRect(12, -6, 26, 12);
-
-        // SOLAR PANEL GRID CELLS
-        ctx.strokeStyle = "rgba(255,255,255,0.4)";
         ctx.beginPath();
-        ctx.moveTo(-25, -6); ctx.lineTo(-25, 6);
-        ctx.moveTo(25, -6); ctx.lineTo(25, 6);
+        ctx.moveTo(-35, -8); ctx.lineTo(-35, 8);
+        ctx.moveTo(-24, -8); ctx.lineTo(-24, 8);
+        ctx.moveTo(25, -8); ctx.lineTo(25, 8);
+        ctx.moveTo(36, -8); ctx.lineTo(36, 8);
         ctx.stroke();
 
-        // MAIN SATELLITE CHASSIS BODY
-        ctx.fillStyle = "#e2e8f0";
-        ctx.fillRect(-10, -8, 20, 16);
+        // MAIN SATELLITE CHASSIS METALLIC GOLD/SILVER BODY
+        ctx.fillStyle = "#f8fafc";
+        ctx.fillRect(-12, -10, 24, 20);
         ctx.strokeStyle = "#ffffff";
-        ctx.strokeRect(-10, -8, 20, 16);
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-12, -10, 24, 20);
 
-        // DISH ANTENNA & SENSOR LENS
-        ctx.fillStyle = "#38bdf8";
+        // GOLD THERMAL FOIL STRIP
+        ctx.fillStyle = "#f59e0b";
+        ctx.fillRect(-8, -6, 16, 12);
+
+        // SENSOR APERTURE DISH
+        ctx.fillStyle = "#10b981";
+        ctx.shadowColor = "#10b981";
         ctx.beginPath();
-        ctx.arc(0, 10, 4, 0, Math.PI * 2);
+        ctx.arc(0, 12, 5, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.restore();
 
-        // ORBIT TELEMETRY BADGE TEXT
-        ctx.font = "10px Outfit, monospace";
+        // CRISP HIGH-CONTRAST TELEMETRY BADGE TEXT
+        ctx.save();
+        ctx.font = "bold 11px Outfit, sans-serif";
         ctx.fillStyle = "#38bdf8";
-        ctx.fillText("SAT-1 NIRVAAN :: ALT 686 km :: SENSOR SENTINEL-2 L2A", satX + 18, satY - 14);
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+        ctx.fillText("🛰 NIRVAAN SAT-1 :: ALT 686 km :: SENSOR SENTINEL-2 L2A", satX + 22, satY - 16);
+        ctx.restore();
 
         requestAnimationFrame(draw);
     }

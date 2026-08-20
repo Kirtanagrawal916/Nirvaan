@@ -3938,11 +3938,11 @@ html[data-theme="light"] .risk-card-body h3 {
 .space-orbit-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(11, 15, 25, 0.25) 0%, rgba(11, 15, 25, 0.75) 70%, rgba(11, 15, 25, 0.95) 100%);
+    background: linear-gradient(180deg, rgba(11, 15, 25, 0.55) 0%, rgba(11, 15, 25, 0.15) 45%, rgba(11, 15, 25, 0.65) 100%);
     pointer-events: none;
 }
 
-/* FLOATING GLASS UI ELEVATION OVERLAY */
+/* FLOATING GLASS UI ELEVATION OVERLAY WITH OPTIMIZED TEXT CLARITY */
 .nirvaan-dashboard-container {
     position: relative;
     z-index: 10;
@@ -3952,25 +3952,25 @@ html[data-theme="light"] .risk-card-body h3 {
 .sat-main-panel,
 .disaster-analysis-sidebar,
 .risk-analysis-section {
-    background: rgba(13, 19, 33, 0.72) !important;
-    backdrop-filter: blur(16px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-    border: 1px solid rgba(56, 189, 248, 0.28) !important;
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), inset 0 0 25px rgba(56, 189, 248, 0.05) !important;
+    background: rgba(11, 16, 28, 0.68) !important;
+    backdrop-filter: blur(14px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
+    border: 1px solid rgba(56, 189, 248, 0.3) !important;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45), inset 0 0 25px rgba(56, 189, 248, 0.06) !important;
 }
 
 /* LIGHT THEME OVERRIDES FOR DYNAMIC BACKGROUND */
 html[data-theme="light"] .space-orbit-overlay {
-    background: radial-gradient(circle at 50% 50%, rgba(248, 250, 252, 0.55) 0%, rgba(241, 245, 249, 0.85) 70%, rgba(226, 232, 240, 0.95) 100%);
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.55) 0%, rgba(241, 245, 249, 0.25) 45%, rgba(226, 232, 240, 0.75) 100%);
 }
 
 html[data-theme="light"] .metric-card-box,
 html[data-theme="light"] .sat-main-panel,
 html[data-theme="light"] .disaster-analysis-sidebar,
 html[data-theme="light"] .risk-analysis-section {
-    background: rgba(255, 255, 255, 0.82) !important;
-    backdrop-filter: blur(16px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(14px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
     border-color: #cbd5e1 !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
 }
