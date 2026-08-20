@@ -1076,44 +1076,44 @@ async function showDashboard() {
             </div>
 
             <!-- FREQUENTLY ASKED QUESTIONS (FAQ) SECTION -->
-            <div class="panel" style="width: 100%; padding: 32px; border-radius: 16px; margin-top: 24px; background: rgba(13, 19, 33, 0.72); border: 1px solid rgba(56, 189, 248, 0.28);">
-                <h2 style="margin-bottom: 16px; color: #38bdf8; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+            <div class="panel" style="width: 100%; padding: 32px; border-radius: 16px; margin-top: 24px;">
+                <h2 style="margin-bottom: 16px; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;" class="faq-section-header">
                     <span>❓</span> Frequently Asked Questions (FAQ)
                 </h2>
-                <p style="font-size: 15px; margin-bottom: 24px; color: #94a3b8;">Learn more about Nirvaan satellite intelligence, metrics, and emergency response workflows.</p>
+                <p style="font-size: 15px; margin-bottom: 24px;" class="faq-section-subtitle">Learn more about Nirvaan satellite intelligence, metrics, and emergency response workflows.</p>
 
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q1: How does Nirvaan detect disaster affected zones?</h4>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                <div class="faq-container">
+                    <div class="faq-card-item">
+                        <h4 class="faq-heading">Q1: How does Nirvaan detect disaster affected zones?</h4>
+                        <p class="faq-answer">
                             Nirvaan compares pre-event baseline scenes with post-event satellite imagery using optical spectral indices (<strong>NDWI</strong> for floods, <strong>dNBR</strong> for burn severity) and synthetic aperture radar (<strong>SAR</strong>) to identify flooded surfaces regardless of cloud cover.
                         </p>
                     </div>
 
-                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q2: What satellite constellations are supported?</h4>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                    <div class="faq-card-item">
+                        <h4 class="faq-heading">Q2: What satellite constellations are supported?</h4>
+                        <p class="faq-answer">
                             Nirvaan natively ingests <strong>Copernicus Sentinel-2</strong> (Optical), <strong>Sentinel-1</strong> (C-Band Radar), <strong>USGS Landsat-8/9</strong>, and high-resolution <strong>PlanetScope (3m)</strong> imagery feeds via automated REST APIs.
                         </p>
                     </div>
 
-                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q3: How frequently is the disaster risk map updated?</h4>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                    <div class="faq-card-item">
+                        <h4 class="faq-heading">Q3: How frequently is the disaster risk map updated?</h4>
+                        <p class="faq-answer">
                             Automated background tasks ingest new satellite passes as soon as they become available from orbital feeds (typically <strong>12 to 24-hour revisit cadence</strong>), instantly recalculating hazard boundaries.
                         </p>
                     </div>
 
-                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q4: Can SITREP situational reports be exported?</h4>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                    <div class="faq-card-item">
+                        <h4 class="faq-heading">Q4: Can SITREP situational reports be exported?</h4>
+                        <p class="faq-answer">
                             Yes, under the <strong>Reports</strong> tab, response leads can generate and export <strong>JSON metadata</strong>, <strong>GeoJSON impact vector boundaries</strong>, or formatted <strong>SITREP situation reports</strong>.
                         </p>
                     </div>
 
-                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q5: How do first responders receive critical warnings?</h4>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                    <div class="faq-card-item">
+                        <h4 class="faq-heading">Q5: How do first responders receive critical warnings?</h4>
+                        <p class="faq-answer">
                             Whenever the AI neural network detects inundation confidence exceeding <strong>85%</strong>, automated push notifications and SMS warning broadcasts are immediately dispatched to registered emergency commanders.
                         </p>
                     </div>
@@ -2256,39 +2256,39 @@ function showFAQ() {
         <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">Frequently Asked Questions</h1>
         <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">Learn more about Nirvaan satellite intelligence, metrics, and emergency response workflows.</p>
 
-        <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="faq-container">
 
-            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
-                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q1: How does Nirvaan detect disaster affected zones?</h3>
-                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+            <div class="faq-card-item">
+                <h3 class="faq-heading">Q1: How does Nirvaan detect disaster affected zones?</h3>
+                <p class="faq-answer">
                     Nirvaan compares pre-event baseline scenes with post-event satellite imagery using optical spectral indices (<strong>NDWI</strong> for floods, <strong>dNBR</strong> for burn severity) and synthetic aperture radar (<strong>SAR</strong>) to identify flooded surfaces regardless of cloud cover.
                 </p>
             </div>
 
-            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
-                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q2: What satellite constellations are supported?</h3>
-                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+            <div class="faq-card-item">
+                <h3 class="faq-heading">Q2: What satellite constellations are supported?</h3>
+                <p class="faq-answer">
                     Nirvaan natively ingests <strong>Copernicus Sentinel-2</strong> (Optical), <strong>Sentinel-1</strong> (C-Band Radar), <strong>USGS Landsat-8/9</strong>, and high-resolution <strong>PlanetScope (3m)</strong> imagery feeds via automated REST APIs.
                 </p>
             </div>
 
-            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
-                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q3: How frequently is the disaster risk map updated?</h3>
-                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+            <div class="faq-card-item">
+                <h3 class="faq-heading">Q3: How frequently is the disaster risk map updated?</h3>
+                <p class="faq-answer">
                     Automated background tasks ingest new satellite passes as soon as they become available from orbital feeds (typically <strong>12 to 24-hour revisit cadence</strong>), instantly recalculating hazard boundaries.
                 </p>
             </div>
 
-            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
-                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q4: Can SITREP situational reports be exported?</h3>
-                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+            <div class="faq-card-item">
+                <h3 class="faq-heading">Q4: Can SITREP situational reports be exported?</h3>
+                <p class="faq-answer">
                     Yes, under the <strong>Reports</strong> tab, response leads can generate and export <strong>JSON metadata</strong>, <strong>GeoJSON impact vector boundaries</strong>, or formatted <strong>SITREP situation reports</strong>.
                 </p>
             </div>
 
-            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
-                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q5: How do first responders receive critical warnings?</h3>
-                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+            <div class="faq-card-item">
+                <h3 class="faq-heading">Q5: How do first responders receive critical warnings?</h3>
+                <p class="faq-answer">
                     Whenever the AI neural network detects inundation confidence exceeding <strong>85%</strong>, automated push notifications and SMS warning broadcasts are immediately dispatched to registered emergency commanders.
                 </p>
             </div>
