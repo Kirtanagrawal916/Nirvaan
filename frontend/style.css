@@ -3389,20 +3389,16 @@ html[data-theme="light"] .ai-metric-val {
     color: #10b981;
 }
 
-/* SATELLITE MONITORING PANEL & DISASTER ANALYSIS SIDEBAR */
+/* FULL WIDTH SATELLITE MONITORING PANEL & DISASTER ANALYSIS TELEMETRY BAR */
 .sat-monitoring-grid {
-    display: grid;
-    grid-template-columns: 1fr 350px;
+    display: flex;
+    flex-direction: column;
     gap: 24px;
-}
-
-@media (max-width: 1080px) {
-    .sat-monitoring-grid {
-        grid-template-columns: 1fr;
-    }
+    width: 100%;
 }
 
 .sat-main-panel {
+    width: 100%;
     background: #111522;
     border: 1px solid rgba(56, 189, 248, 0.2);
     border-radius: 16px;
@@ -3485,11 +3481,11 @@ html[data-theme="light"] .ai-metric-val {
     color: #38bdf8;
 }
 
-/* SATELLITE IMAGE VIEWPORT WITH HEATMAP & BBOX OVERLAYS */
+/* SATELLITE IMAGE VIEWPORT TAKES 100% FULL HORIZONTAL WIDTH */
 .sat-viewport-box {
     position: relative;
     width: 100%;
-    height: 440px;
+    height: 500px;
     background: #090b10;
     border-radius: 14px;
     overflow: hidden;
@@ -3548,8 +3544,9 @@ html[data-theme="light"] .ai-metric-val {
     fill: #ffffff;
 }
 
-/* DISASTER ANALYSIS SIDEBAR PANEL (RIGHT SIDE) */
+/* FULL-WIDTH DISASTER ANALYSIS TELEMETRY BAR */
 .disaster-analysis-sidebar {
+    width: 100%;
     background: linear-gradient(145deg, #131a2b, #0d121f);
     border: 1px solid rgba(56, 189, 248, 0.25);
     border-radius: 16px;
@@ -3635,9 +3632,9 @@ html[data-theme="light"] .ai-metric-val {
 }
 
 .analysis-metrics-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
 }
 
 .analysis-metric-row {
