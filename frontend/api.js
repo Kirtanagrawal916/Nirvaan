@@ -334,3 +334,78 @@ async function getReports() {
 async function generateSituationReport(payload) {
     return await createReport(payload);
 }
+
+/* =========================================================
+   9. PHASE 3: MULTI-DISASTER METADATA & ANALYTICS APIs
+========================================================= */
+async function getDisasterTypesMetadata() {
+    try {
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/disaster-types`);
+        if (!response.ok) return { supported_disasters: [] };
+        return await response.json();
+    } catch (e) {
+        return { supported_disasters: [] };
+    }
+}
+
+async function getAnalyticsOverview(days = 30) {
+    try {
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/analytics/overview?days=${days}`);
+        if (!response.ok) throw new Error(`Analytics overview failed with status ${response.status}`);
+        return await response.json();
+    } catch (e) {
+        console.warn("Error fetching analytics overview:", e);
+        return {
+            total_disasters_tracked: 0,
+            active_unread_alerts: 0,
+            average_detection_confidence: 0,
+            severity_distribution: {},
+            disaster_type_distribution: {}
+        };
+    }
+}
+
+async function getAnalyticsTimeseries(days = 30) {
+    try {
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/analytics/timeseries?days=${days}`);
+        if (!response.ok) return [];
+        return await response.json();
+    } catch (e) {
+        return [];
+    }
+}
+
+async function getAnalyticsGeography() {
+    try {
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/analytics/geography`);
+        if (!response.ok) return [];
+        return await response.json();
+    } catch (e) {
+        return [];
+    }
+}
+
+async function getUserPreferences() {
+    try {
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/notifications/preferences`, { headers: getAuthHeaders() });
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (e) {
+        return null;
+    }
+}
+
+async function saveUserPreferences(payload) {
+    try {
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/notifications/preferences`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error("Failed to save preferences");
+        return await response.json();
+    } catch (e) {
+        console.error("Error saving user preferences:", e);
+        throw e;
+    }
+}

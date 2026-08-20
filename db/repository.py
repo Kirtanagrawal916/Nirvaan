@@ -8,7 +8,8 @@ detections, alerts, and analysis jobs.
 from datetime import datetime, timezone
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+import sqlite3
+from typing import Any, Dict, List, Optional, Union
 import uuid
 
 from db.database import get_db_connection, init_db
@@ -109,10 +110,18 @@ class DatabaseRepository:
         retry_count: Optional[int] = None,
         last_retry_at: Optional[str] = None,
         result_dict: Optional[Dict[str, Any]] = None,
+        result_json: Optional[Union[Dict[str, Any], str]] = None,
+        **kwargs
     ) -> None:
         """Updates job status, stage, progress, timestamps, error message, and result payload."""
         conn = get_db_connection(self.db_path)
-        result_json = json.dumps(result_dict) if result_dict is not None else None
+        final_res = result_json if result_json is not None else result_dict
+        if isinstance(final_res, dict):
+            final_res_str = json.dumps(final_res)
+        elif isinstance(final_res, str):
+            final_res_str = final_res
+        else:
+            final_res_str = None
 
         conn.execute(
             """
@@ -128,7 +137,7 @@ class DatabaseRepository:
                 result_json = COALESCE(?, result_json)
             WHERE id = ?
             """,
-            (status, stage, progress, started_at, completed_at, error, retry_count, last_retry_at, result_json, job_id)
+            (status, stage, progress, started_at, completed_at, error, retry_count, last_retry_at, final_res_str, job_id)
         )
         conn.commit()
         conn.close()
@@ -152,24 +161,36 @@ class DatabaseRepository:
         self,
         event_id: str,
         event_type: str,
-        event_name: str,
-        location_name: str,
-        latitude: float,
-        longitude: float,
-        severity: str,
-        confidence: float,
-        source: str,
-        satellite: str,
-        product_id: str,
-        acquisition_time: str,
-        detection_time: str,
-        model_version: str,
-        geometry_geojson: Optional[Dict[str, Any]] = None,
+        event_name: Optional[str] = None,
+        location_name: Optional[str] = None,
+        latitude: float = 0.0,
+        longitude: float = 0.0,
+        severity: str = "MODERATE",
+        confidence: float = 90.0,
+        source: str = "Sentinel-2 L2A STAC",
+        satellite: str = "Sentinel-2",
+        product_id: Optional[str] = None,
+        acquisition_time: Optional[str] = None,
+        detection_time: Optional[str] = None,
+        model_version: str = "NIRVAAN-NDWI-v1.0",
+        geometry_geojson: Optional[Union[Dict[str, Any], str]] = None,
         status: str = "Active",
+        **kwargs
     ) -> Dict[str, Any]:
         """Saves or updates a disaster record in the database."""
         now = datetime.now(timezone.utc).isoformat()
-        geom_json = json.dumps(geometry_geojson) if geometry_geojson else None
+        
+        if isinstance(geometry_geojson, str):
+            geom_json = geometry_geojson
+        elif isinstance(geometry_geojson, dict):
+            geom_json = json.dumps(geometry_geojson)
+        else:
+            geom_json = None
+
+        final_loc = location_name or "Target Observation Area"
+        final_name = event_name or f"{event_type.capitalize()} Event - {final_loc}"
+        final_acq = acquisition_time or now
+        final_det = detection_time or now
 
         conn = get_db_connection(self.db_path)
         conn.execute(
@@ -197,9 +218,9 @@ class DatabaseRepository:
                 status=excluded.status
             """,
             (
-                event_id, event_type, event_name, location_name, geom_json,
+                event_id, event_type, final_name, final_loc, geom_json,
                 latitude, longitude, severity, confidence, source, satellite,
-                product_id, acquisition_time, detection_time, model_version, status, now
+                product_id, final_acq, final_det, model_version, status, now
             )
         )
         conn.commit()
@@ -444,6 +465,34 @@ class DatabaseRepository:
         conn.close()
         return self.get_alert(alert_id)
 
+    def save_alert(
+        self,
+        event_id: str,
+        title: Optional[str] = None,
+        severity: str = "MODERATE",
+        location: str = "Observation Area",
+        latitude: float = 0.0,
+        longitude: float = 0.0,
+        confidence: float = 90.0,
+        source: str = "NIRVAAN Multi-Hazard Engine",
+        **kwargs
+    ) -> Dict[str, Any]:
+        """Saves an alert directly into the alerts table."""
+        alert_id = f"ALT-{uuid.uuid4().hex[:8].upper()}"
+        now = datetime.now(timezone.utc).isoformat()
+        disaster_type = kwargs.get("disaster_type") or kwargs.get("event_type") or ("wildfire" if "wildfire" in str(event_id).lower() else ("severe_weather" if "weather" in str(event_id).lower() or "cyclone" in str(event_id).lower() else "flood"))
+        conn = get_db_connection(self.db_path)
+        conn.execute(
+            """
+            INSERT INTO alerts (id, disaster_id, event_type, severity, location, latitude, longitude, confidence, source, status, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'UNREAD', ?)
+            """,
+            (alert_id, event_id, disaster_type, severity, location, latitude, longitude, confidence, source, now)
+        )
+        conn.commit()
+        conn.close()
+        return self.get_alert(alert_id)
+
     def get_alerts(self) -> List[Dict[str, Any]]:
         """Returns all registered alerts."""
         conn = get_db_connection(self.db_path)
@@ -457,6 +506,202 @@ class DatabaseRepository:
         row = conn.execute("SELECT * FROM alerts WHERE id = ?", (alert_id,)).fetchone()
         conn.close()
         return dict(row) if row else None
+
+    # =========================================================
+    # PHASE 3: NOTIFICATIONS & ALERT RULES
+    # =========================================================
+
+    def save_notification_rule(
+        self,
+        user_id: Optional[str],
+        disaster_types: str = "all",
+        min_severity: str = "MODERATE",
+        min_confidence: float = 70.0,
+        channels: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
+        """Creates a configurable notification rule."""
+        rule_id = f"rule-{uuid.uuid4().hex[:8]}"
+        channels_json = json.dumps(channels or ["in_app"])
+        now = datetime.now(timezone.utc).isoformat()
+        conn = get_db_connection(self.db_path)
+        conn.execute(
+            """
+            INSERT INTO notification_rules (id, user_id, disaster_types, min_severity, min_confidence, channels_json, is_active, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, 1, ?)
+            """,
+            (rule_id, user_id, disaster_types, min_severity, min_confidence, channels_json, now)
+        )
+        conn.commit()
+        row = conn.execute("SELECT * FROM notification_rules WHERE id = ?", (rule_id,)).fetchone()
+        conn.close()
+        return dict(row)
+
+    def get_active_notification_rules(self) -> List[Dict[str, Any]]:
+        """Retrieves all active notification rules."""
+        conn = get_db_connection(self.db_path)
+        rows = conn.execute("SELECT * FROM notification_rules WHERE is_active = 1").fetchall()
+        conn.close()
+        return [dict(r) for r in rows]
+
+    def log_notification(
+        self,
+        alert_id: str,
+        event_id: str,
+        channel: str,
+        recipient: Optional[str],
+        status: str = "DELIVERED",
+        failure_reason: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Logs a sent notification with strict idempotency."""
+        notif_id = f"notif-{uuid.uuid4().hex[:10]}"
+        idempotency_key = f"{alert_id}:{channel}:{recipient or 'default'}"
+        now = datetime.now(timezone.utc).isoformat()
+
+        conn = get_db_connection(self.db_path)
+        try:
+            conn.execute(
+                """
+                INSERT INTO notifications_log (id, alert_id, event_id, channel, recipient, status, idempotency_key, failure_reason, sent_at, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (notif_id, alert_id, event_id, channel, recipient, status, idempotency_key, failure_reason, now, now)
+            )
+            conn.commit()
+        except sqlite3.IntegrityError:
+            # Duplicate suppressed by idempotency key
+            pass
+
+        row = conn.execute("SELECT * FROM notifications_log WHERE idempotency_key = ?", (idempotency_key,)).fetchone()
+        conn.close()
+        return dict(row) if row else {}
+
+    def is_notification_sent_for_alert(self, alert_id: str, channel: str, recipient: Optional[str] = None) -> bool:
+        """Checks if a notification was already delivered for an alert/channel combo."""
+        idempotency_key = f"{alert_id}:{channel}:{recipient or 'default'}"
+        conn = get_db_connection(self.db_path)
+        row = conn.execute("SELECT id FROM notifications_log WHERE idempotency_key = ?", (idempotency_key,)).fetchone()
+        conn.close()
+        return row is not None
+
+    def has_any_notification_been_sent_for_alert(self, alert_id: str) -> bool:
+        """Checks if any notification was already logged for this alert."""
+        conn = get_db_connection(self.db_path)
+        row = conn.execute("SELECT id FROM notifications_log WHERE alert_id = ?", (alert_id,)).fetchone()
+        conn.close()
+        return row is not None
+
+    def save_user_preferences(
+        self,
+        user_id: str,
+        email: Optional[str] = None,
+        phone: Optional[str] = None,
+        disaster_types: Optional[List[str]] = None,
+        min_severity: str = "MODERATE",
+        quiet_hours_enabled: bool = False
+    ) -> Dict[str, Any]:
+        """Saves or updates user notification preferences."""
+        types_json = json.dumps(disaster_types or ["flood", "wildfire", "severe_weather"])
+        now = datetime.now(timezone.utc).isoformat()
+        conn = get_db_connection(self.db_path)
+        conn.execute(
+            """
+            INSERT INTO user_preferences (user_id, email, phone, disaster_types_json, min_severity, quiet_hours_enabled, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(user_id) DO UPDATE SET
+                email = coalesce(excluded.email, user_preferences.email),
+                phone = coalesce(excluded.phone, user_preferences.phone),
+                disaster_types_json = excluded.disaster_types_json,
+                min_severity = excluded.min_severity,
+                quiet_hours_enabled = excluded.quiet_hours_enabled,
+                updated_at = excluded.updated_at
+            """,
+            (user_id, email, phone, types_json, min_severity, 1 if quiet_hours_enabled else 0, now)
+        )
+        conn.commit()
+        row = conn.execute("SELECT * FROM user_preferences WHERE user_id = ?", (user_id,)).fetchone()
+        conn.close()
+        return dict(row)
+
+    def get_user_preferences(self, user_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieves user notification preferences."""
+        conn = get_db_connection(self.db_path)
+        row = conn.execute("SELECT * FROM user_preferences WHERE user_id = ?", (user_id,)).fetchone()
+        conn.close()
+        return dict(row) if row else None
+
+    # =========================================================
+    # PHASE 3: ADVANCED ANALYTICS AGGREGATION QUERIES
+    # =========================================================
+
+    def get_analytics_overview(self, days: int = 30) -> Dict[str, Any]:
+        """Computes high-level aggregated disaster metrics across real database records."""
+        conn = get_db_connection(self.db_path)
+        
+        total_events = conn.execute("SELECT COUNT(*) FROM disasters").fetchone()[0]
+        active_alerts = conn.execute("SELECT COUNT(*) FROM alerts WHERE status = 'UNREAD'").fetchone()[0]
+        avg_conf = conn.execute("SELECT AVG(confidence) FROM disasters").fetchone()[0] or 0.0
+        
+        # Severity breakdown
+        sev_rows = conn.execute(
+            "SELECT severity, COUNT(*) as cnt FROM disasters GROUP BY severity"
+        ).fetchall()
+        severity_dist = {r["severity"]: r["cnt"] for r in sev_rows}
+
+        # Type breakdown
+        type_rows = conn.execute(
+            "SELECT event_type, COUNT(*) as cnt FROM disasters GROUP BY event_type"
+        ).fetchall()
+        type_dist = {r["event_type"]: r["cnt"] for r in type_rows}
+
+        conn.close()
+        return {
+            "total_disasters_tracked": total_events,
+            "active_unread_alerts": active_alerts,
+            "average_detection_confidence": round(float(avg_conf), 1),
+            "severity_distribution": severity_dist,
+            "disaster_type_distribution": type_dist,
+            "time_window_days": days,
+            "data_provenance": "REAL_DATABASE_ANALYTICS"
+        }
+
+    def get_analytics_timeseries(self, days: int = 30) -> List[Dict[str, Any]]:
+        """Aggregates disaster events over time intervals."""
+        conn = get_db_connection(self.db_path)
+        rows = conn.execute(
+            """
+            SELECT substr(created_at, 1, 10) as date_bucket,
+                   COUNT(*) as event_count,
+                   AVG(confidence) as avg_confidence,
+                   event_type
+            FROM disasters
+            GROUP BY date_bucket, event_type
+            ORDER BY date_bucket ASC
+            LIMIT 60
+            """
+        ).fetchall()
+        conn.close()
+        return [dict(r) for r in rows]
+
+    def get_analytics_geographic_clusters(self) -> List[Dict[str, Any]]:
+        """Groups real disaster detections by geographic location and severity."""
+        conn = get_db_connection(self.db_path)
+        rows = conn.execute(
+            """
+            SELECT location_name,
+                   event_type,
+                   ROUND(latitude, 2) as lat_cluster,
+                   ROUND(longitude, 2) as lon_cluster,
+                   COUNT(*) as event_count,
+                   MAX(severity) as max_severity,
+                   AVG(confidence) as avg_confidence
+            FROM disasters
+            GROUP BY lat_cluster, lon_cluster, event_type
+            ORDER BY event_count DESC
+            LIMIT 50
+            """
+        ).fetchall()
+        conn.close()
+        return [dict(r) for r in rows]
 
 
 # Default instance

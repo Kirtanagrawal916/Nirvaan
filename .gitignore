@@ -13,6 +13,9 @@ htmlcov/
 
 # Environment
 .env
+.env.*
+*.env
+.env.local
 .venv
 env/
 venv/
@@ -23,6 +26,12 @@ ENV/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Database & SQLite
+*.db
+*.sqlite
+*.sqlite3
+data/*.db
 
 # Node & Builds
 node_modules/
