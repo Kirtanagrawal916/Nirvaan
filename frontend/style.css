@@ -1646,8 +1646,115 @@ html[data-theme="light"] .theme-toggle-btn:hover {
 }
 
 /* =========================================================
-   SETTINGS SECTION STYLING (MATCHES FAQ & ABOUT CARD STYLE)
+   FUTURISTIC MORNING WELCOME HERO DASHBOARD BANNER
 ========================================================= */
+
+.morning-hero-banner {
+    position: relative;
+    width: 100%;
+    padding: 42px 32px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 25%, rgba(30, 58, 138, 0.65) 0%, rgba(15, 23, 42, 0.95) 65%, #070b14 100%);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(56, 189, 248, 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.morning-hero-banner::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 300px;
+    background: radial-gradient(ellipse at center, rgba(251, 191, 36, 0.35) 0%, rgba(56, 189, 248, 0.2) 45%, rgba(0, 0, 0, 0) 80%);
+    pointer-events: none;
+    border-radius: 50%;
+}
+
+.morning-hero-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.morning-greeting-title {
+    font-size: 42px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    margin: 0 0 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 30px rgba(251, 191, 36, 0.4);
+}
+
+.sun-icon-glowing {
+    font-size: 44px;
+    display: inline-block;
+    filter: drop-shadow(0 0 16px #fbbf24) drop-shadow(0 0 30px #f59e0b);
+    animation: sunPulseGlow 3s infinite alternate ease-in-out;
+}
+
+@keyframes sunPulseGlow {
+    0% { transform: scale(0.96) rotate(0deg); filter: drop-shadow(0 0 12px #fbbf24); }
+    100% { transform: scale(1.08) rotate(12deg); filter: drop-shadow(0 0 24px #fbbf24) drop-shadow(0 0 40px #f59e0b); }
+}
+
+.morning-welcome-subtitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: #f8fafc;
+    margin: 0 0 16px 0;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    opacity: 0.95;
+}
+
+.morning-badge {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #38bdf8;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 6px 18px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    backdrop-filter: blur(8px);
+}
+
+/* LIGHT THEME OVERRIDES FOR MORNING WELCOME HERO BANNER */
+html[data-theme="light"] .morning-hero-banner {
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 60%, #e2e8f0 100%) !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+}
+
+html[data-theme="light"] .morning-greeting-title {
+    color: #000000 !important;
+    text-shadow: none !important;
+}
+
+html[data-theme="light"] .morning-welcome-subtitle {
+    color: #333333 !important;
+    text-shadow: none !important;
+}
+
+html[data-theme="light"] .morning-badge {
+    background: #e0f2fe !important;
+    border-color: #bae6fd !important;
+    color: #0284c7 !important;
+}
 
 .settings-card-panel {
     position: relative;
