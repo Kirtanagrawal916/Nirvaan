@@ -774,24 +774,24 @@ function showDetection() {
             </p>
 
 
-            <!-- FLOOD DETECTION BOX (CONSISTS OF 65-70% TOTAL HORIZONTAL AREA) -->
-            <div class="flood-detection-box-container">
+            <!-- DISASTER DETECTION 50% / 50% SPLIT LAYOUT GRID -->
+            <div class="detection-50-split-grid">
 
-                <!-- INTERACTIVE FLOOD DETECTION USER INPUT FORM -->
-                <div class="detection-input-card">
+                <!-- COLUMN 1: INTERACTIVE FLOOD DETECTION USER INPUT FORM (50% WIDTH) -->
+                <div class="detection-input-card" style="margin-bottom: 0;">
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
-                        <h3 style="font-size: 16px; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-                            <span>🎛️</span> AI Flood Detection Input Parameters
+                        <h3 style="font-size: 16px; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 8px; margin: 0;">
+                            <span>🎛️</span> AI Flood Detection Parameters
                         </h3>
                         <span style="font-size: 11px; color: #a1a1aa; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px;">
-                            Model: Nirvaan Sentinel-NET v4.2
+                            Model: Sentinel-NET v4.2
                         </span>
                     </div>
 
                     <form id="floodDetectionForm" onsubmit="event.preventDefault(); runLiveDetection();">
 
-                        <div class="detection-input-grid">
+                        <div class="detection-input-grid" style="grid-template-columns: 1fr; gap: 14px;">
 
                             <div class="input-field-group">
                                 <label for="detectRegion">
@@ -849,7 +849,7 @@ function showDetection() {
 
                         </div>
 
-                        <button type="submit" class="run-detection-btn" id="runDetectBtn">
+                        <button type="submit" class="run-detection-btn" id="runDetectBtn" style="margin-top: 10px;">
                             <span>⚡ Run AI Flood Detection Analysis</span>
                             <span>→</span>
                         </button>
@@ -859,72 +859,79 @@ function showDetection() {
                 </div>
 
 
-                <!-- AI MODEL DETECTION RESULTS -->
+                <!-- COLUMN 2: ATTRACTIVE LIVE AI DISASTER ANALYSIS OUTPUT (50% WIDTH) -->
+                <div class="ai-output-panel">
 
-                <div class="panel" style="width: 100%;">
-
-                    <div class="panel-header">
+                    <!-- PANEL HEADER -->
+                    <div class="ai-output-header">
                         <h2>
-                            ⚠ Live AI Disaster Analysis Output
+                            <span class="alert-dot"></span>
+                            <span>Live AI Disaster Analysis Output</span>
                         </h2>
-                        <span style="font-size: 12px; color: #38bdf8; font-weight: 600;" id="detectStatusText">
-                            ● READY FOR ANALYSIS
-                        </span>
+                        <div class="ai-status-badge" id="detectStatusText">
+                            <span>●</span>
+                            <span>READY FOR ANALYSIS</span>
+                        </div>
                     </div>
 
-                    <div class="detection" style="max-width: 100%; padding: 24px;">
-
-                        <div class="detection-icon" id="detectIcon">
-                            ≋
+                    <!-- HERO ANALYSIS RESULT BOX -->
+                    <div class="ai-hero-box">
+                        <div class="ai-hero-icon-wrapper" id="detectIcon">
+                            <span>≋</span>
                         </div>
 
-                        <h2 id="detectResultTitle" style="font-size: 22px;">
+                        <h2 class="ai-hero-title" id="detectResultTitle">
                             FLOOD INUNDATION DETECTED
                         </h2>
 
-                        <p id="detectResultLoc" style="font-size: 14px; opacity: 0.8; margin-bottom: 20px;">
-                            Target: Surat, Gujarat (Tapi Basin) — Sentinel-2 L2A Pass
-                        </p>
+                        <div class="ai-hero-location" id="detectResultLoc">
+                            <span>📍</span>
+                            <span>Surat, Gujarat (Tapi Basin) • Sentinel-2 L2A Pass</span>
+                        </div>
+                    </div>
 
-
-                        <div class="confidence-row">
-                            <span>AI Confidence Score</span>
+                    <!-- CONFIDENCE PROGRESS METER -->
+                    <div class="ai-confidence-box">
+                        <div class="ai-confidence-header">
+                            <span>AI Neural Net Confidence Score</span>
                             <strong id="detectConfidenceVal">94.7%</strong>
                         </div>
-
-                        <div class="progress">
+                        <div class="ai-progress-track">
                             <div
-                                class="progress-value"
+                                class="ai-progress-fill"
                                 id="detectProgressBar"
                                 style="width: 94.7%;"
                             ></div>
                         </div>
+                    </div>
 
-
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; width: 100%; margin-top: 20px;">
-
-                            <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
-                                <span>Severity Level</span>
-                                <strong class="high" id="detectSeverityVal">HIGH</strong>
-                            </div>
-
-                            <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
-                                <span>Inundated Area</span>
-                                <strong id="detectAreaVal">31.8 km²</strong>
-                            </div>
-
-                            <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
-                                <span>Population at Risk</span>
-                                <strong id="detectPopVal">128,400 people</strong>
-                            </div>
-
-                            <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
-                                <span>Spectral NDWI Index</span>
-                                <strong style="color: #38bdf8;" id="detectNdwiVal">0.84 (Critical)</strong>
-                            </div>
-
+                    <!-- 2x2 DETAILED METRICS GRID -->
+                    <div class="ai-metrics-grid-2x2">
+                        <div class="ai-metric-item">
+                            <span class="ai-metric-label">Severity Level</span>
+                            <span class="ai-metric-val high-alert" id="detectSeverityVal">HIGH SEVERITY</span>
                         </div>
 
+                        <div class="ai-metric-item">
+                            <span class="ai-metric-label">Inundated Area</span>
+                            <span class="ai-metric-val cyan-highlight" id="detectAreaVal">31.8 km²</span>
+                        </div>
+
+                        <div class="ai-metric-item">
+                            <span class="ai-metric-label">Population Exposed</span>
+                            <span class="ai-metric-val" id="detectPopVal">128,400 people</span>
+                        </div>
+
+                        <div class="ai-metric-item">
+                            <span class="ai-metric-label">Spectral NDWI Index</span>
+                            <span class="ai-metric-val cyan-highlight" id="detectNdwiVal">0.84 (Critical)</span>
+                        </div>
+                    </div>
+
+                    <!-- TELEMETRY FOOTER -->
+                    <div class="ai-footer-telemetry">
+                        <span>🛰 Neural Net Inference Engine</span>
+                        <span>Multi-Band Fusion L2A</span>
                     </div>
 
                 </div>

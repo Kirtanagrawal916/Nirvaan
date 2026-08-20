@@ -646,23 +646,7 @@ html[data-theme="light"] .topbar-menu-btn {
     background: #ffffff;
 }
 
-html[data-theme="light"] .topbar-menu-btn:hover {
-    background: #f8fafc;
-    border-color: #94a3b8;
-    color: #0f172a;
-}
 
-    color: #7f91a6;
-
-    font-size: 12px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-}
 
 
 .status-dot {
@@ -2781,6 +2765,263 @@ html[data-theme="light"] .input-field-group select,
 html[data-theme="light"] .input-field-group input[type="text"] {
     background: #f8fafc;
     border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+/* =========================================================
+   DISASTER DETECTION 50% SPLIT GRID & ATTRACTIVE AI OUTPUT PANEL
+========================================================= */
+
+.detection-50-split-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    width: 100%;
+    max-width: 1350px;
+    margin: 0 auto 30px auto;
+}
+
+@media (max-width: 992px) {
+    .detection-50-split-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ai-output-panel {
+    background: linear-gradient(145deg, #111625, #0a0d16);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 12px 35px rgba(239, 68, 68, 0.12), inset 0 0 25px rgba(239, 68, 68, 0.04);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+}
+
+.ai-output-panel:hover {
+    border-color: rgba(239, 68, 68, 0.55);
+    box-shadow: 0 16px 45px rgba(239, 68, 68, 0.2), inset 0 0 30px rgba(239, 68, 68, 0.08);
+}
+
+.ai-output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 20px;
+}
+
+.ai-output-header h2 {
+    font-size: 17px;
+    font-weight: 800;
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.ai-output-header h2 span.alert-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: #ef4444;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ef4444;
+    animation: alertPulse 1.5s infinite;
+}
+
+@keyframes alertPulse {
+    0% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 0.4; transform: scale(0.9); }
+}
+
+.ai-status-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* HERO ANALYSIS BOX INSIDE OUTPUT CARD */
+.ai-hero-box {
+    text-align: center;
+    padding: 22px 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    margin-bottom: 20px;
+}
+
+.ai-hero-icon-wrapper {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 14px auto;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.35) 0%, rgba(239, 68, 68, 0.1) 70%);
+    border: 2px solid #ef4444;
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: #ef4444;
+    animation: heroIconGlow 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes heroIconGlow {
+    0% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); transform: scale(0.98); }
+    100% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.6); transform: scale(1.04); }
+}
+
+.ai-hero-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: #ef4444;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.ai-hero-location {
+    font-size: 13px;
+    color: #94a3b8;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 4px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* CONFIDENCE PROGRESS BAR */
+.ai-confidence-box {
+    margin-bottom: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ai-confidence-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #cbd5e1;
+    margin-bottom: 8px;
+}
+
+.ai-confidence-header strong {
+    font-size: 16px;
+    color: #10b981;
+}
+
+.ai-progress-track {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.ai-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #059669, #10b981, #34d399);
+    border-radius: 5px;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 2x2 METRICS GRID */
+.ai-metrics-grid-2x2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.ai-metric-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: background 0.2s ease;
+}
+
+.ai-metric-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.ai-metric-label {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.ai-metric-val {
+    font-size: 15px;
+    font-weight: 800;
+    color: #f1f5f9;
+}
+
+.ai-metric-val.high-alert {
+    color: #ef4444;
+}
+
+.ai-metric-val.cyan-highlight {
+    color: #38bdf8;
+}
+
+.ai-footer-telemetry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #64748b;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* LIGHT THEME OVERRIDES FOR AI OUTPUT PANEL */
+html[data-theme="light"] .ai-output-panel {
+    background: #ffffff;
+    border-color: rgba(239, 68, 68, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+html[data-theme="light"] .ai-output-header h2 {
+    color: #0f172a;
+}
+
+html[data-theme="light"] .ai-hero-box {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+html[data-theme="light"] .ai-metric-item {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+html[data-theme="light"] .ai-metric-val {
     color: #0f172a;
 }
 
