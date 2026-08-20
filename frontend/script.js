@@ -393,10 +393,11 @@ function initSatelliteOrbitBackground(targetCanvasId) {
             ctx.fill();
         });
 
-        // EARTH CURVATURE AT BOTTOM-RIGHT (VIVID ILLUMINATED)
-        const earthX = width * 0.82;
-        const earthY = height * 1.12;
-        const earthRadius = Math.min(width, height) * 0.68;
+        // EARTH CURVATURE AT BOTTOM-RIGHT (NON-OBSCURING CORNER PLACEMENT)
+        const isFullscreenCanvas = !targetCanvasId || targetCanvasId === "satelliteOrbitCanvas";
+        const earthX = isFullscreenCanvas ? width * 0.92 : width * 0.82;
+        const earthY = isFullscreenCanvas ? height * 1.25 : height * 1.12;
+        const earthRadius = isFullscreenCanvas ? Math.min(width, height) * 0.52 : Math.min(width, height) * 0.68;
 
         // EARTH ATMOSPHERE INTENSE OUTER GLOW
         const atmGlow = ctx.createRadialGradient(earthX, earthY, earthRadius * 0.88, earthX, earthY, earthRadius * 1.25);
@@ -1248,100 +1249,39 @@ async function showSatellite() {
 
         <div class="satellite-section">
 
-            <h1 class="page-title">
+            <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
                 Satellite Monitor
             </h1>
 
-            <p class="page-subtitle">
-                Monitor satellite imagery and detect environmental changes
+            <p class="page-subtitle" style="font-size: 16px; margin-bottom: 24px;">
+                Real-Time Orbital Swath Monitoring, Image Ingestion, AI Disaster Detection & Spectral Analysis
             </p>
 
-
-        <div class="panel">
-
-            <div class="panel-header">
-
-                <h2>
-                    🛰 Live Satellite Monitoring
-                </h2>
-
-                <button
-                    onclick="loadPage('satellite')"
-                >
-                    ↻ Refresh
-                </button>
-
+            <!-- FULL SATELLITE MONITORING PANEL MODULE WITH EMBEDDED ORBIT CANVAS & AI CONTROLS -->
+            <div id="satMonitoringSectionContainer" style="margin-bottom: 28px;">
+                ${renderSatelliteMonitoringHTML()}
             </div>
 
-            ${satelliteContent}
-
-        </div>
-
-
-
-        <br>
-
-
-        <div class="feature-grid">
-
-
-            <div class="feature-card">
-
-                <div class="big-icon">
-                    🌍
+            <!-- MULTI-SPECTRAL COMPARISON PANEL -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>
+                        🛰 Live Satellite Multi-Spectral Analysis
+                    </h2>
+                    <button onclick="loadPage('satellite')">
+                        ↻ Refresh Feed
+                    </button>
                 </div>
-
-                <h3>
-                    Earth Observation
-                </h3>
-
-                <p>
-                    Monitor selected geographical
-                    regions using satellite imagery.
-                </p>
-
-            </div>
-
-
-            <div class="feature-card">
-
-
-                <div class="big-icon">
-                    🛰
-                </div>
-
-                <h3>
-                    Image Acquisition
-                </h3>
-
-                <p>
-                    Retrieve satellite images through
-                    the connected backend API.
-                </p>
-
-            </div>
-
-
-            <div class="feature-card">
-
-                <div class="big-icon">
-                    🔄
-                </div>
-
-                <h3>
-                    Change Detection
-                </h3>
-
-                <p>
-                    Compare images captured before
-                    and after a disaster.
-                </p>
-
+                ${satelliteContent}
             </div>
 
         </div>
 
     `);
+
+    setTimeout(() => {
+        initSatelliteOrbitBackground("embeddedOrbitCanvas");
+    }, 50);
 
 }
 
@@ -1558,21 +1498,13 @@ function runLiveDetection() {
         document.getElementById("detectConfidenceVal").textContent = `${confidence}%`;
         document.getElementById("detectProgressBar").style.width = `${confidence}%`;
         document.getElementById("detectSeverityVal").textContent = threshold > 80 ? "EXTREME" : "HIGH";
-        document.getElementById("detectAreaVal").textContent = `${area} km²`;
-        document.getElementById("detectPopVal").textContent = `${pop.toLocaleString()} people`;
-        document.getElementById("detectNdwiVal").textContent = `${ndwi} (Critical)`;
-
-        if (statusText) statusText.textContent = "● ANALYSIS COMPLETE (LIVE SATELLITE FEED)";
-        if (btn) btn.disabled = false;
-
-        alert(`AI Flood Detection complete for ${region}!\n\nConfidence: ${confidence}%\nInundated Area: ${area} km²\nPopulation at Risk: ${pop.toLocaleString()}`);
-    }, 800);
+        initSatelliteOrbitBackground("embeddedOrbitCanvas");
+    }, 50);
 }
 
 
-
 /* =========================================================
-   RISK MAP
+   INTERACTIVE DISASTER RISK MAP MODULE
 ========================================================= */
 
 async function showRiskMap() {
@@ -1583,86 +1515,144 @@ async function showRiskMap() {
 
     setPageContent(`
 
-        <h1 class="page-title">
+        <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
             Disaster Risk Map
         </h1>
 
-        <p class="page-subtitle">
-            Geographic risk visualization, seismic fault lines, inundation heatmaps, and tsunami hazard zones
+        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 24px;">
+            High-contrast geospatial intelligence, animated hazard overlays, glowing risk gradients & live spatial analytics
         </p>
 
-        <!-- MAP CONTROLS & LAYER SELECTOR -->
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
+        <!-- INTERACTIVE RISK MAP & SIDEBAR GRID -->
+        <div class="risk-map-layout-grid">
 
-            <div class="panel" style="padding: 20px;">
+            <!-- MAIN MAP VIEWPORT CONTAINER -->
+            <div class="panel" style="padding: 24px; border-radius: 16px;">
+                <!-- CONTROLS & LAYER FILTER TOOLBAR -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <div>
+                        <h3 style="font-size: 17px; font-weight: 800; color: #38bdf8; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+                            <span>🗺️</span> Interactive Geospatial Risk Engine
+                        </h3>
+                        <p style="font-size: 12px; color: #94a3b8; margin: 0;">Multi-hazard layer fusion with real-time telemetry updates</p>
+                    </div>
 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <h2 style="font-size: 16px; color: #38bdf8;">📍 Interactive Geo-Spatial Risk Engine</h2>
-                        <select id="mapLocationSelect" onchange="updateRiskMapLocation(this.value)" style="background: #0b0c10; border: 1px solid #2b2e33; color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 12.5px;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <select id="mapLocationSelect" onchange="updateRiskMapLocation(this.value)" style="background: #1e2433; border: 1px solid rgba(255,255,255,0.15); color: #f1f5f9; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">
                             <option value="surat" selected>Surat Tapi Basin (Flood - HIGH)</option>
                             <option value="bhuj">Bhuj Kutch Fault Line (Seismic - HIGH)</option>
                             <option value="guwahati">Guwahati Brahmaputra (Flood - EXTREME)</option>
                             <option value="chennai">Chennai Coastal Zone (Tsunami - WATCH)</option>
                         </select>
-                    </div>
 
-                    <div style="display: flex; gap: 8px;">
-                        <button onclick="toggleMapLayer('flood')" class="map-layer-btn active" id="layerBtnFlood">🌊 Inundation</button>
-                        <button onclick="toggleMapLayer('fault')" class="map-layer-btn" id="layerBtnFault">⚡ Fault Line</button>
-                        <button onclick="toggleMapLayer('tsunami')" class="map-layer-btn" id="layerBtnTsunami">🏖️ Tsunami Zone</button>
+                        <div class="sat-btn-group-toggles">
+                            <button onclick="toggleMapLayer('flood')" class="sat-action-btn toggle active" id="layerBtnFlood">🌊 Flood</button>
+                            <button onclick="toggleMapLayer('fault')" class="sat-action-btn toggle" id="layerBtnFault">⚡ Fault Line</button>
+                            <button onclick="toggleMapLayer('tsunami')" class="sat-action-btn toggle" id="layerBtnTsunami">🏖️ Tsunami</button>
+                            <button onclick="toggleMapLayer('all')" class="sat-action-btn toggle" id="layerBtnAll">🎯 All Hazards</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ENHANCED RISK MAP DISPLAY CONTAINER -->
-                <div class="map-container" id="riskMapDisplay" style="height: 380px; position: relative; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); background: radial-gradient(circle at center, #0f1923 0%, #070d14 100%);">
+                <!-- VIEWPORT MAP DISPLAY CANVAS -->
+                <div class="risk-map-viewport" id="riskMapViewport">
+                    <div class="risk-map-bg-grid"></div>
 
-                    <div class="map-grid"></div>
+                    <!-- VECTOR HAZARD OVERLAY SVG -->
+                    <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" viewBox="0 0 800 520">
+                        <!-- RIVER / FLOOD INUNDATION PATH -->
+                        <path id="svgPathFlood" d="M -50 260 Q 200 180 400 280 T 850 240" fill="none" stroke="rgba(56, 189, 248, 0.45)" stroke-width="28" stroke-linecap="round" />
+                        <path id="svgPathFloodCore" d="M -50 260 Q 200 180 400 280 T 850 240" fill="none" stroke="rgba(239, 68, 68, 0.55)" stroke-width="12" stroke-linecap="round" stroke-dasharray="8 4" />
 
-                    <!-- INTERACTIVE MAP OVERLAY ZONES -->
-                    <div class="risk-zone zone-red" id="mapZoneRed" style="top: 35%; left: 42%; width: 140px; height: 140px;"></div>
-                    <div class="risk-zone zone-orange" id="mapZoneOrange" style="top: 25%; left: 32%; width: 220px; height: 220px;"></div>
-                    <div class="risk-zone zone-green" style="top: 15%; left: 20%; width: 320px; height: 320px;"></div>
+                        <!-- SEISMIC FAULT LINE -->
+                        <path id="svgPathFault" d="M 120 -50 L 320 220 L 520 380 L 780 580" fill="none" stroke="rgba(245, 158, 11, 0.6)" stroke-width="3" stroke-dasharray="10 6" />
 
-                    <div class="map-label" id="mapLabelText" style="position: absolute; bottom: 20px; left: 20px; background: rgba(11, 12, 16, 0.85); backdrop-filter: blur(8px); padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); font-size: 13px; font-weight: 700; color: #38bdf8;">
-                        📍 Surat, Gujarat — Active Flood Inundation Zone
+                        <!-- TSUNAMI COASTLINE SURGE BOUNDARY -->
+                        <path id="svgPathTsunami" d="M 680 -50 C 640 180 720 340 620 580" fill="none" stroke="rgba(6, 182, 212, 0.7)" stroke-width="18" stroke-dasharray="14 6" />
+                    </svg>
+
+                    <!-- GLOWING RADIAL GRADIENT RISK ZONES -->
+                    <!-- RED ZONE (CRITICAL) -->
+                    <div class="risk-zone-radial red" id="mapZoneRed" style="top: 52%; left: 48%; width: 180px; height: 180px;" onclick="showMapTooltip('red')"></div>
+                    <div class="risk-map-pin red" style="top: 52%; left: 48%;" onclick="showMapTooltip('red')" title="Click for Flood Depth & Confidence">📍</div>
+
+                    <!-- ORANGE ZONE (WARNING BUFFER) -->
+                    <div class="risk-zone-radial orange" id="mapZoneOrange" style="top: 38%; left: 34%; width: 240px; height: 240px;" onclick="showMapTooltip('orange')"></div>
+                    <div class="risk-map-pin orange" style="top: 38%; left: 34%;" onclick="showMapTooltip('orange')" title="Click for Flood Depth & Confidence">⚠️</div>
+
+                    <!-- GREEN ZONE (SAFE RELIEF ZONE) -->
+                    <div class="risk-zone-radial green" id="mapZoneGreen" style="top: 24%; left: 20%; width: 300px; height: 300px;" onclick="showMapTooltip('green')"></div>
+                    <div class="risk-map-pin green" style="top: 24%; left: 20%;" onclick="showMapTooltip('green')" title="Click for Relief Shelter Info">🟢</div>
+
+                    <!-- INTERACTIVE TOOLTIP MODAL -->
+                    <div class="map-tooltip-card" id="mapTooltipCard" style="bottom: 24px; left: 24px; opacity: 1;">
+                        <div class="map-tooltip-header">
+                            <h4 id="tooltipTitle">📍 Surat Tapi River Basin</h4>
+                            <span class="map-tooltip-badge" id="tooltipBadge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444;">CRITICAL RISK</span>
+                        </div>
+                        <div class="map-tooltip-row"><span>Hazard Type:</span><strong id="tooltipHazard">Flood Inundation</strong></div>
+                        <div class="map-tooltip-row"><span>Water Depth:</span><strong id="tooltipDepth" style="color: #ef4444;">2.4 meters</strong></div>
+                        <div class="map-tooltip-row"><span>AI Confidence:</span><strong id="tooltipConfidence" style="color: #38bdf8;">94.7% (U-Net)</strong></div>
+                        <div class="map-tooltip-row"><span>Population at Risk:</span><strong id="tooltipPop">12,500 residents</strong></div>
+                        <div style="font-size: 10px; color: #94a3b8; margin-top: 8px; text-align: right;">Updated 12 mins ago (Sentinel-2 L2A)</div>
                     </div>
 
-                    <div style="position: absolute; top: 16px; right: 16px; background: rgba(11, 12, 16, 0.85); backdrop-filter: blur(8px); padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); font-size: 11px;">
-                        <div style="font-weight: 700; color: #a1a1aa; margin-bottom: 6px;">MAP LEGEND</div>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;"><span style="width: 10px; height: 10px; background: #ef4444; border-radius: 50%; display: inline-block;"></span> Critical Inundation</div>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;"><span style="width: 10px; height: 10px; background: #f97316; border-radius: 50%; display: inline-block;"></span> Warning Buffer</div>
-                        <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 10px; height: 10px; background: #22c55e; border-radius: 50%; display: inline-block;"></span> Safe Relief Zones</div>
+                    <!-- CLICKABLE LEGEND BADGE -->
+                    <div style="position: absolute; top: 16px; right: 16px; background: rgba(11, 16, 28, 0.9); backdrop-filter: blur(12px); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.3); font-size: 11px;">
+                        <div style="font-weight: 800; color: #38bdf8; margin-bottom: 8px; letter-spacing: 0.5px;">MAP LEGEND</div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: pointer;" onclick="showMapTooltip('red')"><span style="width: 12px; height: 12px; background: #ef4444; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #ef4444;"></span> <strong>Critical Risk Zone</strong> (High Depth)</div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: pointer;" onclick="showMapTooltip('orange')"><span style="width: 12px; height: 12px; background: #f97316; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #f97316;"></span> <strong>Warning Buffer</strong> (Perimeter)</div>
+                        <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;" onclick="showMapTooltip('green')"><span style="width: 12px; height: 12px; background: #22c55e; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #22c55e;"></span> <strong>Safe Relief Zone</strong> (0.0m Depth)</div>
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- LIVE RISK ANALYTICS PANEL -->
-            <div class="panel" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+            <!-- LIVE SPATIAL ANALYTICS SIDEBAR -->
+            <div class="spatial-analytics-sidebar">
                 <div>
-                    <h3 style="font-size: 15px; color: #38bdf8; font-weight: 700; margin-bottom: 14px;">📊 Live Spatial Analytics</h3>
+                    <h3 style="font-size: 16px; color: #38bdf8; font-weight: 800; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+                        <span>📊</span> Spatial Analytics
+                    </h3>
 
-                    <div style="display: flex; flex-direction: column; gap: 14px;">
-                        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
-                            <span style="font-size: 11px; color: #a1a1aa;">Active Risk Hotspots</span>
-                            <div style="font-size: 20px; font-weight: 800; color: #ef4444; margin-top: 2px;" id="riskHotspotsVal">3 Zones Active</div>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <!-- ACTIVE MONITORED ZONES -->
+                        <div style="background: rgba(255,255,255,0.04); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                            <span style="font-size: 11px; color: #94a3b8; font-weight: 700;">ACTIVE RISK HOTSPOTS</span>
+                            <div style="font-size: 22px; font-weight: 900; color: #ef4444; margin-top: 4px;" id="riskHotspotsVal">3 Zones Active</div>
+                            <span style="font-size: 11px; color: #cbd5e1;">Critical inundation in Tapi river corridor</span>
                         </div>
 
-                        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
-                            <span style="font-size: 11px; color: #a1a1aa;">Population in Hazard Area</span>
-                            <div style="font-size: 20px; font-weight: 800; color: #f97316; margin-top: 2px;" id="riskPopVal">142,500 People</div>
+                        <!-- LAST SATELLITE PASS TIME -->
+                        <div style="background: rgba(255,255,255,0.04); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                            <span style="font-size: 11px; color: #94a3b8; font-weight: 700;">LAST SATELLITE PASS TIME</span>
+                            <div style="font-size: 15px; font-weight: 800; color: #38bdf8; margin-top: 4px;">12 mins ago</div>
+                            <span style="font-size: 11px; color: #cbd5e1;">Sentinel-2 L2A (Swath #4829)</span>
                         </div>
 
-                        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
-                            <span style="font-size: 11px; color: #a1a1aa;">Relief Center Readiness</span>
-                            <div style="font-size: 20px; font-weight: 800; color: #22c55e; margin-top: 2px;" id="riskReadinessVal">91% Operational</div>
+                        <!-- SPATIAL TREND GAUGES -->
+                        <div style="background: rgba(255,255,255,0.04); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <span style="color: #94a3b8; font-weight: 700;">Inundation Velocity</span>
+                                <strong style="color: #ef4444;">+14.2% / hr</strong>
+                            </div>
+                            <div class="trend-progress-bar">
+                                <div class="trend-progress-fill" style="width: 76%; background: linear-gradient(90deg, #f97316, #ef4444);"></div>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.04); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <span style="color: #94a3b8; font-weight: 700;">Relief Center Readiness</span>
+                                <strong style="color: #22c55e;">91% Ready</strong>
+                            </div>
+                            <div class="trend-progress-bar">
+                                <div class="trend-progress-fill" style="width: 91%; background: linear-gradient(90deg, #10b981, #22c55e);"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <button class="run-detection-btn" style="margin-top: 16px;" onclick="alert('Exporting high-resolution GeoJSON risk map layer...')">
+                <button class="sat-action-btn upload" style="width: 100%; justify-content: center; padding: 12px; font-size: 13px;" onclick="alert('Exporting high-resolution GeoJSON risk map layer...')">
                     📥 Export GeoJSON Risk Layer
                 </button>
             </div>
