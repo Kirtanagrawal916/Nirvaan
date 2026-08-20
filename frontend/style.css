@@ -3411,10 +3411,12 @@ html[data-theme="light"] .ai-metric-val {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 14px;
+    gap: 16px;
     margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .sat-toolbar-title h3 {
@@ -3436,22 +3438,38 @@ html[data-theme="light"] .ai-metric-val {
 .sat-btn-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
+    max-width: 100%;
+}
+
+.sat-btn-subgroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.sat-btn-subgroup.toggles {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 3px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sat-action-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 9px 16px;
-    border-radius: 10px;
-    font-size: 13px;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
     font-weight: 700;
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: #1e2433;
     color: #f1f5f9;
+    white-space: nowrap;
     transition: all 0.2s ease;
 }
 
@@ -3837,9 +3855,40 @@ html[data-theme="light"] .sat-toolbar-title h3 {
 }
 
 html[data-theme="light"] .sat-action-btn {
-    background: #f8fafc;
+    background: #ffffff;
     border-color: #cbd5e1;
     color: #1e293b;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="light"] .sat-action-btn:hover {
+    background: #f1f5f9;
+    border-color: #0284c7;
+    color: #0284c7;
+}
+
+html[data-theme="light"] .sat-action-btn.upload {
+    background: linear-gradient(135deg, #0284c7, #2563eb);
+    border-color: #0284c7;
+    color: #ffffff;
+}
+
+html[data-theme="light"] .sat-action-btn.analyze {
+    background: linear-gradient(135deg, #059669, #10b981);
+    border-color: #059669;
+    color: #ffffff;
+}
+
+html[data-theme="light"] .sat-action-btn.compare.active,
+html[data-theme="light"] .sat-action-btn.toggle.active {
+    background: rgba(2, 132, 199, 0.12);
+    border-color: #0284c7;
+    color: #0284c7;
+}
+
+html[data-theme="light"] .sat-btn-subgroup.toggles {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
 }
 
 html[data-theme="light"] .disaster-analysis-sidebar {

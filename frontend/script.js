@@ -483,21 +483,26 @@ function renderSatelliteMonitoringHTML() {
                     </div>
 
                     <div class="sat-btn-row">
-                        <button class="sat-action-btn upload" onclick="triggerSatImageUpload()">
-                            <span>📁</span> Upload Image
-                        </button>
-                        <button class="sat-action-btn analyze" onclick="runSatDisasterAnalysis()">
-                            <span>${s.isAnalyzing ? "⌛" : "⚡"}</span> ${s.isAnalyzing ? "Analyzing..." : "Analyze Disaster"}
-                        </button>
-                        <button class="sat-action-btn compare ${s.showComparison ? "active" : ""}" onclick="toggleSatComparisonView()">
-                            <span>⚖️</span> ${s.showComparison ? "Single View" : "Compare Before/After"}
-                        </button>
-                        <button class="sat-action-btn toggle ${s.showHeatmap ? "active" : ""}" onclick="toggleSatHeatmap()" title="Toggle Heatmap Layer">
-                            <span>🔥</span> Heatmap
-                        </button>
-                        <button class="sat-action-btn toggle ${s.showBoundingBoxes ? "active" : ""}" onclick="toggleSatBoundingBoxes()" title="Toggle Bounding Boxes">
-                            <span>🎯</span> Bounding Boxes
-                        </button>
+                        <div class="sat-btn-subgroup">
+                            <button class="sat-action-btn upload" onclick="triggerSatImageUpload()">
+                                <span>📁</span> Upload Image
+                            </button>
+                            <button class="sat-action-btn analyze" onclick="runSatDisasterAnalysis()">
+                                <span>${s.isAnalyzing ? "⌛" : "⚡"}</span> ${s.isAnalyzing ? "Analyzing..." : "Analyze Disaster"}
+                            </button>
+                            <button class="sat-action-btn compare ${s.showComparison ? "active" : ""}" onclick="toggleSatComparisonView()">
+                                <span>⚖️</span> ${s.showComparison ? "Single View" : "Compare Before/After"}
+                            </button>
+                        </div>
+
+                        <div class="sat-btn-subgroup toggles">
+                            <button class="sat-action-btn toggle ${s.showHeatmap ? "active" : ""}" onclick="toggleSatHeatmap()" title="Toggle Heatmap Layer">
+                                <span>🔥</span> Heatmap
+                            </button>
+                            <button class="sat-action-btn toggle ${s.showBoundingBoxes ? "active" : ""}" onclick="toggleSatBoundingBoxes()" title="Toggle Bounding Boxes">
+                                <span>🎯</span> Bounding Boxes
+                            </button>
+                        </div>
                     </div>
                 </div>
 
