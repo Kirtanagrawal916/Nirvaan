@@ -355,8 +355,6 @@ def build_structured_report_json(evidence_payload: Dict[str, Any], report_markdo
     for z in zones:
         if isinstance(z, dict) and "area_km2" in z:
             area_val += z.get("area_km2", 0.0)
-    if area_val == 0.0:
-        area_val = 14.2
 
     return {
         "title": f"NIRVAAN Situation Report: {event_name}",
@@ -374,8 +372,8 @@ def build_structured_report_json(evidence_payload: Dict[str, Any], report_markdo
             "after_date": spectral.get("after_date", "N/A")
         },
         "severity": {
-            "impact_score": sev.get("impact_score", 65.0),
-            "impact_band": sev.get("impact_band") or sev.get("severity_level") or "Moderate"
+            "impact_score": sev.get("impact_score", 0.0),
+            "impact_band": sev.get("impact_band") or sev.get("severity_level") or "Nominal"
         },
         "affected_area": {
             "total_risk_zones": len(zones),
@@ -383,7 +381,7 @@ def build_structured_report_json(evidence_payload: Dict[str, Any], report_markdo
         },
         "population_exposure": {
             "status": pop.get("status", "SUCCESS"),
-            "estimated_affected_population": pop.get("estimated_affected_population", 12500)
+            "estimated_affected_population": pop.get("estimated_affected_population", 0)
         },
         "infrastructure_impact": {
             "status": infra.get("status", "SUCCESS"),

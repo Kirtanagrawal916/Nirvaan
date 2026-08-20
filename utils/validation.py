@@ -141,3 +141,41 @@ def validate_geojson_output(geojson_dict: Optional[Dict[str, Any]]) -> Tuple[boo
             errors.append("FeatureCollection must contain a 'features' array.")
 
     return len(errors) == 0, errors
+
+
+def validate_detection_result(result: Optional[Dict[str, Any]]) -> Tuple[bool, List[str]]:
+    """
+    Validates model inference output payload before committing to persistent database.
+    Checks for impossible coordinates, negative affected area, invalid confidence, and malformed geometry.
+    """
+    errors = []
+    if not isinstance(result, dict) or not result:
+        return False, ["Detection result payload is empty."]
+
+    conf = result.get("confidence_score") or result.get("confidence")
+    if conf is None:
+        errors.append("Missing required 'confidence_score' in model output.")
+    else:
+        try:
+            c_val = float(conf)
+            if not (0.0 <= c_val <= 100.0):
+                errors.append(f"Confidence score out of bounds [0.0, 100.0]: {c_val}")
+        except (ValueError, TypeError):
+            errors.append(f"Invalid non-numeric confidence score: {conf}")
+
+    lat = result.get("latitude")
+    lon = result.get("longitude")
+    if lat is not None and lon is not None:
+        if not validate_coordinates(lat, lon, allow_null_island=False):
+            errors.append(f"Detection result coordinates out of bounds: lat={lat}, lon={lon}")
+
+    area = result.get("affected_area_km2")
+    if area is not None:
+        try:
+            a_val = float(area)
+            if a_val < 0.0 or a_val > 1_000_000.0:
+                errors.append(f"Unreasonable affected area: {a_val} km²")
+        except (ValueError, TypeError):
+            errors.append(f"Invalid non-numeric affected area: {area}")
+
+    return len(errors) == 0, errors
