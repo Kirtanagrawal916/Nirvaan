@@ -705,13 +705,15 @@ function renderSatelliteMonitoringHTML() {
                 <input type="file" id="satImageUploadInput" style="display:none;" accept="image/*,.tif,.tiff" onchange="handleSatImageUpload(event)">
 
                 <div class="sat-toolbar-actions">
-                    <div class="sat-toolbar-title">
+                    <!-- TOP ROW: TITLE & SUBTITLE -->
+                    <div class="sat-toolbar-title-row">
                         <h3><span>🛰️</span> Satellite Monitoring</h3>
                         <p>${s.location} — ${s.sensor}</p>
                     </div>
 
-                    <div class="sat-btn-row">
-                        <div class="sat-btn-subgroup">
+                    <!-- BOTTOM ROW: BUTTON CONTROLS (PRIMARY ACTIONS LEFT, TOGGLES RIGHT) -->
+                    <div class="sat-toolbar-controls-row">
+                        <div class="sat-btn-group-primary">
                             <button class="sat-action-btn upload" onclick="triggerSatImageUpload()">
                                 <span>📁</span> Upload Image
                             </button>
@@ -723,7 +725,7 @@ function renderSatelliteMonitoringHTML() {
                             </button>
                         </div>
 
-                        <div class="sat-btn-subgroup toggles">
+                        <div class="sat-btn-group-toggles">
                             <button class="sat-action-btn toggle ${s.showHeatmap ? "active" : ""}" onclick="toggleSatHeatmap()" title="Toggle Heatmap Layer">
                                 <span>🔥</span> Heatmap
                             </button>

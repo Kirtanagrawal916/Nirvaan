@@ -3408,10 +3408,8 @@ html[data-theme="light"] .ai-metric-val {
 
 .sat-toolbar-actions {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
+    flex-direction: column;
+    gap: 14px;
     margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -3419,40 +3417,45 @@ html[data-theme="light"] .ai-metric-val {
     box-sizing: border-box;
 }
 
-.sat-toolbar-title h3 {
+.sat-toolbar-title-row h3 {
     font-size: 18px;
     font-weight: 800;
     color: #38bdf8;
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 4px;
+    margin: 0 0 4px 0;
 }
 
-.sat-toolbar-title p {
+.sat-toolbar-title-row p {
     font-size: 12px;
     color: #94a3b8;
     margin: 0;
 }
 
-.sat-btn-row {
+.sat-toolbar-controls-row {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 12px;
     flex-wrap: wrap;
-    max-width: 100%;
+    gap: 12px;
+    width: 100%;
 }
 
-.sat-btn-subgroup {
+.sat-btn-group-primary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sat-btn-group-toggles {
     display: flex;
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
-}
-
-.sat-btn-subgroup.toggles {
     background: rgba(255, 255, 255, 0.04);
-    padding: 3px;
+    padding: 4px 8px;
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -3886,7 +3889,7 @@ html[data-theme="light"] .sat-action-btn.toggle.active {
     color: #0284c7;
 }
 
-html[data-theme="light"] .sat-btn-subgroup.toggles {
+html[data-theme="light"] .sat-btn-group-toggles {
     background: #f1f5f9;
     border-color: #cbd5e1;
 }
