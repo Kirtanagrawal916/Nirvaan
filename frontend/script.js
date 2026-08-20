@@ -2699,14 +2699,35 @@ async function refreshSatellite() {
 function showAbout() {
     setPageContent(`
         <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">About Nirvaan</h1>
-        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">Satellite-Based AI Disaster Monitoring & Rapid Intelligence Platform</p>
+        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 24px;">Satellite-Based AI Disaster Monitoring & Rapid Intelligence Platform</p>
 
+        <!-- NIRVAAN HERO BRAND & LOGO SECTION -->
+        <div class="panel" style="padding: 28px; border-radius: 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; background: linear-gradient(135deg, rgba(14, 20, 34, 0.95), rgba(30, 41, 59, 0.9)); border: 1px solid rgba(56, 189, 248, 0.35); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
+            <div style="flex-shrink: 0; position: relative;">
+                <img src="assets/logo.png" alt="NIRVAAN Official Logo" style="width: 140px; height: 140px; border-radius: 16px; border: 2px solid rgba(56, 189, 248, 0.6); box-shadow: 0 0 24px rgba(56, 189, 248, 0.4); object-fit: cover;" onerror="this.onerror=null; this.src='assets/dashboard-bg.jpg';">
+            </div>
+            <div style="flex: 1; min-width: 280px;">
+                <div style="display: inline-block; padding: 4px 12px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 20px; font-size: 11px; font-weight: 800; color: #38bdf8; letter-spacing: 1px; margin-bottom: 8px;">
+                    NEXT-GEN GEOSPATIAL AI ENGINE
+                </div>
+                <h2 style="font-size: 26px; font-weight: 900; color: #f8fafc; margin: 0 0 6px 0; letter-spacing: 0.5px;">NIRVAAN</h2>
+                <p style="font-size: 15px; color: #94a3b8; font-weight: 600; margin: 0 0 12px 0;">Automated Earth Observation & Emergency Response System</p>
+                <p style="font-size: 14px; line-height: 1.6; color: #cbd5e1; margin: 0;">
+                    Engineered to safeguard lives and infrastructure by converting multi-spectral satellite imagery into sub-hour actionable disaster telemetry.
+                </p>
+            </div>
+        </div>
+
+        <!-- BRIEF SYSTEM INTRODUCTION & MISSION -->
         <div class="panel" style="padding: 32px; border-radius: 16px; margin-bottom: 24px;">
             <h2 style="margin-bottom: 16px; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;" class="faq-section-header">
-                <span>🌐</span> Mission & System Overview
+                <span>🌐</span> Brief Introduction & System Mission
             </h2>
-            <p style="font-size: 16px; line-height: 1.8; margin-bottom: 24px;" class="faq-section-subtitle">
-                <strong>Nirvaan</strong> is an advanced, satellite-driven disaster intelligence engine engineered to perform <strong>rapid disaster detection</strong>, <strong>inundated area mapping</strong>, and <strong>real-time situational risk assessment</strong>. By fusing multi-spectral satellite imagery (Copernicus Sentinel-2, USGS Landsat-9) with deep learning segmentation neural networks, Nirvaan equips emergency response managers with sub-hour actionable intelligence.
+            <p style="font-size: 15px; line-height: 1.8; margin-bottom: 20px;" class="faq-section-subtitle">
+                <strong>NIRVAAN</strong> (<em>Satellite Disaster Intelligence Platform</em>) is an end-to-end, high-performance geospatial AI solution designed for early warning, hazard detection, and emergency relief management. When natural disasters strike—such as catastrophic floods, wildfires, tsunamis, or ground displacement—traditional ground-based assessments suffer from delayed access and damaged communication infrastructure. 
+            </p>
+            <p style="font-size: 15px; line-height: 1.8; margin-bottom: 24px;" class="faq-section-subtitle">
+                Nirvaan bridges this critical gap by ingesting raw satellite telemetry from Copernicus Sentinel-2, Sentinel-1 SAR radar, and USGS Landsat-9 imagery. Using computer vision models and spectral index extraction (such as NDWI and dNBR), Nirvaan automatically isolates inundated surfaces, computes severity metrics, estimates affected populations, and generates field-ready situation reports in real time.
             </p>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
@@ -2716,7 +2737,7 @@ function showAbout() {
                         <span class="about-heading-text">Multi-Spectral Imagery</span>
                     </h3>
                     <p class="about-answer">
-                        Automated extraction of <strong>NDWI (Water Index)</strong> and <strong>SAR (Synthetic Aperture Radar)</strong> masks to detect flood extent through heavy cloud cover.
+                        Automated extraction of <strong>NDWI (Normalized Difference Water Index)</strong> and <strong>SAR (Synthetic Aperture Radar)</strong> masks to detect flood extent through heavy cloud cover.
                     </p>
                 </div>
 
@@ -2726,7 +2747,7 @@ function showAbout() {
                         <span class="about-heading-text">Rapid Early Warning</span>
                     </h3>
                     <p class="about-answer">
-                        Sub-hour automated pipeline processing raw satellite swaths into <strong>high-resolution vector risk maps</strong> and automated broadcasts.
+                        Sub-hour automated pipeline processing raw satellite swaths into <strong>high-resolution vector risk maps</strong> and emergency alert broadcasts.
                     </p>
                 </div>
 
@@ -2736,7 +2757,7 @@ function showAbout() {
                         <span class="about-heading-text">Population & Asset Risk</span>
                     </h3>
                     <p class="about-answer">
-                        Spatial demographic overlay calculating <strong>affected populations</strong>, <strong>submerged roadways</strong>, and <strong>critical infrastructure</strong>.
+                        Spatial demographic overlay calculating <strong>affected populations</strong>, <strong>submerged roadways</strong>, and <strong>critical infrastructure proximity</strong>.
                     </p>
                 </div>
 
@@ -2746,7 +2767,7 @@ function showAbout() {
                         <span class="about-heading-text">Inter-Agency Interoperability</span>
                     </h3>
                     <p class="about-answer">
-                        Seamless GIS spatial telemetry exchange with <strong>NDMA</strong>, <strong>ISRO</strong>, and <strong>State Disaster Relief Forces</strong>.
+                        Seamless GIS spatial telemetry exchange with <strong>NDMA</strong>, <strong>ISRO</strong>, and <strong>State Disaster Relief Forces (SDRF)</strong>.
                     </p>
                 </div>
             </div>
