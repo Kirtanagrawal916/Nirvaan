@@ -40,7 +40,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# BH-02 — Static Asset Serving
+# BH-02 — Browser-Accessible Satellite Asset Serving
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 
@@ -49,6 +49,16 @@ ASSETS_DIR = BASE_DIR / "frontend" / "assets"
 
 if ASSETS_DIR.exists():
     app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
+
+
+# Root Endpoint — GET /
+@app.get("/")
+def root() -> Dict[str, str]:
+    """Root endpoint returning API status message."""
+    return {
+        "status": "ok",
+        "message": "Nirvaan API is running"
+    }
 
 
 # B-03 — GET /api/v1/health

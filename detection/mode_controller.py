@@ -17,7 +17,8 @@ class AnalysisTimeoutError(TimeoutError):
 
 class AnalysisModeController:
     """
-    Controller for executing disaster analysis under explicit Instant Demo or Live Analyze modes.
+    Controller for executing disaster analysis under isolated Instant Demo or Live Analyze modes.
+    Enforces deterministic precomputed results for DEMO mode and timeout safeguards for LIVE mode.
     """
 
     def __init__(self, config_path: Optional[Union[str, Path]] = None, timeout_sec: float = DEFAULT_LIVE_TIMEOUT_SEC):
