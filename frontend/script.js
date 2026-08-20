@@ -34,13 +34,13 @@ function updateProvenanceBanner(dataOrProvenance) {
     }
 }
 
-let currentAnalysisMode = "INSTANT_DEMO";
+let currentAnalysisMode = "LIVE_ANALYZE";
 
 function toggleAnalysisMode() {
-    if (currentAnalysisMode === "INSTANT_DEMO") {
-        currentAnalysisMode = "LIVE_ANALYZE";
+    if (currentAnalysisMode === "LIVE_ANALYZE") {
+        currentAnalysisMode = "STAC_ANALYZE";
     } else {
-        currentAnalysisMode = "INSTANT_DEMO";
+        currentAnalysisMode = "LIVE_ANALYZE";
     }
     updateModeIndicatorUI();
 }
@@ -53,12 +53,12 @@ function updateModeIndicatorUI() {
 
     if (currentAnalysisMode === "LIVE_ANALYZE") {
         el.className = "mode-indicator live-mode";
-        txt.innerHTML = "<strong>LIVE ANALYZE</strong>";
-        badge.innerHTML = "FLEX MODE";
+        txt.innerHTML = "<strong>LIVE SYSTEM</strong>";
+        badge.innerHTML = "ACTIVE";
     } else {
-        el.className = "mode-indicator instant-mode";
-        txt.innerHTML = "<strong>INSTANT DEMO</strong>";
-        badge.innerHTML = "DEFAULT";
+        el.className = "mode-indicator live-mode";
+        txt.innerHTML = "<strong>STAC TELEMETRY</strong>";
+        badge.innerHTML = "SENTINEL-2";
     }
 }
 

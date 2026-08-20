@@ -33,7 +33,8 @@ app = FastAPI(
 )
 
 # CORS Configuration
-allowed_origins_raw = os.getenv("CORS_ORIGINS", "*")
+default_origins = "https://nirvaan-one.vercel.app,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173"
+allowed_origins_raw = os.getenv("CORS_ORIGINS", default_origins)
 allowed_origins = [
     origin.strip()
     for origin in allowed_origins_raw.split(",")
