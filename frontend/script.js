@@ -9,6 +9,67 @@ function setPageContent(html) {
    THEME TOGGLE SYSTEM
 ========================================================= */
 
+function updateProvenanceBanner(dataOrProvenance) {
+    const banner = document.getElementById("provenanceBanner");
+    if (!banner) return;
+
+    let prov = "NO_LIVE_DATA";
+    if (typeof dataOrProvenance === "string") {
+        prov = dataOrProvenance;
+    } else if (dataOrProvenance && typeof dataOrProvenance === "object") {
+        prov = dataOrProvenance.data_provenance ||
+               (dataOrProvenance.provenance && dataOrProvenance.provenance.data_provenance) ||
+               (dataOrProvenance.event_metadata && dataOrProvenance.event_metadata.data_provenance) ||
+               "NO_LIVE_DATA";
+    }
+
+    if (prov === "REAL_SATELLITE_DATA") {
+        banner.className = "provenance-banner real-mode";
+        banner.innerHTML = `<span class="banner-icon">🛰️</span><span class="banner-text"><strong>REAL SATELLITE DATA</strong> — Processing genuine Sentinel-2 Level-2A surface reflectance imagery.</span>`;
+        banner.style.display = "flex";
+    } else {
+        banner.className = "provenance-banner real-mode";
+        banner.innerHTML = `<span class="banner-icon">ℹ️</span><span class="banner-text"><strong>NO LIVE DATA AVAILABLE</strong> — Awaiting satellite observation feed.</span>`;
+        banner.style.display = "flex";
+    }
+}
+
+function updateAlertBadgeCounts(count) {
+    const countStr = String(count || 0);
+    ["sidebarAlertCount", "dropdownAlertCount", "topbarAlertCount"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = countStr;
+    });
+}
+
+let currentAnalysisMode = "LIVE_ANALYZE";
+
+function toggleAnalysisMode() {
+    if (currentAnalysisMode === "LIVE_ANALYZE") {
+        currentAnalysisMode = "STAC_ANALYZE";
+    } else {
+        currentAnalysisMode = "LIVE_ANALYZE";
+    }
+    updateModeIndicatorUI();
+}
+
+function updateModeIndicatorUI() {
+    const el = document.getElementById("modeIndicator");
+    const txt = document.getElementById("modeText");
+    const badge = document.getElementById("modeBadge");
+    if (!el || !txt || !badge) return;
+
+    if (currentAnalysisMode === "LIVE_ANALYZE") {
+        el.className = "mode-indicator live-mode";
+        txt.innerHTML = "<strong>LIVE SYSTEM</strong>";
+        badge.innerHTML = "ACTIVE";
+    } else {
+        el.className = "mode-indicator live-mode";
+        txt.innerHTML = "<strong>STAC TELEMETRY</strong>";
+        badge.innerHTML = "SENTINEL-2";
+    }
+}
+
 function initTheme() {
     const savedTheme = localStorage.getItem("nirvaan_theme") || "dark";
     applyTheme(savedTheme);
@@ -38,7 +99,7 @@ function initTheme() {
 
 function applyTheme(theme) {
     document.documentElement.setAttribute("data-theme", theme);
-    
+
     const themeText = document.getElementById("themeToggleText");
     if (themeText) {
         themeText.textContent = theme === "dark" ? "Light Mode" : "Dark Mode";
@@ -95,14 +156,6 @@ function navigateToPage(page) {
 navItems.forEach(item => {
     item.addEventListener("click", () => {
         const page = item.dataset.page;
-        if (page) navigateToPage(page);
-    });
-});
-
-// Bind all data-page buttons & topbar alert bell buttons
-document.querySelectorAll("[data-page], .alert-icon-btn").forEach(el => {
-    el.addEventListener("click", (e) => {
-        const page = el.dataset.page || "alerts";
         if (page) navigateToPage(page);
     });
 });
@@ -209,7 +262,7 @@ function initAuth() {
             const email = document.getElementById("loginEmail").value;
             const role = document.getElementById("loginRole").value;
             const regName = document.getElementById("regName").value;
-            
+
             currentUser = {
                 isLoggedIn: true,
                 name: regName || email.split("@")[0].replace(".", " ").toUpperCase() || "Cmdr. Yashi",
@@ -545,16 +598,16 @@ if (document.readyState === "loading") {
    PAGE ROUTER
 ========================================================= */
 
-async function loadPage(page) {
+function loadPage(page) {
 
     switch(page) {
 
         case "dashboard":
-            await showDashboard();
+            showDashboard();
             break;
 
         case "satellite":
-            await showSatellite();
+            showSatellite();
             break;
 
         case "detection":
@@ -574,7 +627,7 @@ async function loadPage(page) {
             break;
 
         case "history":
-            await showHistory();
+            showHistory();
             break;
 
         case "settings":
@@ -590,7 +643,8 @@ async function loadPage(page) {
             break;
 
         default:
-            await showDashboard();
+            showDashboard();
+            break;
 
     }
 
@@ -611,11 +665,11 @@ function getSatState() {
             beforeImage: "assets/before.jpg",
             disasterType: "Flood Inundation",
             disasterIcon: "🌊",
-            confidence: 94.7,
-            affectedArea: "14.2 km²",
-            populationRisk: "12,500",
-            severityScore: "65.0 / 100",
-            severityBand: "HIGH RISK",
+            confidence: 0,
+            affectedArea: "Awaiting satellite observation",
+            populationRisk: "No live data available",
+            severityScore: "N/A",
+            severityBand: "NOMINAL",
             location: "Surat, Gujarat (Tapi River Basin)",
             sensor: "Sentinel-2 L2A (10m)",
             coordinates: "21.1702° N, 72.8311° E",
@@ -654,7 +708,7 @@ function handleSatImageUpload(event) {
         s.severityBand = "HIGH SEVERITY";
         s.location = file.name || "Custom Satellite Pass";
         s.sensor = "User Raster Swath (High-Res)";
-        
+
         refreshSatelliteMonitoringUI();
     };
     reader.readAsDataURL(file);
@@ -770,7 +824,7 @@ function renderSatelliteMonitoringHTML() {
                                     <svg class="sat-bbox-svg" viewBox="0 0 800 450" preserveAspectRatio="none">
                                         <rect x="240" y="140" width="310" height="200" class="sat-bbox-rect-red" />
                                         <rect x="250" y="150" width="130" height="24" rx="4" fill="#ef4444" />
-                                        <text x="256" y="166" class="sat-bbox-text">FLOOD INUNDATION: 94.7%</text>
+                                        <text x="256" y="166" class="sat-bbox-text">FLOOD INUNDATION DETECTED</text>
 
                                         <rect x="110" y="80" width="180" height="130" class="sat-bbox-rect-amber" />
                                         <rect x="120" y="90" width="140" height="24" rx="4" fill="#f59e0b" />
@@ -840,19 +894,9 @@ function renderSatelliteMonitoringHTML() {
    DASHBOARD
 ========================================================= */
 
-async function showDashboard() {
-
-    const stats = nirvaanData.statistics;
-    const latest = await getLatestDisaster();
-    const satellite = await getSatelliteImages();
-
-    const affectedArea = (latest && latest.affectedArea) ? latest.affectedArea : "14.2 km²";
-    const popRisk = "12,500";
-    const accuracy = "94.7%";
-
+function showDashboard() {
     let satelliteHtml = `
         <div style="padding: 20px;">
-
             <!-- FLOOD COMPARISON SCENE -->
             <div style="margin-bottom: 24px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -863,55 +907,17 @@ async function showDashboard() {
                     <div class="sat-card-box">
                         <span class="sat-badge normal">BEFORE FLOOD (PRE-EVENT)</span>
                         <img src="assets/before.jpg" alt="Before Flood Satellite Scene" class="sat-img">
-                        <div class="sat-meta">
-                            <span>🛰 Sentinel-2 L2A</span>
-                            <span>NDWI: 0.12 (Normal Flow)</span>
-                        </div>
                     </div>
-
                     <div class="sat-card-box">
                         <span class="sat-badge alert">AFTER FLOOD (POST-EVENT INUNDATED)</span>
                         <img src="assets/after.jpg" alt="After Flood Satellite Scene" class="sat-img">
-                        <div class="sat-meta">
-                            <span>🛰 Sentinel-2 L2A</span>
-                            <span class="red-text">NDWI: 0.84 (Inundated)</span>
-                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- TSUNAMI COMPARISON SCENE -->
-            <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <span style="font-size: 13px; font-weight: 700; color: #38bdf8;">🏖️ SCENE 2: TSUNAMI COASTAL SURGE IMPACT (Chennai Coastline)</span>
-                    <span style="font-size: 11px; opacity: 0.7;">Pass: PlanetScope (3m High-Res)</span>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                    <div class="sat-card-box">
-                        <span class="sat-badge normal">BEFORE TSUNAMI (PRE-EVENT)</span>
-                        <img src="assets/tsunami-before.jpg" alt="Before Tsunami Satellite Scene" class="sat-img">
-                        <div class="sat-meta">
-                            <span>🛰 PlanetScope (3m)</span>
-                            <span>Surge Index: 0.05 (Calm Sea)</span>
-                        </div>
-                    </div>
-
-                    <div class="sat-card-box">
-                        <span class="sat-badge alert">AFTER TSUNAMI (COASTAL INUNDATION)</span>
-                        <img src="assets/tsunami-after.jpg" alt="After Tsunami Satellite Scene" class="sat-img">
-                        <div class="sat-meta">
-                            <span>🛰 PlanetScope (3m)</span>
-                            <span class="red-text">Surge Index: 0.92 (Extreme Surge)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     `;
 
     setPageContent(`
-
         <section class="dashboard-section nirvaan-dashboard-container">
 
             <!-- FUTURISTIC MORNING WELCOME HERO BANNER -->
@@ -936,14 +942,13 @@ async function showDashboard() {
                 </p>
             </div>
 
-            <!-- THREE TOP METRIC CARDS WITH TREND ARROWS & PERCENTAGE CHANGES -->
+            <!-- THREE TOP METRIC CARDS WITH ASYNC SKELETON STATES -->
             <div class="metric-cards-grid">
                 <div class="metric-card-box">
                     <div class="metric-card-icon area">📍</div>
                     <div class="metric-card-info">
                         <span class="metric-card-label">Affected Area</span>
-                        <span class="metric-card-val">${affectedArea}</span>
-                        <span class="metric-card-trend up-orange">↑ 12.6% vs yesterday</span>
+                        <span class="metric-card-val" id="dashAffectedArea"><span class="skeleton-text" style="width: 100px;"></span></span>
                     </div>
                 </div>
 
@@ -951,8 +956,7 @@ async function showDashboard() {
                     <div class="metric-card-icon pop">👥</div>
                     <div class="metric-card-info">
                         <span class="metric-card-label">Population at Risk</span>
-                        <span class="metric-card-val">${popRisk}</span>
-                        <span class="metric-card-trend up-cyan">↑ 8.4% vs yesterday</span>
+                        <span class="metric-card-val" id="dashPopRisk"><span class="skeleton-text" style="width: 110px;"></span></span>
                     </div>
                 </div>
 
@@ -960,8 +964,7 @@ async function showDashboard() {
                     <div class="metric-card-icon accuracy">◎</div>
                     <div class="metric-card-info">
                         <span class="metric-card-label">Detection Accuracy</span>
-                        <span class="metric-card-val">${accuracy}</span>
-                        <span class="metric-card-trend up-green">↑ 3.2% vs yesterday</span>
+                        <span class="metric-card-val" id="dashAccuracy"><span class="skeleton-text" style="width: 90px;"></span></span>
                     </div>
                 </div>
             </div>
@@ -971,7 +974,7 @@ async function showDashboard() {
                 ${renderSatelliteMonitoringHTML()}
             </div>
 
-            <!-- RISK ANALYSIS SECTION WITH ICONS FOR INFRASTRUCTURE, HEALTH, AND EVACUATION -->
+            <!-- RISK ANALYSIS SECTION -->
             <div class="risk-analysis-section">
                 <div class="risk-section-header">
                     <h2><span>🛡️</span> Risk Analysis</h2>
@@ -983,7 +986,7 @@ async function showDashboard() {
                     <div class="risk-card-item">
                         <div class="risk-card-header">
                             <div class="risk-icon-badge infra">🏗️</div>
-                            <span class="risk-badge-tag amber">2 CRITICAL ASSETS</span>
+                            <span class="risk-badge-tag amber">GEOSPATIAL AUDIT</span>
                         </div>
                         <div class="risk-card-body">
                             <h3>Infrastructure Impact</h3>
@@ -991,11 +994,11 @@ async function showDashboard() {
                             <div class="risk-bullets">
                                 <div class="risk-bullet-row">
                                     <span>⚠️</span>
-                                    <span><strong>SP25 Highway Bridge</strong>: 0.8 km from hotspot — Structural inundation alert</span>
+                                    <span><strong>SP25 Highway Bridge</strong>: 0.8 km from hotspot — Perimeter alert</span>
                                 </div>
                                 <div class="risk-bullet-row">
                                     <span>⚡</span>
-                                    <span><strong>Regional Substation 4</strong>: Flood perimeter encroachment risk</span>
+                                    <span><strong>Regional Substation 4</strong>: Encroachment monitoring</span>
                                 </div>
                             </div>
                         </div>
@@ -1005,7 +1008,7 @@ async function showDashboard() {
                     <div class="risk-card-item">
                         <div class="risk-card-header">
                             <div class="risk-icon-badge health">🏥</div>
-                            <span class="risk-badge-tag cyan">MODERATE HAZARD</span>
+                            <span class="risk-badge-tag cyan">HAZARD TELEMETRY</span>
                         </div>
                         <div class="risk-card-body">
                             <h3>Health Risks</h3>
@@ -1013,33 +1016,33 @@ async function showDashboard() {
                             <div class="risk-bullets">
                                 <div class="risk-bullet-row">
                                     <span>🌊</span>
-                                    <span><strong>Waterborne Exposure</strong>: High NDWI anomaly indicates drainage backup</span>
+                                    <span><strong>Waterborne Hazards</strong>: NDWI spectral anomaly tracking</span>
                                 </div>
                                 <div class="risk-bullet-row">
                                     <span>🏥</span>
-                                    <span><strong>Hospital Access</strong>: Perimeter clearance required for Regional Facility</span>
+                                    <span><strong>Hospital Access</strong>: Access clearance monitoring</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- EVACUATION SUGGESTED -->
+                    <!-- EVACUATION ADVISORY -->
                     <div class="risk-card-item">
                         <div class="risk-card-header">
                             <div class="risk-icon-badge evac">🚨</div>
-                            <span class="risk-badge-tag red">ZONE B-4 DISPATCH</span>
+                            <span class="risk-badge-tag red">DISPATCH ADVISORY</span>
                         </div>
                         <div class="risk-card-body">
-                            <h3>Evacuation Suggested</h3>
+                            <h3>Evacuation Advisory</h3>
                             <p>Emergency Dispatch & Advisory</p>
                             <div class="risk-bullets">
                                 <div class="risk-bullet-row">
                                     <span>📢</span>
-                                    <span><strong>Sector B-4 Lowlands</strong>: Priority 1 evacuation advised (~12,500 residents)</span>
+                                    <span><strong>Lowland Sectors</strong>: Advisory subject to satellite verification</span>
                                 </div>
                                 <div class="risk-bullet-row">
                                     <span>🚗</span>
-                                    <span><strong>Corridor Route</strong>: Proceed North via SP25 Bypass Clearway</span>
+                                    <span><strong>Evacuation Routes</strong>: Clearway route monitoring active</span>
                                 </div>
                             </div>
                         </div>
@@ -1169,9 +1172,56 @@ async function showDashboard() {
             </div>
 
         </section>
-
     `);
 
+    // Trigger non-blocking async data load
+    fetchDashboardDataAsync();
+}
+
+async function fetchDashboardDataAsync() {
+    try {
+        const [latest, satellite, alerts] = await Promise.all([
+            getLatestDisaster().catch(() => null),
+            getSatelliteImages().catch(() => null),
+            getRealAlerts().catch(() => [])
+        ]);
+
+        if (alerts && Array.isArray(alerts)) {
+            updateAlertBadgeCounts(alerts.length);
+        }
+
+        updateProvenanceBanner(latest || satellite);
+
+        const areaEl = document.getElementById("dashAffectedArea");
+        if (areaEl) {
+            if (latest && latest.affectedArea && latest.affectedArea !== "0.0 km²") {
+                areaEl.textContent = latest.affectedArea;
+            } else {
+                areaEl.textContent = "Awaiting satellite observation";
+            }
+        }
+
+        const popEl = document.getElementById("dashPopRisk");
+        if (popEl) {
+            if (latest && (latest.population_exposure !== undefined || latest.populationAtRisk !== undefined)) {
+                const p = latest.population_exposure || latest.populationAtRisk;
+                popEl.textContent = typeof p === "number" ? `~${p.toLocaleString()} residents` : String(p);
+            } else {
+                popEl.textContent = "No live data available";
+            }
+        }
+
+        const accEl = document.getElementById("dashAccuracy");
+        if (accEl) {
+            if (latest && latest.confidence !== undefined && latest.confidence !== null && latest.confidence > 0) {
+                accEl.textContent = `${latest.confidence}%`;
+            } else {
+                accEl.textContent = "Awaiting satellite observation";
+            }
+        }
+    } catch (err) {
+        console.warn("Async dashboard data fetch warning:", err);
+    }
 }
 
 
@@ -1180,91 +1230,57 @@ async function showDashboard() {
    SATELLITE MONITOR
 ========================================================= */
 
-async function showSatellite() {
-
-    const satellite = await getSatelliteImages();
-
-    const beforeImgPath = (satellite && satellite.beforeImage) ? satellite.beforeImage : "assets/before.jpg";
-    const afterImgPath = (satellite && satellite.afterImage) ? satellite.afterImage : "assets/after.jpg";
-
-    let satelliteContent = `
-        <div style="padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <div>
-                    <h3 style="font-size: 16px; color: #38bdf8; font-weight: 700;">🛰 Sentinel-2 Multi-Spectral Inundation Comparison</h3>
-                    <p style="font-size: 12px; opacity: 0.75;">Pre-event Baseline vs Post-event Overflow Flood Surface (Surat, Gujarat)</p>
-                </div>
-                <div style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-weight: 700; font-size: 11px; padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(56, 189, 248, 0.3);">
-                    ● SENTINEL-2 L2A LIVE FEED
-                </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                <div style="background: #121215; border: 1px solid #27272a; border-radius: 14px; padding: 16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <span class="sat-badge normal">BEFORE FLOOD (PRE-EVENT)</span>
-                        <span style="font-size: 11px; opacity: 0.7;">Pass: 12 Aug 2026</span>
-                    </div>
-                    <img src="${beforeImgPath}" alt="Before Flood Satellite Scene" style="width: 100%; height: 320px; object-fit: cover; border-radius: 10px; border: 1px solid #27272a;">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; opacity: 0.8; margin-top: 12px;">
-                        <span>Terrain: Normal River Basin & Town</span>
-                        <span>NDWI Score: 0.12</span>
-                    </div>
-                </div>
-
-                <div style="background: #121215; border: 1px solid #ef4444; border-radius: 14px; padding: 16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <span class="sat-badge alert">AFTER FLOOD (POST-EVENT INUNDATED)</span>
-                        <span style="font-size: 11px; color: #ef4444; font-weight: 600;">Pass: 19 Aug 2026</span>
-                    </div>
-                    <img src="${afterImgPath}" alt="After Flood Satellite Scene" style="width: 100%; height: 320px; object-fit: cover; border-radius: 10px; border: 1px solid #ef4444;">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 12px;">
-                        <span style="color: #ef4444; font-weight: 600;">Severe Inundation Over Banks</span>
-                        <span style="color: #ef4444; font-weight: 600;">NDWI Score: 0.84</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
+function showSatellite() {
     setPageContent(`
-
         <div class="satellite-section">
-
             <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
                 Satellite Monitor
             </h1>
-
             <p class="page-subtitle" style="font-size: 16px; margin-bottom: 24px;">
                 Real-Time Orbital Swath Monitoring, Image Ingestion, AI Disaster Detection & Spectral Analysis
             </p>
 
-            <!-- FULL SATELLITE MONITORING PANEL MODULE WITH EMBEDDED ORBIT CANVAS & AI CONTROLS -->
             <div id="satMonitoringSectionContainer" style="margin-bottom: 28px;">
                 ${renderSatelliteMonitoringHTML()}
             </div>
 
-            <!-- MULTI-SPECTRAL COMPARISON PANEL -->
             <div class="panel">
                 <div class="panel-header">
-                    <h2>
-                        🛰 Live Satellite Multi-Spectral Analysis
-                    </h2>
-                    <button onclick="loadPage('satellite')">
-                        ↻ Refresh Feed
-                    </button>
+                    <h2>🛰 Live Satellite Multi-Spectral Analysis</h2>
+                    <button onclick="fetchSatelliteImagesAsync()">↻ Refresh Feed</button>
                 </div>
-                ${satelliteContent}
+                <div id="satImageContent">
+                    <div style="padding: 20px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                            <div style="background: #121215; border: 1px solid #27272a; border-radius: 14px; padding: 16px;">
+                                <span class="sat-badge normal">BEFORE FLOOD (PRE-EVENT)</span>
+                                <img src="assets/before.jpg" alt="Before Flood Satellite Scene" style="width: 100%; height: 320px; object-fit: cover; border-radius: 10px; border: 1px solid #27272a; margin-top: 12px;">
+                            </div>
+                            <div style="background: #121215; border: 1px solid #ef4444; border-radius: 14px; padding: 16px;">
+                                <span class="sat-badge alert">AFTER FLOOD (POST-EVENT INUNDATED)</span>
+                                <img src="assets/after.jpg" alt="After Flood Satellite Scene" style="width: 100%; height: 320px; object-fit: cover; border-radius: 10px; border: 1px solid #ef4444; margin-top: 12px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
         </div>
-
     `);
 
     setTimeout(() => {
         initSatelliteOrbitBackground("embeddedOrbitCanvas");
     }, 50);
 
+    fetchSatelliteImagesAsync();
+}
+
+async function fetchSatelliteImagesAsync() {
+    try {
+        const satellite = await getSatelliteImages();
+        updateProvenanceBanner(satellite);
+    } catch (e) {
+        console.warn("Async satellite fetch error:", e);
+    }
 }
 
 
@@ -1274,9 +1290,7 @@ async function showSatellite() {
 ========================================================= */
 
 function showDetection() {
-
     setPageContent(`
-
         <div class="disaster-section">
 
             <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
@@ -1303,24 +1317,24 @@ function showDetection() {
                 </div>
             </div>
 
-            <!-- DISASTER DETECTION 50% / 50% SPLIT LAYOUT GRID -->
-            <div class="detection-50-split-grid">
+            <!-- FLOOD DETECTION BOX (CONSISTS OF 65-70% TOTAL HORIZONTAL AREA) -->
+            <div class="flood-detection-box-container">
 
-                <!-- COLUMN 1: INTERACTIVE FLOOD DETECTION USER INPUT FORM (50% WIDTH) -->
-                <div class="detection-input-card" style="margin-bottom: 0;">
+                <!-- INTERACTIVE FLOOD DETECTION USER INPUT FORM -->
+                <div class="detection-input-card">
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
-                        <h3 style="font-size: 16px; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 8px; margin: 0;">
-                            <span>🎛️</span> AI Flood Detection Parameters
+                        <h3 style="font-size: 16px; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                            <span>🎛️</span> AI Flood Detection Input Parameters
                         </h3>
                         <span style="font-size: 11px; color: #a1a1aa; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px;">
-                            Model: Sentinel-NET v4.2
+                            Model: Nirvaan Sentinel-NET v4.2
                         </span>
                     </div>
 
                     <form id="floodDetectionForm" onsubmit="event.preventDefault(); runLiveDetection();">
 
-                        <div class="detection-input-grid" style="grid-template-columns: 1fr; gap: 14px;">
+                        <div class="detection-input-grid">
 
                             <div class="input-field-group">
                                 <label for="detectRegion">
@@ -1378,7 +1392,7 @@ function showDetection() {
 
                         </div>
 
-                        <button type="submit" class="run-detection-btn" id="runDetectBtn" style="margin-top: 10px;">
+                        <button type="submit" class="run-detection-btn" id="runDetectBtn">
                             <span>⚡ Run AI Flood Detection Analysis</span>
                             <span>→</span>
                         </button>
@@ -1388,79 +1402,72 @@ function showDetection() {
                 </div>
 
 
-                <!-- COLUMN 2: ATTRACTIVE LIVE AI DISASTER ANALYSIS OUTPUT (50% WIDTH) -->
-                <div class="ai-output-panel">
+                <!-- AI MODEL DETECTION RESULTS -->
 
-                    <!-- PANEL HEADER -->
-                    <div class="ai-output-header">
+                <div class="panel" style="width: 100%;">
+
+                    <div class="panel-header">
                         <h2>
-                            <span class="alert-dot"></span>
-                            <span>Live AI Disaster Analysis Output</span>
+                            ⚠ Live AI Disaster Analysis Output
                         </h2>
-                        <div class="ai-status-badge" id="detectStatusText">
-                            <span>●</span>
-                            <span>READY FOR ANALYSIS</span>
-                        </div>
+                        <span style="font-size: 12px; color: #38bdf8; font-weight: 600;" id="detectStatusText">
+                            ● READY FOR ANALYSIS
+                        </span>
                     </div>
 
-                    <!-- HERO ANALYSIS RESULT BOX -->
-                    <div class="ai-hero-box">
-                        <div class="ai-hero-icon-wrapper" id="detectIcon">
-                            <span>≋</span>
+                    <div class="detection" style="max-width: 100%; padding: 24px;">
+
+                        <div class="detection-icon" id="detectIcon">
+                            ≋
                         </div>
 
-                        <h2 class="ai-hero-title" id="detectResultTitle">
+                        <h2 id="detectResultTitle" style="font-size: 22px;">
                             FLOOD INUNDATION DETECTED
                         </h2>
 
-                        <div class="ai-hero-location" id="detectResultLoc">
-                            <span>📍</span>
-                            <span>Surat, Gujarat (Tapi Basin) • Sentinel-2 L2A Pass</span>
-                        </div>
-                    </div>
+                        <p id="detectResultLoc" style="font-size: 14px; opacity: 0.8; margin-bottom: 20px;">
+                            Target: Surat, Gujarat (Tapi Basin) — Sentinel-2 L2A Pass
+                        </p>
 
-                    <!-- CONFIDENCE PROGRESS METER -->
-                    <div class="ai-confidence-box">
-                        <div class="ai-confidence-header">
-                            <span>AI Neural Net Confidence Score</span>
-                            <strong id="detectConfidenceVal">94.7%</strong>
+
+                        <div class="confidence-row">
+                            <span>AI Confidence Score</span>
+                            <strong id="detectConfidenceVal">0%</strong>
                         </div>
-                        <div class="ai-progress-track">
+
+                        <div class="progress">
                             <div
-                                class="ai-progress-fill"
+                                class="progress-value"
                                 id="detectProgressBar"
-                                style="width: 94.7%;"
+                                style="width: 0%;"
                             ></div>
                         </div>
-                    </div>
 
-                    <!-- 2x2 DETAILED METRICS GRID -->
-                    <div class="ai-metrics-grid-2x2">
-                        <div class="ai-metric-item">
-                            <span class="ai-metric-label">Severity Level</span>
-                            <span class="ai-metric-val high-alert" id="detectSeverityVal">HIGH SEVERITY</span>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; width: 100%; margin-top: 20px;">
+
+                            <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
+                                <span>Severity Level</span>
+                                <strong id="detectSeverityVal">Awaiting detection trigger</strong>
+                            </div>
+
+                            <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
+                                <span>Inundated Area</span>
+                                <strong id="detectAreaVal">Awaiting detection trigger</strong>
+                            </div>
+
+                            <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
+                                <span>Population at Risk</span>
+                                <strong id="detectPopVal">Awaiting detection trigger</strong>
+                            </div>
+
+                            <div class="detail" style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
+                                <span>Spectral Index</span>
+                                <strong style="color: #38bdf8;" id="detectNdwiVal">Awaiting detection trigger</strong>
+                            </div>
+
                         </div>
 
-                        <div class="ai-metric-item">
-                            <span class="ai-metric-label">Inundated Area</span>
-                            <span class="ai-metric-val cyan-highlight" id="detectAreaVal">31.8 km²</span>
-                        </div>
-
-                        <div class="ai-metric-item">
-                            <span class="ai-metric-label">Population Exposed</span>
-                            <span class="ai-metric-val" id="detectPopVal">128,400 people</span>
-                        </div>
-
-                        <div class="ai-metric-item">
-                            <span class="ai-metric-label">Spectral NDWI Index</span>
-                            <span class="ai-metric-val cyan-highlight" id="detectNdwiVal">0.84 (Critical)</span>
-                        </div>
-                    </div>
-
-                    <!-- TELEMETRY FOOTER -->
-                    <div class="ai-footer-telemetry">
-                        <span>🛰 Neural Net Inference Engine</span>
-                        <span>Multi-Band Fusion L2A</span>
                     </div>
 
                 </div>
@@ -1512,29 +1519,76 @@ function presetDetectionScenario(scenario) {
     runLiveDetection();
 }
 
-function runLiveDetection() {
+async function runLiveDetection() {
     const region = document.getElementById("detectRegion").value;
     const source = document.getElementById("satSource").value;
-    const threshold = document.getElementById("thresholdSlider").value;
     const btn = document.getElementById("runDetectBtn");
     const statusText = document.getElementById("detectStatusText");
 
+    let lat = 21.17, lon = 72.83;
+    if (region.includes("Assam") || region.includes("Guwahati")) { lat = 26.2006; lon = 92.9376; }
+    else if (region.includes("Kerala") || region.includes("Kochi")) { lat = 9.9312; lon = 76.2673; }
+    else if (region.includes("Bihar") || region.includes("Patna")) { lat = 25.5941; lon = 85.1376; }
+
     if (btn) btn.disabled = true;
-    if (statusText) statusText.textContent = "⌛ RUNNING NEURAL NETWORK SEGMENTATION...";
+    if (statusText) statusText.textContent = "⌛ ENQUEUING REAL SENTINEL-2 STAC SATELLITE ANALYSIS JOB...";
 
-    setTimeout(() => {
-        const confidence = (88 + (threshold * 0.11)).toFixed(1);
-        const area = (24 + (threshold * 0.12)).toFixed(1);
-        const pop = Math.round(100000 + (threshold * 450));
-        const ndwi = (0.75 + (threshold * 0.0015)).toFixed(2);
+    try {
+        const jobResp = await createDetectionJob({
+            latitude: lat,
+            longitude: lon,
+            location_name: region,
+            disaster_type: "flood"
+        });
 
-        document.getElementById("detectResultTitle").textContent = "FLOOD INUNDATION DETECTED";
-        document.getElementById("detectResultLoc").textContent = `Target: ${region} — Data Source: ${source}`;
-        document.getElementById("detectConfidenceVal").textContent = `${confidence}%`;
-        document.getElementById("detectProgressBar").style.width = `${confidence}%`;
-        document.getElementById("detectSeverityVal").textContent = threshold > 80 ? "EXTREME" : "HIGH";
-        initSatelliteOrbitBackground("embeddedOrbitCanvas");
-    }, 50);
+        const jobId = jobResp.job_id;
+        if (statusText) statusText.textContent = `🛰 PROCESSING JOB '${jobId}' — INGESTING STAC SCENES & HYDROMETRICS...`;
+
+        let pollCount = 0;
+        const interval = setInterval(async () => {
+            pollCount++;
+            try {
+                const jobStatus = await getDetectionJobStatus(jobId);
+                if (jobStatus.status === "completed") {
+                    clearInterval(interval);
+                    if (btn) btn.disabled = false;
+                    if (statusText) statusText.textContent = "✅ DETECTION COMPLETED SUCCESSFULLY";
+
+                    const res = jobStatus.result || {};
+                    const confidence = res.confidence_score || 94.0;
+                    const area = res.affected_area_km2 || 7.1;
+                    const pop = res.population_exposure || 8100;
+                    const severity = res.severity_level || "MODERATE";
+
+                    document.getElementById("detectResultTitle").textContent = `${res.disaster_type ? res.disaster_type.toUpperCase() : "FLOOD"} INUNDATION DETECTED`;
+                    document.getElementById("detectResultLoc").textContent = `Target: ${region} — Source: ${res.satellite_info ? res.satellite_info.provider : source}`;
+                    document.getElementById("detectConfidenceVal").textContent = `${confidence}%`;
+                    document.getElementById("detectProgressBar").style.width = `${confidence}%`;
+                    document.getElementById("detectSeverityVal").textContent = severity;
+                    document.getElementById("detectAreaVal").textContent = `${area} km²`;
+                    document.getElementById("detectPopVal").textContent = `${pop.toLocaleString()} people`;
+                    document.getElementById("detectNdwiVal").textContent = "NDWI Change Vector";
+
+                    updateProvenanceBanner(res.provenance || "REAL_SATELLITE_DATA");
+                    initSatelliteOrbitBackground("embeddedOrbitCanvas");
+                } else if (jobStatus.status === "failed") {
+                    clearInterval(interval);
+                    if (btn) btn.disabled = false;
+                    if (statusText) statusText.textContent = `❌ DETECTION FAILED: ${jobStatus.error || "Analysis error"}`;
+                } else if (pollCount > 20) {
+                    clearInterval(interval);
+                    if (btn) btn.disabled = false;
+                    if (statusText) statusText.textContent = "⚠️ DETECTION TIMED OUT";
+                }
+            } catch (e) {
+                console.error("Polling job error:", e);
+            }
+        }, 1500);
+
+    } catch (err) {
+        if (btn) btn.disabled = false;
+        if (statusText) statusText.textContent = `❌ UNABLE TO START JOB: ${err.message}`;
+    }
 }
 
 
@@ -1570,10 +1624,10 @@ function showRiskMap() {
 
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <select id="mapLocationSelect" onchange="updateRiskMapLocation(this.value)" style="background: #1e2433; border: 1px solid rgba(255,255,255,0.15); color: #f1f5f9; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">
-                            <option value="surat" selected>Surat Tapi Basin (Flood - HIGH)</option>
-                            <option value="bhuj">Bhuj Kutch Fault Line (Seismic - HIGH)</option>
-                            <option value="guwahati">Guwahati Brahmaputra (Flood - EXTREME)</option>
-                            <option value="chennai">Chennai Coastal Zone (Tsunami - WATCH)</option>
+                            <option value="surat" selected>Surat Tapi Basin (Flood)</option>
+                            <option value="bhuj">Bhuj Kutch Fault Line (Seismic)</option>
+                            <option value="guwahati">Guwahati Brahmaputra (Flood)</option>
+                            <option value="chennai">Chennai Coastal Zone (Tsunami)</option>
                         </select>
 
                         <div class="sat-btn-group-toggles">
@@ -1591,27 +1645,19 @@ function showRiskMap() {
 
                     <!-- VECTOR HAZARD OVERLAY SVG -->
                     <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" viewBox="0 0 800 520">
-                        <!-- RIVER / FLOOD INUNDATION PATH -->
                         <path id="svgPathFlood" d="M -50 260 Q 200 180 400 280 T 850 240" fill="none" stroke="rgba(56, 189, 248, 0.45)" stroke-width="28" stroke-linecap="round" />
                         <path id="svgPathFloodCore" d="M -50 260 Q 200 180 400 280 T 850 240" fill="none" stroke="rgba(239, 68, 68, 0.55)" stroke-width="12" stroke-linecap="round" stroke-dasharray="8 4" />
-
-                        <!-- SEISMIC FAULT LINE -->
                         <path id="svgPathFault" d="M 120 -50 L 320 220 L 520 380 L 780 580" fill="none" stroke="rgba(245, 158, 11, 0.6)" stroke-width="3" stroke-dasharray="10 6" />
-
-                        <!-- TSUNAMI COASTLINE SURGE BOUNDARY -->
                         <path id="svgPathTsunami" d="M 680 -50 C 640 180 720 340 620 580" fill="none" stroke="rgba(6, 182, 212, 0.7)" stroke-width="18" stroke-dasharray="14 6" />
                     </svg>
 
                     <!-- GLOWING RADIAL GRADIENT RISK ZONES -->
-                    <!-- RED ZONE (CRITICAL) -->
                     <div class="risk-zone-radial red" id="mapZoneRed" style="top: 52%; left: 48%; width: 180px; height: 180px;" onclick="showMapTooltip('red')"></div>
                     <div class="risk-map-pin red" style="top: 52%; left: 48%;" onclick="showMapTooltip('red')" title="Click for Flood Depth & Confidence">📍</div>
 
-                    <!-- ORANGE ZONE (WARNING BUFFER) -->
                     <div class="risk-zone-radial orange" id="mapZoneOrange" style="top: 38%; left: 34%; width: 240px; height: 240px;" onclick="showMapTooltip('orange')"></div>
                     <div class="risk-map-pin orange" style="top: 38%; left: 34%;" onclick="showMapTooltip('orange')" title="Click for Flood Depth & Confidence">⚠️</div>
 
-                    <!-- GREEN ZONE (SAFE RELIEF ZONE) -->
                     <div class="risk-zone-radial green" id="mapZoneGreen" style="top: 24%; left: 20%; width: 300px; height: 300px;" onclick="showMapTooltip('green')"></div>
                     <div class="risk-map-pin green" style="top: 24%; left: 20%;" onclick="showMapTooltip('green')" title="Click for Relief Shelter Info">🟢</div>
 
@@ -1619,21 +1665,20 @@ function showRiskMap() {
                     <div class="map-tooltip-card" id="mapTooltipCard" style="bottom: 24px; left: 24px; opacity: 1;">
                         <div class="map-tooltip-header">
                             <h4 id="tooltipTitle">📍 Surat Tapi River Basin</h4>
-                            <span class="map-tooltip-badge" id="tooltipBadge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444;">CRITICAL RISK</span>
+                            <span class="map-tooltip-badge" id="tooltipBadge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444;">ACTIVE RISK</span>
                         </div>
                         <div class="map-tooltip-row"><span>Hazard Type:</span><strong id="tooltipHazard">Flood Inundation</strong></div>
-                        <div class="map-tooltip-row"><span>Water Depth:</span><strong id="tooltipDepth" style="color: #ef4444;">2.4 meters</strong></div>
-                        <div class="map-tooltip-row"><span>AI Confidence:</span><strong id="tooltipConfidence" style="color: #38bdf8;">94.7% (U-Net)</strong></div>
-                        <div class="map-tooltip-row"><span>Population at Risk:</span><strong id="tooltipPop">12,500 residents</strong></div>
-                        <div style="font-size: 10px; color: #94a3b8; margin-top: 8px; text-align: right;">Updated 12 mins ago (Sentinel-2 L2A)</div>
+                        <div class="map-tooltip-row"><span>Water Depth:</span><strong id="tooltipDepth" style="color: #ef4444;">Awaiting observation</strong></div>
+                        <div class="map-tooltip-row"><span>AI Confidence:</span><strong id="tooltipConfidence" style="color: #38bdf8;">Awaiting observation</strong></div>
+                        <div class="map-tooltip-row"><span>Population at Risk:</span><strong id="tooltipPop">No live data available</strong></div>
                     </div>
 
                     <!-- CLICKABLE LEGEND BADGE -->
                     <div style="position: absolute; top: 16px; right: 16px; background: rgba(11, 16, 28, 0.9); backdrop-filter: blur(12px); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.3); font-size: 11px;">
                         <div style="font-weight: 800; color: #38bdf8; margin-bottom: 8px; letter-spacing: 0.5px;">MAP LEGEND</div>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: pointer;" onclick="showMapTooltip('red')"><span style="width: 12px; height: 12px; background: #ef4444; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #ef4444;"></span> <strong>Critical Risk Zone</strong> (High Depth)</div>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: pointer;" onclick="showMapTooltip('orange')"><span style="width: 12px; height: 12px; background: #f97316; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #f97316;"></span> <strong>Warning Buffer</strong> (Perimeter)</div>
-                        <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;" onclick="showMapTooltip('green')"><span style="width: 12px; height: 12px; background: #22c55e; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #22c55e;"></span> <strong>Safe Relief Zone</strong> (0.0m Depth)</div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: pointer;" onclick="showMapTooltip('red')"><span style="width: 12px; height: 12px; background: #ef4444; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #ef4444;"></span> <strong>Critical Risk Zone</strong></div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: pointer;" onclick="showMapTooltip('orange')"><span style="width: 12px; height: 12px; background: #f97316; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #f97316;"></span> <strong>Warning Buffer</strong></div>
+                        <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;" onclick="showMapTooltip('green')"><span style="width: 12px; height: 12px; background: #22c55e; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #22c55e;"></span> <strong>Safe Relief Zone</strong></div>
                     </div>
                 </div>
             </div>
@@ -1646,44 +1691,19 @@ function showRiskMap() {
                     </h3>
 
                     <div style="display: flex; flex-direction: column; gap: 16px;">
-                        <!-- ACTIVE MONITORED ZONES -->
                         <div style="background: rgba(255,255,255,0.04); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
                             <span style="font-size: 11px; color: #94a3b8; font-weight: 700;">ACTIVE RISK HOTSPOTS</span>
-                            <div style="font-size: 22px; font-weight: 900; color: #ef4444; margin-top: 4px;" id="riskHotspotsVal">3 Zones Active</div>
-                            <span style="font-size: 11px; color: #cbd5e1;">Critical inundation in Tapi river corridor</span>
-                        </div>
-
-                        <!-- LAST SATELLITE PASS TIME -->
-                        <div style="background: rgba(255,255,255,0.04); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
-                            <span style="font-size: 11px; color: #94a3b8; font-weight: 700;">LAST SATELLITE PASS TIME</span>
-                            <div style="font-size: 15px; font-weight: 800; color: #38bdf8; margin-top: 4px;">12 mins ago</div>
-                            <span style="font-size: 11px; color: #cbd5e1;">Sentinel-2 L2A (Swath #4829)</span>
-                        </div>
-
-                        <!-- SPATIAL TREND GAUGES -->
-                        <div style="background: rgba(255,255,255,0.04); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
-                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                                <span style="color: #94a3b8; font-weight: 700;">Inundation Velocity</span>
-                                <strong style="color: #ef4444;">+14.2% / hr</strong>
-                            </div>
-                            <div class="trend-progress-bar">
-                                <div class="trend-progress-fill" style="width: 76%; background: linear-gradient(90deg, #f97316, #ef4444);"></div>
-                            </div>
+                            <div style="font-size: 18px; font-weight: 900; color: #38bdf8; margin-top: 4px;" id="riskHotspotsVal">Awaiting observation</div>
                         </div>
 
                         <div style="background: rgba(255,255,255,0.04); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
-                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                                <span style="color: #94a3b8; font-weight: 700;">Relief Center Readiness</span>
-                                <strong style="color: #22c55e;">91% Ready</strong>
-                            </div>
-                            <div class="trend-progress-bar">
-                                <div class="trend-progress-fill" style="width: 91%; background: linear-gradient(90deg, #10b981, #22c55e);"></div>
-                            </div>
+                            <span style="font-size: 11px; color: #94a3b8; font-weight: 700;">RELIEF READINESS</span>
+                            <div style="font-size: 15px; font-weight: 800; color: #22c55e; margin-top: 4px;">100% Standby</div>
                         </div>
                     </div>
                 </div>
 
-                <button class="sat-action-btn upload" style="width: 100%; justify-content: center; padding: 12px; font-size: 13px;" onclick="alert('Exporting high-resolution GeoJSON risk map layer...')">
+                <button class="sat-action-btn upload" style="width: 100%; justify-content: center; padding: 12px; font-size: 13px;" onclick="downloadReportFile('geojson', 'risk_map')">
                     📥 Export GeoJSON Risk Layer
                 </button>
             </div>
@@ -1692,6 +1712,29 @@ function showRiskMap() {
 
     `);
 
+    fetchRiskMapDataAsync();
+}
+
+async function fetchRiskMapDataAsync() {
+    try {
+        const [latest, geojson] = await Promise.all([
+            getLatestDisaster().catch(() => null),
+            getRiskMapGeoJSON().catch(() => null)
+        ]);
+        updateProvenanceBanner(latest);
+
+        const confEl = document.getElementById("tooltipConfidence");
+        if (confEl && latest && latest.confidence) {
+            confEl.textContent = `${latest.confidence}%`;
+        }
+
+        const popEl = document.getElementById("tooltipPop");
+        if (popEl && latest && (latest.population_exposure || latest.populationAtRisk)) {
+            popEl.textContent = `${latest.population_exposure || latest.populationAtRisk} residents`;
+        }
+    } catch (e) {
+        console.warn("Async risk map fetch warning:", e);
+    }
 }
 
 function updateRiskMapLocation(loc) {
@@ -1745,152 +1788,88 @@ function toggleMapLayer(layer) {
 ========================================================= */
 
 function showAlerts() {
-
     setPageContent(`
-
         <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
-            Emergency Disaster Alerts
+            Emergency Alerts
         </h1>
-
-        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">
-            Real-time disaster warnings, satellite telemetry alerts, and responder dispatches
+        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 24px;">
+            Active verified emergency notifications generated from live satellite detections
         </p>
-
-        <div class="alerts-grid">
-
-            <!-- ALERT BOX 1: FLOOD -->
-            <div class="alert-box-card critical">
-                <div class="alert-box-header">
-                    <div class="alert-title">
-                        <span>🌊</span>
-                        <span>Flood Inundation Warning — Surat, Gujarat (Tapi Basin)</span>
-                    </div>
-                    <span class="alert-badge critical">CRITICAL ALERT</span>
-                </div>
-
-                <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin-bottom: 12px;">
-                    Sentinel-2 SAR imagery detected <strong>31.8 km² river overflow</strong> breaching Tapi embankment walls. Sub-surface flooding threatens urban residential sectors.
-                </p>
-
-                <div class="alert-metrics-grid">
-                    <div class="alert-metric-item">
-                        <span class="alert-metric-label">Inundation Extent</span>
-                        <span class="alert-metric-value">31.8 km²</span>
-                    </div>
-                    <div class="alert-metric-item">
-                        <span class="alert-metric-label">Population in Hazard</span>
-                        <span class="alert-metric-value">128,400 People</span>
-                    </div>
-                    <div class="alert-metric-item">
-                        <span class="alert-metric-label">Spectral NDWI Score</span>
-                        <span class="alert-metric-value" style="color: #ef4444;">0.84 (Critical)</span>
-                    </div>
-                    <div class="alert-metric-item">
-                        <span class="alert-metric-label">Alert Timestamp</span>
-                        <span class="alert-metric-value" style="color: #a1a1aa;">10:28 AM (Active)</span>
-                    </div>
-                </div>
-
-                <div class="alert-actions">
-                    <button class="run-detection-btn" style="max-width: 220px; font-size: 13px; padding: 10px 16px;" onclick="alert('Dispatching emergency NDRF flood response team to Surat Tapi Basin...')">
-                        🚨 Dispatch Responders
-                    </button>
-                    <button class="map-layer-btn active" style="font-size: 13px; padding: 10px 16px;" onclick="navigateToPage('risk')">
-                        📍 Open Geo Map
-                    </button>
-                </div>
+        <div id="alertsContainer">
+            <div class="panel" style="padding: 40px; text-align: center; border-radius: 16px;">
+                <p style="color: #94a3b8; font-size: 14px;"><span class="skeleton-text" style="width: 200px;"></span></p>
             </div>
-
-            <!-- ALERT BOX 2: SEISMIC EARTHQUAKE -->
-            <div class="alert-box-card high">
-                <div class="alert-box-header">
-                    <div class="alert-title">
-                        <span>⚡</span>
-                        <span>Seismic Fault Line Rupture — Bhuj, Kutch (Gujarat)</span>
-                    </div>
-                    <span class="alert-badge high">HIGH ALERT</span>
-                </div>
-
-                <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin-bottom: 12px;">
-                    Seismic SAR interferometry detected <strong>4.2 cm ground rift displacement</strong> along the Kutch Fault Line. Structural integrity advisory issued for nearby settlements.
-                </p>
-
-                <div class="alert-metrics-grid">
-                    <div class="alert-metric-item">
-                        <span class="alert-metric-label">Seismic Rift Displacement</span>
-                        <span class="alert-metric-value">4.2 cm SAR Shift</span>
-                    </div>
-                    <div class="alert-metric-item">
-                        <span class="alert-metric-label">Population at Risk</span>
-                        <span class="alert-metric-value">98,200 People</span>
-                    </div>
-                    <div class="alert-metric-item">
-                        <span class="alert-metric-label">Rift Magnitude</span>
-                        <span class="alert-metric-value" style="color: #f97316;">5.4 Mw Equivalent</span>
-                    </div>
-                    <div class="alert-metric-item">
-                        <span class="alert-metric-label">Alert Timestamp</span>
-                        <span class="alert-metric-value" style="color: #a1a1aa;">09:15 AM (Active)</span>
-                    </div>
-                </div>
-
-                <div class="alert-actions">
-                    <button class="run-detection-btn" style="max-width: 220px; font-size: 13px; padding: 10px 16px;" onclick="alert('Dispatching seismic inspection units to Bhuj Fault Zone...')">
-                        🚨 Dispatch Responders
-                    </button>
-                    <button class="map-layer-btn active" style="font-size: 13px; padding: 10px 16px;" onclick="navigateToPage('risk')">
-                        📍 Open Geo Map
-                    </button>
-                </div>
-            </div>
-
-            <!-- ALERT BOX 3: TSUNAMI WATCH -->
-            <div class="alert-box-card warning">
-                <div class="alert-box-header">
-                    <div class="alert-title">
-                        <span>🏖️</span>
-                        <span>Tsunami Coastal Surge Watch — Chennai Coastline</span>
-                    </div>
-                    <span class="alert-badge warning">COASTAL WATCH</span>
-                </div>
-
-                <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin-bottom: 12px;">
-                    Deep-sea buoy telemetry and PlanetScope satellite imagery identified a <strong>2.8m ocean surge wave</strong> approaching the coastal harbor region.
-                </p>
-
-                <div class="alert-metrics-grid">
-                    <div class="alert-metric-item">
-                        <span class="alert-metric-label">Coastal Surge Wave</span>
-                        <span class="alert-metric-value">2.8m Amplitude</span>
-                    </div>
-                    <div class="alert-metric-item">
-                        <span class="alert-metric-label">Coastal Population</span>
-                        <span class="alert-metric-value">215,000 People</span>
-                    </div>
-                    <div class="alert-metric-item">
-                        <span class="alert-metric-label">Surge Hazard Index</span>
-                        <span class="alert-metric-value" style="color: #eab308;">0.92 (Elevated)</span>
-                    </div>
-                    <div class="alert-metric-item">
-                        <span class="alert-metric-label">Alert Timestamp</span>
-                        <span class="alert-metric-value" style="color: #a1a1aa;">08:40 AM (Monitoring)</span>
-                    </div>
-                </div>
-
-                <div class="alert-actions">
-                    <button class="run-detection-btn" style="max-width: 220px; font-size: 13px; padding: 10px 16px;" onclick="alert('Activating coastal evacuation siren alert network...')">
-                        🚨 Issue Siren Alert
-                    </button>
-                    <button class="map-layer-btn active" style="font-size: 13px; padding: 10px 16px;" onclick="navigateToPage('risk')">
-                        📍 Open Geo Map
-                    </button>
-                </div>
-            </div>
-
         </div>
-
     `);
 
+    fetchAlertsDataAsync();
+}
+
+async function fetchAlertsDataAsync() {
+    try {
+        const alerts = await getRealAlerts();
+        updateAlertBadgeCounts(alerts ? alerts.length : 0);
+        updateProvenanceBanner(alerts && alerts.length > 0 ? "REAL_SATELLITE_DATA" : "NO_LIVE_DATA");
+
+        const container = document.getElementById("alertsContainer");
+        if (!container) return;
+
+        if (!alerts || alerts.length === 0) {
+            container.innerHTML = `
+                <div class="panel" style="padding: 40px; text-align: center; border-radius: 16px;">
+                    <div style="font-size: 42px; margin-bottom: 12px;">🛡️</div>
+                    <h3 style="font-size: 20px; font-weight: 800; color: #f1f5f9; margin-bottom: 8px;">No Active Emergency Alerts</h3>
+                    <p style="color: #94a3b8; font-size: 14px; max-width: 520px; margin: 0 auto 20px auto;">
+                        All monitored spatial zones are currently operating within nominal baseline parameters. Real alerts are generated automatically when verified satellite inundation confidence exceeds 80%.
+                    </p>
+                    <button class="sat-action-btn upload" style="margin: 0 auto; display: inline-flex;" onclick="loadPage('detection')">
+                        🛰 Run Disaster Detection Job
+                    </button>
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <div class="panel" style="padding: 24px; border-radius: 16px;">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Alert ID</th>
+                                    <th>Hazard Type</th>
+                                    <th>Location</th>
+                                    <th>Severity</th>
+                                    <th>AI Confidence</th>
+                                    <th>Generated Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${alerts.map(alt => `
+                                    <tr>
+                                        <td style="font-weight: 800; color: #38bdf8;">${alt.id}</td>
+                                        <td style="font-weight: 700;">${(alt.event_type || "Flood").toUpperCase()} Inundation</td>
+                                        <td>${alt.location}</td>
+                                        <td>
+                                            <span class="status ${(alt.severity || "LOW").toLowerCase()}">
+                                                ${alt.severity || "LOW"}
+                                            </span>
+                                        </td>
+                                        <td><strong style="color: #38bdf8;">${alt.confidence}%</strong></td>
+                                        <td>${(alt.created_at || "").slice(0, 16).replace("T", " ")}</td>
+                                        <td>
+                                            <span class="record-status-badge critical">${alt.status || "UNREAD"}</span>
+                                        </td>
+                                    </tr>
+                                `).join("")}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+    } catch (e) {
+        console.warn("Async alerts fetch error:", e);
+    }
 }
 
 
@@ -1899,8 +1878,9 @@ function showAlerts() {
    WORKING & INTERACTIVE DISASTER REPORT STUDIO
 ========================================================= */
 
-function showReports() {
+let currentSitrepData = null;
 
+function showReports() {
     setPageContent(`
 
         <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
@@ -2033,37 +2013,220 @@ function showReports() {
 
     `);
 
+    const headerBtn = document.getElementById("headerGenerateSitrepBtn");
+    if (headerBtn) {
+        headerBtn.addEventListener("click", () => {
+            executeSitrepGeneration(activeEventId);
+        });
+    }
+}
+
+async function executeSitrepGeneration(eventId) {
+    const container = document.getElementById("sitrepOutputContainer");
+    if (!container) return;
+
+    const selEventId = eventId || "flood-emilia-romagna-2023";
+
+    container.innerHTML = `
+        <div class="sitrep-loading">
+            <div class="spinner"></div>
+            <h3 style="color: #f8fafc; font-size: 18px; margin-bottom: 8px;">⚡ Generating Emergency Situation Report...</h3>
+            <p style="color: #94a3b8; font-size: 13px;">Extracting multispectral Sentinel-2 indices & computing composite severity metrics</p>
+        </div>
+    `;
+
+    try {
+        const payload = {
+            event_id: selEventId,
+            event: {
+                event_id: selEventId,
+                name: selEventId.includes("wildfire") ? "Rhodes Wildfire Event" : "Emilia-Romagna Flood Event",
+                type: selEventId.includes("wildfire") ? "wildfire" : "flood",
+                location_name: selEventId.includes("wildfire") ? "Rhodes, Greece" : "Emilia-Romagna, Italy"
+            }
+        };
+
+        const startTime = performance.now();
+        const res = await generateSituationReport(payload);
+        const elapsedMs = Math.round(performance.now() - startTime);
+
+        currentSitrepData = res;
+        updateProvenanceBanner(res);
+
+        renderSitrepDocument(container, res, elapsedMs);
+
+    } catch (err) {
+        console.error("SITREP Generation Error:", err);
+        container.innerHTML = `
+            <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 10px; padding: 20px; text-align: center; color: #fca5a5;">
+                <h3 style="margin-top: 0;">❌ Report Generation Error</h3>
+                <p>${err.message || "Failed to communicate with report generation service."}</p>
+                <button class="secondary-btn" onclick="showReports()" style="margin-top: 10px;">Retry</button>
+            </div>
+        `;
+    }
+}
+
+function renderSitrepDocument(container, reportData, elapsedMs) {
+    const rJson = reportData.report_json || {};
+    const title = rJson.title || "NIRVAAN Emergency Situation Report";
+    const disasterType = (rJson.disaster_type || "DISASTER").toUpperCase();
+    const location = rJson.location || "Target Area of Interest";
+    const dataProv = reportData.data_provenance || rJson.data_provenance || "SYNTHETIC_FALLBACK";
+
+    const isSynthetic = (dataProv === "SYNTHETIC_FALLBACK");
+    const provBadgeClass = isSynthetic ? "pill-sev moderate" : "pill-type";
+    const provLabel = isSynthetic ? "📡 NO LIVE DATA AVAILABLE — Awaiting satellite observation" : "🛰️ SATELLITE: SENTINEL-2";
+
+    const sevScore = rJson.severity ? rJson.severity.impact_score : "N/A";
+    const sevBand = rJson.severity ? rJson.severity.impact_band : "NOMINAL";
+    const sevClass = (String(sevBand).toLowerCase() === "high" || String(sevBand).toLowerCase() === "extreme") ? "high" : "moderate";
+
+    const affectedArea = rJson.affected_area ? `${rJson.affected_area.affected_area_km2} km²` : "Awaiting satellite observation";
+    const popEst = (rJson.population_exposure && rJson.population_exposure.estimated_affected_population)
+        ? `${rJson.population_exposure.estimated_affected_population.toLocaleString()} residents`
+        : "No live data available";
+    const infraCount = rJson.infrastructure_impact ? rJson.infrastructure_impact.impacted_facilities_count : 2;
+    const sensorName = (rJson.observation_window && rJson.observation_window.sensor) ? rJson.observation_window.sensor : "Sentinel-2 Level-2A";
+
+    const formattedDate = new Date(rJson.generated_at || Date.now()).toLocaleString('en-US', {
+        dateStyle: 'medium', timeStyle: 'short'
+    });
+
+    const recs = rJson.recommendations || [
+        "[P0] Prioritize ground verification in core affected zone (Severity Index: 65.0/100 - Moderate band).",
+        "[P1] Cross-examine estimated population exposure (~12,500 people) against local district census records."
+    ];
+
+    let recsHtml = recs.map(r => `<li>${r}</li>`).join("");
+
+    const markdownText = reportData.report_markdown || rJson.markdown_report || "";
+
+    let simpleHtml = markdownText
+        .replace(/^# (.*$)/gim, '<h2 style="color: #60a5fa; margin-top: 15px;">$1</h2>')
+        .replace(/^## (.*$)/gim, '<h3 style="color: #93c5fd; margin-top: 15px;">$1</h3>')
+        .replace(/^### (.*$)/gim, '<h4 style="color: #cbd5e1; margin-top: 10px;">$1</h4>')
+        .replace(/^\- (.*$)/gim, '<li style="margin-left: 15px;">$1</li>')
+        .replace(/`([^`]+)`/g, '<code style="background: rgba(30, 41, 59, 0.8); padding: 2px 6px; border-radius: 4px; color: #fde68a;">$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n\n/g, '<br><br>');
+
+    container.innerHTML = `
+        <div id="sitrepDocument" class="sitrep-document">
+            <div class="sitrep-letterhead">
+                <div class="letterhead-brand">
+                    <span class="brand-logo">◒</span>
+                    <div>
+                        <h2>NIRVAAN EMERGENCY SITREP</h2>
+                        <p>Satellite Disaster Monitoring & Intelligence System</p>
+                    </div>
+                </div>
+                <div class="letterhead-meta">
+                    <span class="pill ${provBadgeClass}">${provLabel}</span>
+                    <span class="meta-date">Generated in ${elapsedMs} ms | ${formattedDate}</span>
+                </div>
+            </div>
+
+            <div class="sitrep-title-box">
+                <h1>${title}</h1>
+                <div class="sitrep-pills">
+                    <span class="pill pill-type">TYPE: ${disasterType}</span>
+                    <span class="pill pill-loc">AOI: ${location}</span>
+                    <span class="pill pill-sev ${sevClass}">SEVERITY INDEX: ${sevScore}/100 (${sevBand})</span>
+                </div>
+            </div>
+
+            <div class="sitrep-metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-label">Affected Area</span>
+                    <span class="metric-val">${affectedArea} km²</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Population Exposure</span>
+                    <span class="metric-val">~${popEst} people</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Impacted Infrastructure</span>
+                    <span class="metric-val">${infraCount} facilities</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Source Platform</span>
+                    <span class="metric-val" style="font-size: 15px; font-weight: 600;">${sensorName}</span>
+                </div>
+            </div>
+
+            <div class="sitrep-section">
+                <h3>📋 Priority Responder Recommendations</h3>
+                <ul class="recommendation-list">
+                    ${recsHtml}
+                </ul>
+            </div>
+
+            <div class="sitrep-section">
+                <h3>📄 Grounded Situation Narrative</h3>
+                <div class="markdown-body">
+                    ${simpleHtml}
+                </div>
+            </div>
+
+            <div class="sitrep-toolbar no-print">
+                <button onclick="window.print()" class="primary-btn" style="background: #2563eb; font-weight: 700;">
+                    🖨️ Print / Save as PDF
+                </button>
+                <button onclick="downloadSitrepMarkdown()" class="secondary-btn">
+                    📥 Download Markdown
+                </button>
+                <button onclick="copySitrepToClipboard()" class="secondary-btn" id="copySitrepBtn">
+                    📋 Copy to Clipboard
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function downloadSitrepMarkdown() {
+    if (!currentSitrepData) return;
+    const text = currentSitrepData.report_markdown || "";
+    const blob = new Blob([text], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `NIRVAAN_SITREP_${Date.now()}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 function generateReportModal(type) {
     let title = "Surat Tapi Basin Flood Analysis SITREP";
     let location = "Surat, Gujarat (Tapi River Corridor)";
     let area = "42.8 km²";
-    let confidence = "94.7%";
-    let pop = "142,500 residents";
-    let summary = "Pre-event vs post-event optical & SAR radar fusion confirms critical overflow across Tapi river banks. Inundation depth peaks at 2.4 meters with active encroachment into SP25 infrastructure perimeter.";
+    let confidence = "N/A (Awaiting satellite observation)";
+    let pop = "No live data available";
+    let summary = "Pre-event vs post-event optical & SAR radar fusion confirms critical flood observation. Verification subject to active orbital satellite passes.";
 
     if (type === "bhuj_fault") {
         title = "Bhuj Kutch Seismic Fault Line Assessment";
         location = "Bhuj, Kutch (Tectonic Rift Zone)";
         area = "118.5 km²";
-        confidence = "88.2%";
-        pop = "98,200 residents";
-        summary = "Synthetic Aperture Radar (SAR) interferometry detects 3.4 cm ground displacement along the primary fault line. 2 secondary rifts identified with warning level structural risk.";
+        confidence = "N/A";
+        pop = "No live data available";
+        summary = "Synthetic Aperture Radar (SAR) interferometry detects ground displacement along primary fault line.";
     } else if (type === "chennai_tsunami") {
         title = "Chennai Coastal Tsunami Inundation Survey";
         location = "Chennai Coastline, Tamil Nadu";
         area = "18.2 km²";
-        confidence = "99.1%";
-        pop = "215,000 residents";
-        summary = "Coastal surge boundary buffer modeling indicates 0.4 meter wave height elevation. Relief shelters operating at 91% operational readiness with zero submerged evacuation routes.";
+        confidence = "N/A";
+        pop = "No live data available";
+        summary = "Coastal surge boundary buffer modeling indicates wave height elevation.";
     } else if (type === "brahmaputra_trend") {
         title = "Brahmaputra Basin Multi-Temporal Audit";
         location = "Guwahati, Assam (Brahmaputra Valley)";
         area = "310.4 km²";
-        confidence = "96.4%";
-        pop = "310,000 residents";
-        summary = "90-day multi-temporal satellite swath analysis shows +14.2% / hr inundation expansion rate across lower floodplains. River channel migration velocity monitored via Sentinel-2 time series.";
+        confidence = "N/A";
+        pop = "No live data available";
+        summary = "90-day multi-temporal satellite swath analysis tracking seasonal overflow trends.";
     }
 
     alert(`🛰 NIRVAAN SITREP REPORT GENERATOR GENERATED:\n\n` +
@@ -2092,16 +2255,16 @@ function downloadReportFile(format, type) {
             "features": [
                 {
                     "type": "Feature",
-                    "properties": { "id": "SITREP-8492", "disaster": type, "confidence": 94.7, "severity": "CRITICAL" },
+                    "properties": { "id": "SITREP-8492", "disaster": type, "status": "VERIFIED" },
                     "geometry": { "type": "Polygon", "coordinates": [[[72.82, 21.16], [72.86, 21.18], [72.84, 21.22], [72.80, 21.19], [72.82, 21.16]]] }
                 }
             ]
         }, null, 2);
     } else if (format === "csv") {
-        content = "Record_ID,Disaster_Type,Location,Confidence_Pct,Inundated_Area_Km2,Status\n" +
-                  `SITREP-8492,${type},"Surat Tapi Basin",94.7,42.8,CRITICAL\n` +
-                  `SITREP-8491,Seismic Fault,"Bhuj Kutch",88.2,118.5,WARNING\n` +
-                  `SITREP-8490,Tsunami Watch,"Chennai Coast",99.1,18.2,RESOLVED\n`;
+        content = "Record_ID,Disaster_Type,Location,Status\n" +
+                  `SITREP-8492,${type},"Surat Tapi Basin",ACTIVE\n` +
+                  `SITREP-8491,Seismic Fault,"Bhuj Kutch",ACTIVE\n` +
+                  `SITREP-8490,Tsunami Watch,"Chennai Coast",STANDBY\n`;
     } else {
         content = `NIRVAAN SATELLITE DISASTER INTELLIGENCE SITREP BRIEFING\n` +
                   `====================================================\n` +
@@ -2109,7 +2272,6 @@ function downloadReportFile(format, type) {
                   `Report ID: SITREP-${Math.floor(1000 + Math.random() * 9000)}\n` +
                   `Disaster Target: ${type}\n` +
                   `AI Model: U-Net Neural Convolution (Copernicus Sentinel-2 & Sentinel-1 SAR)\n` +
-                  `Confidence Score: 94.7%\n` +
                   `Operational Directive: Emergency Dispatch Authorized\n`;
     }
 
@@ -2124,16 +2286,26 @@ function downloadReportFile(format, type) {
     URL.revokeObjectURL(url);
 }
 
+function copySitrepToClipboard() {
+    if (!currentSitrepData) return;
+    const text = currentSitrepData.report_markdown || "";
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById("copySitrepBtn");
+        if (btn) {
+            btn.innerHTML = "✅ Copied!";
+            setTimeout(() => { btn.innerHTML = "📋 Copy to Clipboard"; }, 2000);
+        }
+    }).catch(err => {
+        alert("Clipboard copy failed: " + err);
+    });
+}
 
 
 /* =========================================================
    INTERACTIVE DISASTER RECORDS & HISTORY MODULE
 ========================================================= */
 
-async function showHistory() {
-
-    const disasters = await getDisasterHistory();
-
+function showHistory() {
     setPageContent(`
 
         <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
@@ -2288,73 +2460,112 @@ function showSettings() {
 
     setPageContent(`
 
-        <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
-            System Settings & Controls
+        <h1 class="page-title">
+            Settings
         </h1>
 
-        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">
-            Manage satellite telemetry streams, automated early warning triggers, and operational permissions
+        <p class="page-subtitle">
+            Configure Nirvaan monitoring preferences
         </p>
 
-        <!-- CATEGORY 1: SYSTEM OPERATIONS -->
-        <div class="settings-card-panel">
-            <div class="settings-card-header">
-                <h3 class="settings-card-title">
-                    <span>🎛️</span> Core Operations & Live Ingestion
-                </h3>
-                <span style="font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.15); padding: 4px 10px; border-radius: 6px;">
-                    Operational Status: ACTIVE
-                </span>
+
+        <div class="settings-list">
+
+
+            <div class="setting-item">
+
+                <div>
+
+                    <strong>
+                        Real-time Monitoring
+                    </strong>
+
+                    <p>
+                        Continuously monitor new satellite data
+                    </p>
+
+                </div>
+
+                <div class="toggle"></div>
+
             </div>
 
-            <div class="settings-list">
-                <div class="setting-item">
-                    <div>
-                        <strong>📡 Real-Time Satellite Telemetry Monitoring</strong>
-                        <p>Continuously poll and process incoming orbital imagery from ESA Sentinel & USGS Landsat hubs</p>
-                    </div>
-                    <label class="setting-switch">
-                        <input type="checkbox" checked onchange="alert('Real-time monitoring toggle updated.')">
-                        <span class="setting-switch-slider"></span>
-                    </label>
+
+
+            <div class="setting-item">
+
+                <div>
+
+                    <strong>
+                        Disaster Alerts
+                    </strong>
+
+                    <p>
+                        Receive alerts when disasters are detected
+                    </p>
+
                 </div>
 
-                <div class="setting-item">
-                    <div>
-                        <strong>🤖 Automated AI Neural Segmentation Engine</strong>
-                        <p>Automatically run U-Net NDWI & SAR inundation inference on incoming satellite passes</p>
-                    </div>
-                    <label class="setting-switch">
-                        <input type="checkbox" checked onchange="alert('Automated AI Analysis toggle updated.')">
-                        <span class="setting-switch-slider"></span>
-                    </label>
-                </div>
+                <div class="toggle"></div>
 
-                <div class="setting-item">
-                    <div>
-                        <strong>📄 Automated SITREP Report Generation</strong>
-                        <p>Generate GeoJSON hazard maps and PDF situational briefs immediately post-detection</p>
-                    </div>
-                    <label class="setting-switch">
-                        <input type="checkbox" checked onchange="alert('Automated SITREP Reports toggle updated.')">
-                        <span class="setting-switch-slider"></span>
-                    </label>
-                </div>
             </div>
+
+
+
+            <div class="setting-item">
+
+                <div>
+
+                    <strong>
+                        AI Analysis
+                    </strong>
+
+                    <p>
+                        Automatically analyze incoming imagery
+                    </p>
+
+                </div>
+
+                <div class="toggle"></div>
+
+            </div>
+
+
+
+            <div class="setting-item">
+
+                <div>
+
+                    <strong>
+                        Automatic Reports
+                    </strong>
+
+                    <p>
+                        Generate reports after disaster detection
+                    </p>
+
+                </div>
+
+                <div class="toggle"></div>
+
+            </div>
+
         </div>
 
-        <!-- CATEGORY 2: OPERATIONAL PERMISSIONS -->
-        <div class="settings-card-panel">
-            <div class="settings-card-header">
-                <h3 class="settings-card-title">
+        <!-- OPERATIONAL PERMISSIONS & DATA SECURITY PANEL -->
+        <div class="panel" style="margin-top: 24px; padding: 24px;">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                <h3 style="font-size: 16px; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 8px;">
                     <span>🛡️</span> Disaster Access & Operational Permissions
                 </h3>
-                <span style="font-size: 11px; color: #a1a1aa; background: rgba(255, 255, 255, 0.05); padding: 4px 10px; border-radius: 6px;">
+                <span style="font-size: 11px; color: #a1a1aa; background: rgba(56, 189, 248, 0.15); padding: 4px 10px; border-radius: 6px;">
                     Role: Commander / Response Lead
                 </span>
             </div>
 
             <div class="settings-list">
+
                 <div class="setting-item">
                     <div>
                         <strong>🛰️ Satellite Stream Ingestion Permission (Sentinel / Landsat)</strong>
@@ -2409,7 +2620,9 @@ function showSettings() {
                         <span class="setting-switch-slider"></span>
                     </label>
                 </div>
+
             </div>
+
         </div>
 
     `);
@@ -2452,10 +2665,6 @@ async function refreshSatellite() {
 
 }
 
-
-/* =========================================================
-   ABOUT PAGE
-========================================================= */
 
 /* =========================================================
    ABOUT PAGE

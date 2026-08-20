@@ -11,6 +11,7 @@
     >
 
     <title>Nirvaan | Disaster Monitoring</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,8 +169,8 @@
                     Alerts
                 </span>
 
-                <span class="alert-count">
-                    3
+                <span class="alert-count" id="sidebarAlertCount">
+                    0
                 </span>
 
             </button>
@@ -331,7 +332,7 @@
                         >
                             <span class="menu-icon">♧</span>
                             <span>Alerts</span>
-                            <span class="alert-count-badge">3</span>
+                            <span class="alert-count-badge" id="dropdownAlertCount">0</span>
                         </button>
 
                         <button
@@ -405,10 +406,10 @@
 
             <div class="topbar-right">
 
-                <div id="modeIndicator" class="mode-indicator instant-mode" onclick="toggleAnalysisMode()" title="Click to toggle between Instant Demo Mode and Live Analysis Mode">
-                    <span class="mode-icon">⚡</span>
-                    <span id="modeText"><strong>INSTANT DEMO</strong></span>
-                    <span class="mode-badge" id="modeBadge">DEFAULT</span>
+                <div id="modeIndicator" class="mode-indicator live-mode" onclick="toggleAnalysisMode()" title="Live Satellite Disaster Intelligence System">
+                    <span class="mode-icon">🛰️</span>
+                    <span id="modeText"><strong>LIVE SYSTEM</strong></span>
+                    <span class="mode-badge" id="modeBadge">ACTIVE</span>
                 </div>
 
                 <!-- ALERT BELL ICON BUTTON -->
@@ -420,7 +421,7 @@
                     aria-label="Disaster Alerts"
                 >
                     <span class="icon-bell">🔔</span>
-                    <span class="alert-count-badge">3</span>
+                    <span class="alert-count-badge" id="topbarAlertCount">0</span>
                 </button>
 
                 <!-- ATTRACIVE SLIDING THEME SWITCHER -->

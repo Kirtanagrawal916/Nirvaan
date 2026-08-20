@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: nirvaan-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: CORS_ORIGINS
+        value: "https://nirvaan-one.vercel.app,http://localhost:5173"
+      - key: LIVE_ANALYSIS_TIMEOUT_SEC
+        value: "10.0"
