@@ -9,8 +9,8 @@
 const API_BASE_URL =
     (typeof window !== "undefined" && window.NIRVAAN_API_URL)
     ? window.NIRVAAN_API_URL
-    : (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_NIRVAAN_API_URL)
-    ? import.meta.env.VITE_NIRVAAN_API_URL
+    : (typeof window !== "undefined" && window.VITE_NIRVAAN_API_URL)
+    ? window.VITE_NIRVAAN_API_URL
     : "http://localhost:8000/api";
 
 
