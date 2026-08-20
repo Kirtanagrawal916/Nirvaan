@@ -1262,6 +1262,16 @@ async function fetchDashboardDataAsync() {
 
         updateProvenanceBanner(latest || satellite);
 
+        if (latest && latest.data_provenance === "REAL_SATELLITE_DATA") {
+            const s = getSatState();
+            if (latest.confidence) s.confidence = latest.confidence;
+            if (latest.affectedArea) s.affectedArea = latest.affectedArea;
+            if (latest.location) s.location = latest.location;
+            if (latest.severity) s.severityScore = latest.severity;
+            if (latest.satellite) s.sensor = `${latest.satellite} L2A`;
+            refreshSatelliteMonitoringUI();
+        }
+
         const areaEl = document.getElementById("dashAffectedArea");
         if (areaEl) {
             if (latest && latest.affectedArea && latest.affectedArea !== "0.0 km²") {
