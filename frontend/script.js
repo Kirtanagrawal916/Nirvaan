@@ -906,9 +906,22 @@ async function showDashboard() {
 
         <section class="dashboard-section nirvaan-dashboard-container">
 
+            <!-- FUTURISTIC MORNING WELCOME HERO BANNER -->
+            <div class="morning-hero-banner">
+                <div class="morning-hero-content">
+                    <h1 class="morning-greeting-title">
+                        Good Morning <span class="sun-icon-glowing">☀️</span>
+                    </h1>
+                    <p class="morning-welcome-subtitle">Welcome to Nirvaan</p>
+                    <div class="morning-badge">
+                        <span>🛰 NIRVAAN SATELLITE DISASTER INTELLIGENCE PLATFORM</span>
+                    </div>
+                </div>
+            </div>
+
             <div style="margin-bottom: 4px;">
                 <h1 class="page-title" style="margin-bottom: 4px;">
-                    Dashboard
+                    Dashboard Overview
                 </h1>
                 <p class="page-subtitle" style="margin: 0;">
                     Real-time AI Disaster Monitoring, Geospatial Satellite Telemetry & Risk Intelligence
@@ -1258,14 +1271,29 @@ function showDetection() {
 
         <div class="disaster-section">
 
-            <h1 class="page-title">
+            <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
                 Disaster Detection Engine
             </h1>
 
-            <p class="page-subtitle">
+            <p class="page-subtitle" style="font-size: 16px; margin-bottom: 24px;">
                 Configure satellite parameters, upload scenes, and run real-time AI flood analysis
             </p>
 
+            <!-- INTERACTIVE PRESET HAZARD SCENARIO SELECTOR BAR -->
+            <div class="panel" style="padding: 18px 24px; border-radius: 16px; margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h4 style="font-size: 14.5px; font-weight: 800; color: #38bdf8; margin: 0 0 4px 0;" class="faq-section-header">⚡ Quick Disaster Presets</h4>
+                        <p style="font-size: 12px; color: #94a3b8; margin: 0;" class="faq-section-subtitle">Click a preset scenario to auto-calibrate AI neural network parameters</p>
+                    </div>
+                    <div class="sat-btn-group-toggles">
+                        <button onclick="presetDetectionScenario('surat')" class="sat-action-btn toggle active" id="presetSurat">🌊 Surat Flood</button>
+                        <button onclick="presetDetectionScenario('bhuj')" class="sat-action-btn toggle" id="presetBhuj">⚡ Bhuj Seismic</button>
+                        <button onclick="presetDetectionScenario('chennai')" class="sat-action-btn toggle" id="presetChennai">🏖️ Chennai Surge</button>
+                        <button onclick="presetDetectionScenario('guwahati')" class="sat-action-btn toggle" id="presetGuwahati">⛰️ Guwahati Overflow</button>
+                    </div>
+                </div>
+            </div>
 
             <!-- DISASTER DETECTION 50% / 50% SPLIT LAYOUT GRID -->
             <div class="detection-50-split-grid">
@@ -1435,6 +1463,45 @@ function showDetection() {
 
     `);
 
+}
+
+function presetDetectionScenario(scenario) {
+    const region = document.getElementById('detectRegion');
+    const sat = document.getElementById('satSource');
+    const slider = document.getElementById('thresholdSlider');
+    const badge = document.getElementById('sliderValBadge');
+
+    const presets = ['Surat', 'Bhuj', 'Chennai', 'Guwahati'];
+    presets.forEach(p => {
+        const btn = document.getElementById('preset' + p);
+        if (btn) btn.classList.remove('active');
+    });
+    const activeBtn = document.getElementById('preset' + scenario.charAt(0).toUpperCase() + scenario.slice(1));
+    if (activeBtn) activeBtn.classList.add('active');
+
+    if (scenario === 'surat') {
+        if (region) region.value = "Surat, Gujarat (Tapi Basin)";
+        if (sat) sat.value = "Sentinel-2 L2A (10m SAR+Optical)";
+        if (slider) slider.value = 85;
+        if (badge) badge.textContent = "85%";
+    } else if (scenario === 'bhuj') {
+        if (region) region.value = "Kochi, Kerala (Periyar Basin)";
+        if (sat) sat.value = "RISAT-1A Synthetic Aperture Radar";
+        if (slider) slider.value = 92;
+        if (badge) badge.textContent = "92%";
+    } else if (scenario === 'chennai') {
+        if (region) region.value = "Patna, Bihar (Ganges Basin)";
+        if (sat) sat.value = "PlanetScope Constellation (3m High-Res)";
+        if (slider) slider.value = 88;
+        if (badge) badge.textContent = "88%";
+    } else if (scenario === 'guwahati') {
+        if (region) region.value = "Guwahati, Assam (Brahmaputra)";
+        if (sat) sat.value = "Sentinel-2 L2A (10m SAR+Optical)";
+        if (slider) slider.value = 95;
+        if (badge) badge.textContent = "95%";
+    }
+
+    runLiveDetection();
 }
 
 function runLiveDetection() {
