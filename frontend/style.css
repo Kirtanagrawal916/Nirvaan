@@ -3452,10 +3452,10 @@ html[data-theme="light"] .ai-metric-val {
 .sat-btn-group-toggles {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 14px;
     flex-wrap: wrap;
     background: rgba(255, 255, 255, 0.04);
-    padding: 4px 8px;
+    padding: 6px 12px;
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -3502,18 +3502,14 @@ html[data-theme="light"] .ai-metric-val {
     color: #38bdf8;
 }
 
-/* SATELLITE IMAGE VIEWPORT TAKES 100% FULL HORIZONTAL WIDTH */
 .sat-viewport-box {
-    position: relative;
     width: 100%;
     height: 500px;
-    background: #090b10;
+    background: #090d16;
     border-radius: 14px;
+    position: relative;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border: 1px solid rgba(56, 189, 248, 0.2);
 }
 
 .sat-viewport-img {
@@ -3526,11 +3522,9 @@ html[data-theme="light"] .ai-metric-val {
 .sat-heatmap-overlay {
     position: absolute;
     inset: 0;
+    background: radial-gradient(circle at 45% 42%, rgba(239, 68, 68, 0.65) 0%, rgba(245, 158, 11, 0.45) 40%, rgba(56, 189, 248, 0.15) 75%, transparent 100%);
     pointer-events: none;
-    background: radial-gradient(circle at 45% 55%, rgba(239, 68, 68, 0.65) 0%, rgba(249, 115, 22, 0.45) 30%, rgba(56, 189, 248, 0.25) 55%, transparent 75%);
     mix-blend-mode: color-dodge;
-    opacity: 0.85;
-    animation: heatmapPulse 3s infinite alternate ease-in-out;
 }
 
 .sat-bbox-svg {
@@ -3539,23 +3533,19 @@ html[data-theme="light"] .ai-metric-val {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 10;
 }
 
 .sat-bbox-rect-red {
-    fill: rgba(239, 68, 68, 0.15);
+    fill: rgba(239, 68, 68, 0.25);
     stroke: #ef4444;
     stroke-width: 2.5;
     stroke-dasharray: 6 3;
-    animation: dashScan 20s linear infinite;
 }
 
 .sat-bbox-rect-amber {
-    fill: rgba(245, 158, 11, 0.12);
+    fill: rgba(245, 158, 11, 0.2);
     stroke: #f59e0b;
-    stroke-width: 2.5;
-    stroke-dasharray: 6 3;
-    animation: dashScan 20s linear infinite;
+    stroke-width: 2;
 }
 
 .sat-bbox-text {
@@ -3565,9 +3555,11 @@ html[data-theme="light"] .ai-metric-val {
     fill: #ffffff;
 }
 
-/* FULL-WIDTH DISASTER ANALYSIS TELEMETRY BAR */
+/* COMPACT DECREASED HORIZONTAL WIDTH DISASTER ANALYSIS TELEMETRY BAR */
 .disaster-analysis-sidebar {
     width: 100%;
+    max-width: 840px;
+    margin: 0 auto;
     background: linear-gradient(145deg, #131a2b, #0d121f);
     border: 1px solid rgba(56, 189, 248, 0.25);
     border-radius: 16px;
