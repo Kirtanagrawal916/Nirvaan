@@ -12,6 +12,17 @@ function getTimeBasedGreeting() {
     }
 }
 
+function updateDashboardGreeting() {
+    const titleEl = document.getElementById("dashboardGreetingTitle");
+    if (!titleEl) return;
+    const greeting = getTimeBasedGreeting();
+    titleEl.innerHTML = `${greeting.text} <span class="sun-icon-glowing">${greeting.icon}</span>`;
+}
+
+if (typeof window !== "undefined") {
+    setInterval(updateDashboardGreeting, 30000);
+}
+
 function setPageContent(html) {
     const container = document.getElementById("pageContent");
     if (container) {
@@ -938,7 +949,7 @@ function showDashboard() {
             <!-- FUTURISTIC DYNAMIC WELCOME HERO BANNER -->
             <div class="morning-hero-banner">
                 <div class="morning-hero-content">
-                    <h1 class="morning-greeting-title">
+                    <h1 class="morning-greeting-title" id="dashboardGreetingTitle">
                         ${greeting.text} <span class="sun-icon-glowing">${greeting.icon}</span>
                     </h1>
                     <p class="morning-welcome-subtitle">Welcome to Nirvaan</p>
