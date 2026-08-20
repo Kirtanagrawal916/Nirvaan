@@ -7,6 +7,7 @@ function setPageContent(html) {
 }
 /* =========================================================
    THEME TOGGLE SYSTEM
+========================================================= */
 
 function updateProvenanceBanner(dataOrProvenance) {
     const banner = document.getElementById("provenanceBanner");
@@ -115,6 +116,7 @@ if (document.readyState === "loading") {
 
 /* =========================================================
    NAVIGATION (SIDEBAR & TOPBAR NAVBAR)
+========================================================= */
 
 let pageContent = document.getElementById("pageContent");
 const navItems = document.querySelectorAll(".nav-item");
@@ -152,6 +154,7 @@ navItems.forEach(item => {
 
 /* =========================================================
    AUTHENTICATION & LOGIN SYSTEM
+========================================================= */
 
 function initAuth() {
     const loginBtn = document.getElementById("loginBtn");
@@ -337,6 +340,7 @@ if (topbarMenuBtn && menuDropdown) {
 
 /* =========================================================
    INITIAL PAGE
+========================================================= */
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
@@ -350,6 +354,7 @@ if (document.readyState === "loading") {
 
 /* =========================================================
    PAGE ROUTER
+========================================================= */
 
 async function loadPage(page) {
 
@@ -406,6 +411,7 @@ async function loadPage(page) {
 
 /* =========================================================
    DASHBOARD
+========================================================= */
 
 async function showDashboard() {
 
@@ -658,6 +664,7 @@ async function showDashboard() {
 
 /* =========================================================
    SATELLITE MONITOR
+========================================================= */
 
 async function showSatellite() {
 
@@ -812,6 +819,7 @@ async function showSatellite() {
 
 /* =========================================================
    DISASTER DETECTION
+========================================================= */
 
 async function showDetection() {
 
@@ -1035,6 +1043,7 @@ function runLiveDetection() {
 
 /* =========================================================
    RISK MAP
+========================================================= */
 
 async function showRiskMap() {
 
@@ -1182,6 +1191,7 @@ function toggleMapLayer(layer) {
 
 /* =========================================================
    ALERTS
+========================================================= */
 
 async function showAlerts() {
 
@@ -1848,6 +1858,7 @@ function showSettings() {
 
 /* =========================================================
    SATELLITE REFRESH
+========================================================= */
 
 async function refreshSatellite() {
 
