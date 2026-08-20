@@ -52,20 +52,29 @@ async def request_id_middleware(request: Request, call_next):
     return response
 
 # CORS Configuration
-default_origins = "https://nirvaan-one.vercel.app,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173"
-allowed_origins_raw = os.getenv("CORS_ORIGINS", default_origins)
-allowed_origins = [
-    origin.strip()
-    for origin in allowed_origins_raw.split(",")
-    if origin.strip()
+default_origins = [
+    "https://nirvaan-one.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
 ]
+env_origins = os.getenv("CORS_ORIGINS")
+if env_origins:
+    allowed_origins = [origin.strip() for origin in env_origins.split(",") if origin.strip()]
+else:
+    allowed_origins = default_origins
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins if allowed_origins else ["*"],
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["X-Request-ID", "Content-Length", "Content-Type"],
 )
 
 # Satellite Asset Serving
@@ -82,8 +91,7 @@ def root() -> Dict[str, str]:
     """Root endpoint returning API status message."""
     return {
         "status": "ok",
-        "message": "Nirvaan API is running",
-        "version": "2.0.0"
+        "message": "Nirvaan API is running"
     }
 
 
@@ -266,3 +274,9 @@ def get_risk_map(response: Response) -> Dict[str, Any]:
     res = handle_risk_map_endpoint()
     response.status_code = res["status_code"]
     return res["data"]
+
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("api.main:app", host="0.0.0.0", port=port, reload=False)

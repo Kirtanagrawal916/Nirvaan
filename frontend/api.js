@@ -3,23 +3,35 @@
 
    Connects directly to backend /api/v1/ REST endpoints.
    No mock/synthetic/fake data fallbacks.
+   Includes retry backoff for Render cold starts.
 ========================================================= */
 
 function getApiBaseUrl() {
-    if (typeof window !== "undefined") {
-        const winUrl = window.NIRVAAN_API_URL || window.VITE_API_BASE_URL || window.VITE_NIRVAAN_API_URL;
-        if (winUrl) {
-            let u = String(winUrl).trim().replace(/\/$/, "");
-            return u.endsWith("/api") ? u : `${u}/api`;
-        }
+    let rawUrl = null;
 
-        // 2. If running on local development host (localhost or 127.0.0.1)
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-            return "http://localhost:8000/api";
+    // 1. Check Vite build-time environment variables
+    try {
+        if (typeof import.meta !== "undefined" && import.meta.env) {
+            rawUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_NIRVAAN_API_URL || import.meta.env.VITE_API_URL;
         }
+    } catch (e) {}
+
+    // 2. Check window runtime globals
+    if (!rawUrl && typeof window !== "undefined") {
+        rawUrl = window.NIRVAAN_API_URL || window.VITE_API_BASE_URL || window.VITE_NIRVAAN_API_URL;
     }
 
-    // 3. Default Production Render Backend URL (for Vercel deployment and non-localhost)
+    if (rawUrl) {
+        let u = String(rawUrl).trim().replace(/\/$/, "");
+        return u.endsWith("/api") ? u : `${u}/api`;
+    }
+
+    // 3. If running on local development host (localhost or 127.0.0.1)
+    if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+        return "http://localhost:8000/api";
+    }
+
+    // 4. Default Production Render Backend URL (for Vercel deployment: https://nirvaan-one.vercel.app)
     return "https://nirvaan-pd7i.onrender.com/api";
 }
 
@@ -34,11 +46,60 @@ function getAuthHeaders() {
     return headers;
 }
 
+/**
+ * Robust fetch with automatic retry and exponential backoff for backend cold starts.
+ */
+async function fetchWithRetry(url, options = {}, retries = 2, backoffMs = 1200, timeoutMs = 15000) {
+    let attempt = 0;
+    while (attempt <= retries) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        const fetchOptions = {
+            ...options,
+            signal: controller.signal
+        };
+
+        try {
+            const response = await fetch(url, fetchOptions);
+            clearTimeout(timeoutId);
+
+            // Render free tier returns 502/503/504 while waking up the container
+            if (!response.ok && [502, 503, 504].includes(response.status) && attempt < retries) {
+                attempt++;
+                await new Promise(r => setTimeout(r, backoffMs * Math.pow(1.5, attempt - 1)));
+                continue;
+            }
+
+            return response;
+        } catch (err) {
+            clearTimeout(timeoutId);
+            if (attempt < retries) {
+                attempt++;
+                await new Promise(r => setTimeout(r, backoffMs * Math.pow(1.5, attempt - 1)));
+            } else {
+                throw err;
+            }
+        }
+    }
+}
+
 /* =========================================================
-   0. AUTHENTICATION APIs
+   0. HEALTH CHECK
+========================================================= */
+async function checkBackendHealth() {
+    try {
+        const res = await fetchWithRetry(`${API_BASE_URL}/v1/health`, { method: "GET" }, 1, 800, 6000);
+        return res.ok;
+    } catch (e) {
+        return false;
+    }
+}
+
+/* =========================================================
+   1. AUTHENTICATION APIs
 ========================================================= */
 async function registerUser(email, password, fullName) {
-    const res = await fetch(`${API_BASE_URL}/v1/auth/register`, {
+    const res = await fetchWithRetry(`${API_BASE_URL}/v1/auth/register`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({ email, password, full_name: fullName })
@@ -53,7 +114,7 @@ async function registerUser(email, password, fullName) {
 }
 
 async function loginUser(email, password) {
-    const res = await fetch(`${API_BASE_URL}/v1/auth/login`, {
+    const res = await fetchWithRetry(`${API_BASE_URL}/v1/auth/login`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({ email, password })
@@ -68,11 +129,15 @@ async function loginUser(email, password) {
 }
 
 async function getAuthMe() {
-    const res = await fetch(`${API_BASE_URL}/v1/auth/me`, {
-        headers: getAuthHeaders()
-    });
-    if (!res.ok) return null;
-    return await res.json();
+    try {
+        const res = await fetchWithRetry(`${API_BASE_URL}/v1/auth/me`, {
+            headers: getAuthHeaders()
+        });
+        if (!res.ok) return null;
+        return await res.json();
+    } catch (e) {
+        return null;
+    }
 }
 
 function logoutUser() {
@@ -82,13 +147,12 @@ function logoutUser() {
     }
 }
 
-
 /* =========================================================
-   1. GET LATEST DISASTER
+   2. GET LATEST DISASTER
 ========================================================= */
 async function getLatestDisaster() {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/disaster/latest`, { headers: getAuthHeaders() });
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/disaster/latest`, { headers: getAuthHeaders() });
         if (!response.ok) {
             throw new Error(`API request failed with status ${response.status}`);
         }
@@ -109,9 +173,8 @@ async function getLatestDisaster() {
     }
 }
 
-
 /* =========================================================
-   2. GET DISASTER HISTORY (WITH FILTERS & PAGINATION)
+   3. GET DISASTER HISTORY (WITH FILTERS & PAGINATION)
 ========================================================= */
 async function getDisasterHistory(params = {}) {
     try {
@@ -123,7 +186,7 @@ async function getDisasterHistory(params = {}) {
         if (params.source_type) query.append("source_type", params.source_type);
 
         const url = `${API_BASE_URL}/v1/disasters?${query.toString()}`;
-        const response = await fetch(url, { headers: getAuthHeaders() });
+        const response = await fetchWithRetry(url, { headers: getAuthHeaders() });
         if (!response.ok) {
             throw new Error(`Unable to fetch disasters with status ${response.status}`);
         }
@@ -134,13 +197,12 @@ async function getDisasterHistory(params = {}) {
     }
 }
 
-
 /* =========================================================
-   3. GET SATELLITE IMAGES / SCENES
+   4. GET SATELLITE IMAGES / SCENES
 ========================================================= */
 async function getSatelliteImages() {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/satellite/latest`);
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/satellite/latest`);
         if (!response.ok) {
             throw new Error(`Satellite API unavailable with status ${response.status}`);
         }
@@ -157,7 +219,7 @@ async function getSatelliteImages() {
 
 async function getSatelliteScenes() {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/satellite-scenes`);
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/satellite-scenes`);
         if (!response.ok) {
             throw new Error(`Satellite scenes API unavailable with status ${response.status}`);
         }
@@ -168,13 +230,12 @@ async function getSatelliteScenes() {
     }
 }
 
-
 /* =========================================================
-   4. ASYNCHRONOUS DETECTION JOBS
+   5. ASYNCHRONOUS DETECTION JOBS
 ========================================================= */
 async function createDetectionJob(payload) {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/detection`, {
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/detection`, {
             method: "POST",
             headers: getAuthHeaders(),
             body: JSON.stringify(payload || {})
@@ -195,7 +256,7 @@ async function createDetectionJob(payload) {
 
 async function getDetectionJobStatus(jobId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/detection/${jobId}`, { headers: getAuthHeaders() });
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/detection/${jobId}`, { headers: getAuthHeaders() }, 1, 500, 8000);
         if (!response.ok) {
             throw new Error(`Query job status failed with status ${response.status}`);
         }
@@ -206,13 +267,12 @@ async function getDetectionJobStatus(jobId) {
     }
 }
 
-
 /* =========================================================
-   5. GET ALERTS (REAL DATABASE ALERTS)
+   6. GET ALERTS (REAL DATABASE ALERTS)
 ========================================================= */
 async function getRealAlerts() {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/alerts`, { headers: getAuthHeaders() });
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/alerts`, { headers: getAuthHeaders() });
         if (!response.ok) {
             throw new Error(`Alerts API failed with status ${response.status}`);
         }
@@ -223,13 +283,12 @@ async function getRealAlerts() {
     }
 }
 
-
 /* =========================================================
-   6. GET RISK MAP (GEOJSON)
+   7. GET RISK MAP (GEOJSON)
 ========================================================= */
 async function getRiskMapGeoJSON() {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/risk`, { headers: getAuthHeaders() });
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/risk`, { headers: getAuthHeaders() });
         if (!response.ok) {
             throw new Error(`Risk map API failed with status ${response.status}`);
         }
@@ -240,13 +299,12 @@ async function getRiskMapGeoJSON() {
     }
 }
 
-
 /* =========================================================
-   7. SITREP REPORTS APIs
+   8. SITREP REPORTS APIs
 ========================================================= */
 async function createReport(payload = {}) {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/reports`, {
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/reports`, {
             method: "POST",
             headers: getAuthHeaders(),
             body: JSON.stringify(payload)
@@ -264,7 +322,7 @@ async function createReport(payload = {}) {
 
 async function getReports() {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/reports`, { headers: getAuthHeaders() });
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/reports`, { headers: getAuthHeaders() });
         if (!response.ok) return [];
         return await response.json();
     } catch (error) {
