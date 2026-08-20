@@ -24,5 +24,7 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Node
+# Node & Builds
 node_modules/
+dist/
+frontend/dist/

@@ -169,8 +169,8 @@
                     Alerts
                 </span>
 
-                <span class="alert-count">
-                    3
+                <span class="alert-count" id="sidebarAlertCount">
+                    0
                 </span>
 
             </button>
@@ -332,7 +332,7 @@
                         >
                             <span class="menu-icon">♧</span>
                             <span>Alerts</span>
-                            <span class="alert-count-badge">3</span>
+                            <span class="alert-count-badge" id="dropdownAlertCount">0</span>
                         </button>
 
                         <button
@@ -421,7 +421,7 @@
                     aria-label="Disaster Alerts"
                 >
                     <span class="icon-bell">🔔</span>
-                    <span class="alert-count-badge">3</span>
+                    <span class="alert-count-badge" id="topbarAlertCount">0</span>
                 </button>
 
                 <!-- ATTRACIVE SLIDING THEME SWITCHER -->
@@ -449,11 +449,11 @@
 
         <div
             id="provenanceBanner"
-            class="provenance-banner synthetic-mode"
+            class="provenance-banner real-mode"
             style="display: none;"
         >
-            <span class="banner-icon">⚠️</span>
-            <span class="banner-text"><strong>DEMO MODE: SYNTHETIC DATA</strong> — This view displays simulated/synthetic placeholder satellite data for demonstration purposes.</span>
+            <span class="banner-icon">ℹ️</span>
+            <span class="banner-text"><strong>NO LIVE DATA AVAILABLE</strong> — Awaiting satellite observation feed.</span>
         </div>
 
 
