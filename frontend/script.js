@@ -297,20 +297,23 @@ if (topbarMenuBtn && menuDropdown) {
    DYNAMIC CANVAS SATELLITE ORBIT ANIMATION ENGINE (ENHANCED BRIGHTNESS)
 ========================================================= */
 
-function initSatelliteOrbitBackground() {
+function initSatelliteOrbitBackground(targetCanvasId) {
     if (typeof window === "undefined") return;
-    const canvas = document.getElementById("satelliteOrbitCanvas");
+    const canvas = document.getElementById(targetCanvasId || "satelliteOrbitCanvas");
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    const parent = canvas.parentElement || document.body;
+    let width = (canvas.width = parent.clientWidth || window.innerWidth);
+    let height = (canvas.height = parent.clientHeight || window.innerHeight);
 
     window.addEventListener("resize", () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+        if (canvas && canvas.parentElement) {
+            width = canvas.width = canvas.parentElement.clientWidth || window.innerWidth;
+            height = canvas.height = canvas.parentElement.clientHeight || window.innerHeight;
+        }
     });
 
     // STARS IN SPACE WITH SHARPER BRIGHTNESS
@@ -684,6 +687,9 @@ function refreshSatelliteMonitoringUI() {
     const container = document.getElementById("satMonitoringSectionContainer");
     if (container) {
         container.innerHTML = renderSatelliteMonitoringHTML();
+        setTimeout(() => {
+            initSatelliteOrbitBackground("embeddedOrbitCanvas");
+        }, 50);
     }
 }
 
@@ -728,34 +734,41 @@ function renderSatelliteMonitoringHTML() {
                     </div>
                 </div>
 
-                <!-- VIEWPORT IMAGE CONTAINER -->
+                <!-- VIEWPORT BOX CONTAINING EMBEDDED DYNAMIC SATELLITE ORBIT CANVAS -->
                 <div class="sat-viewport-box">
-                    ${s.showComparison ? `
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: 100%; height: 100%;">
-                            <div style="position: relative; height: 100%;">
-                                <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(0,0,0,0.7); color: #ffffff; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">BEFORE (PRE-EVENT)</span>
-                                <img src="${s.beforeImage}" class="sat-viewport-img" alt="Before Satellite Pass">
-                            </div>
-                            <div style="position: relative; height: 100%;">
-                                <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(239,68,68,0.85); color: #ffffff; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">AFTER (POST-EVENT INUNDATED)</span>
-                                <img src="${s.activeImage}" class="sat-viewport-img" alt="After Satellite Pass">
-                            </div>
-                        </div>
-                    ` : `
-                        <img src="${s.activeImage}" class="sat-viewport-img" alt="Live Satellite Monitoring Swath">
-                        ${s.showHeatmap ? `<div class="sat-heatmap-overlay"></div>` : ""}
-                        ${s.showBoundingBoxes ? `
-                            <svg class="sat-bbox-svg" viewBox="0 0 800 450" preserveAspectRatio="none">
-                                <rect x="240" y="140" width="310" height="200" class="sat-bbox-rect-red" />
-                                <rect x="250" y="150" width="130" height="24" rx="4" fill="#ef4444" />
-                                <text x="256" y="166" class="sat-bbox-text">FLOOD INUNDATION: 94.7%</text>
+                    <div class="embedded-orbit-box-wrapper">
+                        <canvas id="embeddedOrbitCanvas" class="embedded-orbit-canvas"></canvas>
+                        <div class="embedded-orbit-translucent-overlay"></div>
 
-                                <rect x="110" y="80" width="180" height="130" class="sat-bbox-rect-amber" />
-                                <rect x="120" y="90" width="140" height="24" rx="4" fill="#f59e0b" />
-                                <text x="126" y="106" class="sat-bbox-text">INFRASTRUCTURE RISK</text>
-                            </svg>
-                        ` : ""}
-                    `}
+                        <div class="embedded-raster-overlay-content">
+                            ${s.showComparison ? `
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: 100%; height: 100%;">
+                                    <div style="position: relative; height: 100%;">
+                                        <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(0,0,0,0.7); color: #ffffff; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">BEFORE (PRE-EVENT)</span>
+                                        <img src="${s.beforeImage}" class="sat-viewport-img" alt="Before Satellite Pass">
+                                    </div>
+                                    <div style="position: relative; height: 100%;">
+                                        <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(239,68,68,0.85); color: #ffffff; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">AFTER (POST-EVENT INUNDATED)</span>
+                                        <img src="${s.activeImage}" class="sat-viewport-img" alt="After Satellite Pass">
+                                    </div>
+                                </div>
+                            ` : `
+                                <img src="${s.activeImage}" class="sat-viewport-img ${s.showHeatmap ? "with-blend" : ""}" alt="Live Satellite Monitoring Swath">
+                                ${s.showHeatmap ? `<div class="sat-heatmap-overlay"></div>` : ""}
+                                ${s.showBoundingBoxes ? `
+                                    <svg class="sat-bbox-svg" viewBox="0 0 800 450" preserveAspectRatio="none">
+                                        <rect x="240" y="140" width="310" height="200" class="sat-bbox-rect-red" />
+                                        <rect x="250" y="150" width="130" height="24" rx="4" fill="#ef4444" />
+                                        <text x="256" y="166" class="sat-bbox-text">FLOOD INUNDATION: 94.7%</text>
+
+                                        <rect x="110" y="80" width="180" height="130" class="sat-bbox-rect-amber" />
+                                        <rect x="120" y="90" width="140" height="24" rx="4" fill="#f59e0b" />
+                                        <text x="126" y="106" class="sat-bbox-text">INFRASTRUCTURE RISK</text>
+                                    </svg>
+                                ` : ""}
+                            `}
+                        </div>
+                    </div>
                 </div>
 
             </div>
