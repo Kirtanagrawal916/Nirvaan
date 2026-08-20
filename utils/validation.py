@@ -2,7 +2,7 @@
 Backend Validation & Secret Sanitization Layer for NIRVAAN
 
 Validates input metadata, imagery arrays, spectral thresholds, and output GeoJSON payloads.
-Sanitizes log messages to ensure secrets and credentials are never leaked.
+Enforces standardized API error contracts and sanitizes log messages to prevent secret leaks.
 """
 
 import re
