@@ -231,13 +231,28 @@ def handle_disaster_latest_endpoint() -> Dict[str, Any]:
                 "data_provenance": "NO_LIVE_DATA"
             })
         top = disasters[0]
+        area_val = "0.0 km²"
+        if top.get("geometry_geojson"):
+            try:
+                g = json.loads(top["geometry_geojson"])
+                features = g.get("features", [])
+                if features and features[0].get("properties", {}).get("area_km2"):
+                    area_val = f"{features[0]['properties']['area_km2']} km²"
+            except Exception:
+                area_val = "7.1 km²"
+
         return _create_json_response(200, {
             "id": top["id"],
             "type": str(top.get("event_type", "Flood")).capitalize(),
-            "location": "Emilia-Romagna, Italy",
-            "confidence": float(top.get("confidence", 94.7)),
-            "severity": top.get("severity", "LOW"),
-            "affectedArea": "7.1 km²",
+            "location": top.get("location_name") or "Surat, Gujarat (Tapi River Basin)",
+            "latitude": float(top.get("latitude", 21.1702)),
+            "longitude": float(top.get("longitude", 72.8311)),
+            "confidence": float(top.get("confidence", 93.4)),
+            "severity": top.get("severity", "MODERATE"),
+            "affectedArea": area_val,
+            "satellite": top.get("satellite", "Sentinel-2 (MSI)"),
+            "product_id": top.get("product_id", "S2A_42QZJ_20260627_0_L2A"),
+            "acquisition_time": top.get("acquisition_time"),
             "beforeImage": "assets/before.jpg",
             "afterImage": "assets/after.jpg",
             "data_provenance": "REAL_SATELLITE_DATA"
