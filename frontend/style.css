@@ -3915,9 +3915,66 @@ html[data-theme="light"] .risk-card-body h3 {
     color: #0f172a;
 }
 
-html[data-theme="light"] .risk-bullet-row {
-    color: #334155;
+/* =========================================================
+   FUTURISTIC SATELLITE ORBIT DYNAMIC CANVAS BACKGROUND STYLES
+========================================================= */
+
+.space-orbit-bg-wrapper {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
 }
+
+#satelliteOrbitCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.space-orbit-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(11, 15, 25, 0.25) 0%, rgba(11, 15, 25, 0.75) 70%, rgba(11, 15, 25, 0.95) 100%);
+    pointer-events: none;
+}
+
+/* FLOATING GLASS UI ELEVATION OVERLAY */
+.nirvaan-dashboard-container {
+    position: relative;
+    z-index: 10;
+}
+
+.metric-card-box,
+.sat-main-panel,
+.disaster-analysis-sidebar,
+.risk-analysis-section {
+    background: rgba(13, 19, 33, 0.72) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border: 1px solid rgba(56, 189, 248, 0.28) !important;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), inset 0 0 25px rgba(56, 189, 248, 0.05) !important;
+}
+
+/* LIGHT THEME OVERRIDES FOR DYNAMIC BACKGROUND */
+html[data-theme="light"] .space-orbit-overlay {
+    background: radial-gradient(circle at 50% 50%, rgba(248, 250, 252, 0.55) 0%, rgba(241, 245, 249, 0.85) 70%, rgba(226, 232, 240, 0.95) 100%);
+}
+
+html[data-theme="light"] .metric-card-box,
+html[data-theme="light"] .sat-main-panel,
+html[data-theme="light"] .disaster-analysis-sidebar,
+html[data-theme="light"] .risk-analysis-section {
+    background: rgba(255, 255, 255, 0.82) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+}
+
 
 
 

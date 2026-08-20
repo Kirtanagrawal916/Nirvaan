@@ -294,14 +294,184 @@ if (topbarMenuBtn && menuDropdown) {
 
 
 /* =========================================================
+   DYNAMIC CANVAS SATELLITE ORBIT ANIMATION ENGINE
+========================================================= */
+
+function initSatelliteOrbitBackground() {
+    if (typeof window === "undefined") return;
+    const canvas = document.getElementById("satelliteOrbitCanvas");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    window.addEventListener("resize", () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    // STARS IN SPACE
+    const stars = Array.from({ length: 140 }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 1.5 + 0.5,
+        alpha: Math.random() * 0.8 + 0.2,
+        speed: Math.random() * 0.05 + 0.01
+    }));
+
+    // CITY LIGHT DOTS ON EARTH CURVATURE
+    const cityLights = Array.from({ length: 90 }, () => ({
+        angle: Math.random() * Math.PI * 0.6 + Math.PI * 0.95,
+        dist: Math.random() * 80 + 320,
+        size: Math.random() * 2 + 1,
+        color: Math.random() > 0.4 ? "#f59e0b" : "#38bdf8"
+    }));
+
+    let orbitAngle = 0;
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+
+        // 1. DEEP SPACE & STARFIELD
+        stars.forEach(s => {
+            s.alpha += Math.sin(Date.now() * 0.002 + s.x) * 0.01;
+            ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.1, Math.min(0.9, s.alpha))})`;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // EARTH CURVATURE AT BOTTOM-RIGHT
+        const earthX = width * 0.85;
+        const earthY = height * 1.15;
+        const earthRadius = Math.min(width, height) * 0.65;
+
+        // EARTH ATMOSPHERE OUTER GLOW
+        const atmGlow = ctx.createRadialGradient(earthX, earthY, earthRadius * 0.9, earthX, earthY, earthRadius * 1.18);
+        atmGlow.addColorStop(0, "rgba(56, 189, 248, 0.4)");
+        atmGlow.addColorStop(0.5, "rgba(16, 185, 129, 0.2)");
+        atmGlow.addColorStop(1, "rgba(56, 189, 248, 0)");
+
+        ctx.fillStyle = atmGlow;
+        ctx.beginPath();
+        ctx.arc(earthX, earthY, earthRadius * 1.18, 0, Math.PI * 2);
+        ctx.fill();
+
+        // EARTH BODY GRADIENT
+        const earthGrad = ctx.createRadialGradient(earthX - 100, earthY - 100, 50, earthX, earthY, earthRadius);
+        earthGrad.addColorStop(0, "#0e2a47");
+        earthGrad.addColorStop(0.5, "#091c33");
+        earthGrad.addColorStop(0.85, "#040c17");
+        earthGrad.addColorStop(1, "#02060d");
+
+        ctx.fillStyle = earthGrad;
+        ctx.beginPath();
+        ctx.arc(earthX, earthY, earthRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // EARTH CITY LIGHTS
+        cityLights.forEach(cl => {
+            const lx = earthX + Math.cos(cl.angle) * cl.dist;
+            const ly = earthY + Math.sin(cl.angle) * cl.dist;
+            ctx.fillStyle = cl.color;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = cl.color;
+            ctx.beginPath();
+            ctx.arc(lx, ly, cl.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        });
+
+        // 2. ORBIT TRAJECTORY DASHED LINE
+        orbitAngle += 0.0035;
+        const rx = width * 0.42;
+        const ry = height * 0.38;
+        const cx = width * 0.55;
+        const cy = height * 0.52;
+
+        ctx.save();
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.35)";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, -Math.PI / 10, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // 3. SATELLITE POSITION CALCULATION
+        const satX = cx + Math.cos(orbitAngle) * rx;
+        const satY = cy + Math.sin(orbitAngle) * ry;
+
+        // TELEMETRY BEAM TO EARTH
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.25)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(satX, satY);
+        ctx.lineTo(earthX - earthRadius * 0.3, earthY - earthRadius * 0.4);
+        ctx.stroke();
+
+        // SATELLITE SOLAR PANELS & MAIN BODY
+        ctx.save();
+        ctx.translate(satX, satY);
+        ctx.rotate(orbitAngle + Math.PI / 4);
+
+        // LEFT SOLAR ARRAY PANEL
+        ctx.fillStyle = "#0284c7";
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 1;
+        ctx.fillRect(-38, -6, 26, 12);
+        ctx.strokeRect(-38, -6, 26, 12);
+
+        // RIGHT SOLAR ARRAY PANEL
+        ctx.fillRect(12, -6, 26, 12);
+        ctx.strokeRect(12, -6, 26, 12);
+
+        // SOLAR PANEL GRID CELLS
+        ctx.strokeStyle = "rgba(255,255,255,0.4)";
+        ctx.beginPath();
+        ctx.moveTo(-25, -6); ctx.lineTo(-25, 6);
+        ctx.moveTo(25, -6); ctx.lineTo(25, 6);
+        ctx.stroke();
+
+        // MAIN SATELLITE CHASSIS BODY
+        ctx.fillStyle = "#e2e8f0";
+        ctx.fillRect(-10, -8, 20, 16);
+        ctx.strokeStyle = "#ffffff";
+        ctx.strokeRect(-10, -8, 20, 16);
+
+        // DISH ANTENNA & SENSOR LENS
+        ctx.fillStyle = "#38bdf8";
+        ctx.beginPath();
+        ctx.arc(0, 10, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+
+        // ORBIT TELEMETRY BADGE TEXT
+        ctx.font = "10px Outfit, monospace";
+        ctx.fillStyle = "#38bdf8";
+        ctx.fillText("SAT-1 NIRVAAN :: ALT 686 km :: SENSOR SENTINEL-2 L2A", satX + 18, satY - 14);
+
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+}
+
+/* =========================================================
    INITIAL PAGE
 ========================================================= */
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
+        initSatelliteOrbitBackground();
         loadPage("dashboard");
     });
 } else {
+    initSatelliteOrbitBackground();
     loadPage("dashboard");
 }
 
