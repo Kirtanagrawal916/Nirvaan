@@ -25,13 +25,70 @@ function getApiBaseUrl() {
 
 const API_BASE_URL = getApiBaseUrl();
 
+function getAuthHeaders() {
+    const headers = { "Content-Type": "application/json" };
+    const token = typeof localStorage !== "undefined" ? localStorage.getItem("nirvaan_token") : null;
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+    return headers;
+}
+
+/* =========================================================
+   0. AUTHENTICATION APIs
+========================================================= */
+async function registerUser(email, password, fullName) {
+    const res = await fetch(`${API_BASE_URL}/v1/auth/register`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ email, password, full_name: fullName })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || "Registration failed");
+    if (data.access_token) {
+        localStorage.setItem("nirvaan_token", data.access_token);
+        localStorage.setItem("nirvaan_user", JSON.stringify(data.user));
+    }
+    return data;
+}
+
+async function loginUser(email, password) {
+    const res = await fetch(`${API_BASE_URL}/v1/auth/login`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || "Authentication failed");
+    if (data.access_token) {
+        localStorage.setItem("nirvaan_token", data.access_token);
+        localStorage.setItem("nirvaan_user", JSON.stringify(data.user));
+    }
+    return data;
+}
+
+async function getAuthMe() {
+    const res = await fetch(`${API_BASE_URL}/v1/auth/me`, {
+        headers: getAuthHeaders()
+    });
+    if (!res.ok) return null;
+    return await res.json();
+}
+
+function logoutUser() {
+    if (typeof localStorage !== "undefined") {
+        localStorage.removeItem("nirvaan_token");
+        localStorage.removeItem("nirvaan_user");
+    }
+}
+
 
 /* =========================================================
    1. GET LATEST DISASTER
 ========================================================= */
 async function getLatestDisaster() {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/disaster/latest`);
+        const response = await fetch(`${API_BASE_URL}/v1/disaster/latest`, { headers: getAuthHeaders() });
         if (!response.ok) {
             throw new Error(`API request failed with status ${response.status}`);
         }
@@ -54,11 +111,19 @@ async function getLatestDisaster() {
 
 
 /* =========================================================
-   2. GET DISASTER HISTORY
+   2. GET DISASTER HISTORY (WITH FILTERS & PAGINATION)
 ========================================================= */
-async function getDisasterHistory() {
+async function getDisasterHistory(params = {}) {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/disasters`);
+        const query = new URLSearchParams();
+        if (params.limit) query.append("limit", params.limit);
+        if (params.offset) query.append("offset", params.offset);
+        if (params.type) query.append("type", params.type);
+        if (params.severity) query.append("severity", params.severity);
+        if (params.source_type) query.append("source_type", params.source_type);
+
+        const url = `${API_BASE_URL}/v1/disasters?${query.toString()}`;
+        const response = await fetch(url, { headers: getAuthHeaders() });
         if (!response.ok) {
             throw new Error(`Unable to fetch disasters with status ${response.status}`);
         }
@@ -111,13 +176,14 @@ async function createDetectionJob(payload) {
     try {
         const response = await fetch(`${API_BASE_URL}/v1/detection`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(),
             body: JSON.stringify(payload || {})
         });
 
         if (!response.ok) {
             const errData = await response.json().catch(() => ({}));
-            throw new Error(errData.message || `Detection job submission failed with status ${response.status}`);
+            const msg = errData.error?.message || errData.message || `Detection job submission failed with status ${response.status}`;
+            throw new Error(msg);
         }
 
         return await response.json();
@@ -129,7 +195,7 @@ async function createDetectionJob(payload) {
 
 async function getDetectionJobStatus(jobId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/detection/${jobId}`);
+        const response = await fetch(`${API_BASE_URL}/v1/detection/${jobId}`, { headers: getAuthHeaders() });
         if (!response.ok) {
             throw new Error(`Query job status failed with status ${response.status}`);
         }
@@ -146,7 +212,7 @@ async function getDetectionJobStatus(jobId) {
 ========================================================= */
 async function getRealAlerts() {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/alerts`);
+        const response = await fetch(`${API_BASE_URL}/v1/alerts`, { headers: getAuthHeaders() });
         if (!response.ok) {
             throw new Error(`Alerts API failed with status ${response.status}`);
         }
@@ -163,7 +229,7 @@ async function getRealAlerts() {
 ========================================================= */
 async function getRiskMapGeoJSON() {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/risk`);
+        const response = await fetch(`${API_BASE_URL}/v1/risk`, { headers: getAuthHeaders() });
         if (!response.ok) {
             throw new Error(`Risk map API failed with status ${response.status}`);
         }
@@ -176,24 +242,37 @@ async function getRiskMapGeoJSON() {
 
 
 /* =========================================================
-   7. GENERATE SITREP (SITUATION REPORT)
+   7. SITREP REPORTS APIs
 ========================================================= */
-async function generateSituationReport(payload) {
+async function createReport(payload = {}) {
     try {
-        const response = await fetch(`${API_BASE_URL}/v1/report`, {
+        const response = await fetch(`${API_BASE_URL}/v1/reports`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload || {})
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
         });
-
         if (!response.ok) {
-            throw new Error(`Report API request failed with status ${response.status}`);
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error?.message || `Report creation failed with status ${response.status}`);
         }
-
-        const resData = await response.json();
-        return resData && resData.data ? resData.data : resData;
+        return await response.json();
     } catch (error) {
-        console.warn("Backend Report API not connected or error occurred:", error);
+        console.error("Error generating report:", error);
         throw error;
     }
+}
+
+async function getReports() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/v1/reports`, { headers: getAuthHeaders() });
+        if (!response.ok) return [];
+        return await response.json();
+    } catch (error) {
+        console.warn("Error listing reports:", error);
+        return [];
+    }
+}
+
+async function generateSituationReport(payload) {
+    return await createReport(payload);
 }

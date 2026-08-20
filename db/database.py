@@ -118,10 +118,15 @@ def init_db(db_path: Optional[Path] = None) -> None:
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS analysis_jobs (
         id TEXT PRIMARY KEY,
-        status TEXT NOT NULL, -- queued, processing, completed, failed
+        status TEXT NOT NULL, -- queued, processing, completed, failed, cancelled
+        stage TEXT DEFAULT 'queued',
+        progress INTEGER DEFAULT 0,
         disaster_type TEXT NOT NULL,
         latitude REAL NOT NULL,
         longitude REAL NOT NULL,
+        user_id TEXT,
+        retry_count INTEGER DEFAULT 0,
+        last_retry_at TEXT,
         created_at TEXT NOT NULL,
         started_at TEXT,
         completed_at TEXT,
@@ -130,6 +135,54 @@ def init_db(db_path: Optional[Path] = None) -> None:
         result_json TEXT
     );
     """)
+
+    # 6. Users Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        email TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        full_name TEXT,
+        role TEXT NOT NULL DEFAULT 'user',
+        created_at TEXT NOT NULL
+    );
+    """)
+
+    # 7. Reports Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS reports (
+        id TEXT PRIMARY KEY,
+        disaster_id TEXT NOT NULL,
+        user_id TEXT,
+        title TEXT NOT NULL,
+        report_json TEXT NOT NULL,
+        report_markdown TEXT NOT NULL,
+        data_provenance TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (disaster_id) REFERENCES disasters (id) ON DELETE CASCADE
+    );
+    """)
+
+    # 8. Indexes for performance
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_disasters_detection_time ON disasters(detection_time DESC);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_disasters_type_severity ON disasters(event_type, severity);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_created_status ON analysis_jobs(status, created_at DESC);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_alerts_created ON alerts(created_at DESC);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_reports_created ON reports(created_at DESC);")
+
+    # Safe Schema Migrations for existing databases
+    existing_job_cols = [r["name"] for r in cursor.execute("PRAGMA table_info(analysis_jobs);").fetchall()]
+    if "stage" not in existing_job_cols:
+        cursor.execute("ALTER TABLE analysis_jobs ADD COLUMN stage TEXT DEFAULT 'queued';")
+    if "progress" not in existing_job_cols:
+        cursor.execute("ALTER TABLE analysis_jobs ADD COLUMN progress INTEGER DEFAULT 0;")
+    if "user_id" not in existing_job_cols:
+        cursor.execute("ALTER TABLE analysis_jobs ADD COLUMN user_id TEXT;")
+    if "retry_count" not in existing_job_cols:
+        cursor.execute("ALTER TABLE analysis_jobs ADD COLUMN retry_count INTEGER DEFAULT 0;")
+    if "last_retry_at" not in existing_job_cols:
+        cursor.execute("ALTER TABLE analysis_jobs ADD COLUMN last_retry_at TEXT;")
 
     conn.commit()
     conn.close()

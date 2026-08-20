@@ -6,13 +6,16 @@ queries, asynchronous detection job enqueuing, alerts, satellite scene ingestion
 """
 
 import os
-from typing import Any, Dict
-from fastapi import FastAPI, Response
+from typing import Any, Dict, Optional
+from fastapi import FastAPI, Header, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 
 from api.server import (
+    handle_auth_register,
+    handle_auth_login,
+    handle_auth_me,
     handle_health_check,
     handle_readiness_check,
     handle_disaster_latest_endpoint,
@@ -21,16 +24,32 @@ from api.server import (
     handle_satellite_latest_endpoint,
     handle_create_detection_job_endpoint,
     handle_get_detection_job_endpoint,
+    handle_create_report_endpoint,
+    handle_list_reports_endpoint,
+    handle_get_report_endpoint,
     handle_alerts_endpoint,
     handle_satellite_scenes_endpoint,
     handle_risk_map_endpoint,
 )
+from utils.auth import get_current_user_from_header
+from utils.logging import configure_nirvaan_logging, set_request_id
+
+configure_nirvaan_logging()
 
 app = FastAPI(
     title="NIRVAAN Disaster Intelligence API",
-    version="1.0.0-mvp",
+    version="2.0.0",
     description="Satellite-Based Disaster Intelligence & Spatial Risk API",
 )
+
+# Request Correlation ID Middleware
+@app.middleware("http")
+async def request_id_middleware(request: Request, call_next):
+    req_id = request.headers.get("X-Request-ID")
+    actual_id = set_request_id(req_id)
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = actual_id
+    return response
 
 # CORS Configuration
 default_origins = "https://nirvaan-one.vercel.app,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173"
@@ -63,8 +82,35 @@ def root() -> Dict[str, str]:
     """Root endpoint returning API status message."""
     return {
         "status": "ok",
-        "message": "Nirvaan API is running"
+        "message": "Nirvaan API is running",
+        "version": "2.0.0"
     }
+
+
+# Auth Endpoints
+@app.post("/api/v1/auth/register")
+def register_user(payload: Dict[str, Any], response: Response) -> Dict[str, Any]:
+    """Registers a new user account."""
+    res = handle_auth_register(payload)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+@app.post("/api/v1/auth/login")
+def login_user(payload: Dict[str, Any], response: Response) -> Dict[str, Any]:
+    """Authenticates a user and issues a JWT token."""
+    res = handle_auth_login(payload)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+@app.get("/api/v1/auth/me")
+def get_authenticated_user_profile(response: Response, authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
+    """Returns profile for currently authenticated user."""
+    user = get_current_user_from_header(authorization)
+    res = handle_auth_me(user)
+    response.status_code = res["status_code"]
+    return res["data"]
 
 
 # GET /api/v1/health
@@ -88,9 +134,26 @@ def readiness_check(response: Response) -> Dict[str, Any]:
 # GET /api/v1/disasters
 @app.get("/api/v1/disasters")
 @app.get("/api/disasters")
-def get_disasters(response: Response) -> Any:
-    """Returns real detected disasters from database."""
-    res = handle_disasters_history_endpoint()
+def get_disasters(
+    response: Response,
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+    type: Optional[str] = Query(None),
+    severity: Optional[str] = Query(None),
+    from_date: Optional[str] = Query(None),
+    to_date: Optional[str] = Query(None),
+    source_type: Optional[str] = Query(None)
+) -> Any:
+    """Returns real detected disasters from database with pagination & filtering."""
+    res = handle_disasters_history_endpoint(
+        limit=limit,
+        offset=offset,
+        event_type=type,
+        severity=severity,
+        from_date=from_date,
+        to_date=to_date,
+        source_type=source_type
+    )
     response.status_code = res["status_code"]
     return res["data"]
 
@@ -117,9 +180,10 @@ def get_latest_disaster(response: Response) -> Dict[str, Any]:
 # POST /api/v1/detection
 @app.post("/api/v1/detection")
 @app.post("/api/detection")
-def create_detection_job(payload: Dict[str, Any], response: Response) -> Dict[str, Any]:
+def create_detection_job(payload: Dict[str, Any], response: Response, authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
     """Enqueues an asynchronous detection job for given coordinates."""
-    res = handle_create_detection_job_endpoint(payload)
+    current_user = get_current_user_from_header(authorization)
+    res = handle_create_detection_job_endpoint(payload, current_user=current_user)
     response.status_code = res["status_code"]
     return res["data"]
 
@@ -129,6 +193,38 @@ def create_detection_job(payload: Dict[str, Any], response: Response) -> Dict[st
 def get_detection_job_status(job_id: str, response: Response) -> Dict[str, Any]:
     """Queries asynchronous detection job status and results."""
     res = handle_get_detection_job_endpoint(job_id)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# POST /api/v1/reports
+@app.post("/api/v1/reports")
+def create_situation_report(payload: Dict[str, Any], response: Response, authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
+    """Generates and stores a SITREP report from a disaster record."""
+    current_user = get_current_user_from_header(authorization)
+    res = handle_create_report_endpoint(payload, current_user=current_user)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# GET /api/v1/reports
+@app.get("/api/v1/reports")
+def list_situation_reports(
+    response: Response,
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0)
+) -> Any:
+    """Lists generated SITREP reports."""
+    res = handle_list_reports_endpoint(limit=limit, offset=offset)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# GET /api/v1/reports/{report_id}
+@app.get("/api/v1/reports/{report_id}")
+def get_situation_report(report_id: str, response: Response) -> Any:
+    """Gets single SITREP report by ID."""
+    res = handle_get_report_endpoint(report_id)
     response.status_code = res["status_code"]
     return res["data"]
 
