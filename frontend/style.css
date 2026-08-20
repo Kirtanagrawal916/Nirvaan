@@ -4020,6 +4020,17 @@ html[data-theme="light"] .risk-analysis-section {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
 }
 
+/* Z-INDEX LAYER STACKING UTILITIES */
+.text-box {
+  position: relative;
+  z-index: 2;
+}
+
+.background {
+  position: absolute;
+  z-index: 1;
+}
+
 
 
 
