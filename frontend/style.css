@@ -3930,9 +3930,10 @@ html[data-theme="light"] .risk-card-body h3 {
     inset: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 0;
+    z-index: -1;
     pointer-events: none;
     overflow: hidden;
+    opacity: 0.5;
 }
 
 #satelliteOrbitCanvas {
@@ -3944,7 +3945,7 @@ html[data-theme="light"] .risk-card-body h3 {
 .space-orbit-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(11, 15, 25, 0.55) 0%, rgba(11, 15, 25, 0.15) 45%, rgba(11, 15, 25, 0.65) 100%);
+    background: linear-gradient(180deg, rgba(11, 15, 25, 0.65) 0%, rgba(11, 15, 25, 0.35) 45%, rgba(11, 15, 25, 0.75) 100%);
     pointer-events: none;
 }
 
@@ -3987,7 +3988,7 @@ html[data-theme="light"] .risk-card-body h3 {
     opacity: 0.8;
 }
 
-/* FLOATING GLASS UI ELEVATION OVERLAY WITH OPTIMIZED TEXT CLARITY */
+/* FLOATING GLASS UI ELEVATION OVERLAY WITH 100% TEXT READABILITY & ZERO OBSCURATION */
 .nirvaan-dashboard-container {
     position: relative;
     z-index: 10;
@@ -3996,12 +3997,16 @@ html[data-theme="light"] .risk-card-body h3 {
 .metric-card-box,
 .sat-main-panel,
 .disaster-analysis-sidebar,
-.risk-analysis-section {
-    background: rgba(11, 16, 28, 0.68) !important;
-    backdrop-filter: blur(14px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
+.risk-analysis-section,
+.panel,
+.card {
+    position: relative;
+    z-index: 5;
+    background: rgba(14, 20, 34, 0.92) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
     border: 1px solid rgba(56, 189, 248, 0.3) !important;
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45), inset 0 0 25px rgba(56, 189, 248, 0.06) !important;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), inset 0 0 25px rgba(56, 189, 248, 0.05) !important;
 }
 
 /* LIGHT THEME OVERRIDES FOR DYNAMIC BACKGROUND */
@@ -4012,12 +4017,234 @@ html[data-theme="light"] .space-orbit-overlay {
 html[data-theme="light"] .metric-card-box,
 html[data-theme="light"] .sat-main-panel,
 html[data-theme="light"] .disaster-analysis-sidebar,
-html[data-theme="light"] .risk-analysis-section {
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(14px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
+html[data-theme="light"] .risk-analysis-section,
+html[data-theme="light"] .panel,
+html[data-theme="light"] .card {
+    position: relative;
+    z-index: 5;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
     border-color: #cbd5e1 !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Z-INDEX LAYER STACKING UTILITIES */
+.text-box {
+  position: relative;
+  z-index: 2;
+}
+
+.background {
+  position: absolute;
+  z-index: 1;
+}
+
+/* =========================================================
+   INTERACTIVE DISASTER RISK MAP STYLES
+========================================================= */
+
+.risk-map-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 1100px) {
+    .risk-map-layout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.risk-map-viewport {
+    position: relative;
+    height: 520px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #0e1726 0%, #080c14 100%);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+}
+
+.risk-map-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.08) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+}
+
+/* ANIMATED GLOWING RADIAL GRADIENT RISK ZONES */
+.risk-zone-radial {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.risk-zone-radial.red {
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.8) 0%, rgba(239, 68, 68, 0.35) 45%, rgba(239, 68, 68, 0) 75%);
+    animation: riskGlowPulseRed 2.8s infinite alternate ease-in-out;
+}
+
+.risk-zone-radial.orange {
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.75) 0%, rgba(249, 115, 22, 0.3) 45%, rgba(249, 115, 22, 0) 75%);
+    animation: riskGlowPulseOrange 3.2s infinite alternate ease-in-out;
+}
+
+.risk-zone-radial.green {
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.65) 0%, rgba(34, 197, 94, 0.25) 45%, rgba(34, 197, 94, 0) 75%);
+    animation: riskGlowPulseGreen 3.6s infinite alternate ease-in-out;
+}
+
+@keyframes riskGlowPulseRed {
+    0% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.75; }
+    100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+}
+
+@keyframes riskGlowPulseOrange {
+    0% { transform: translate(-50%, -50%) scale(0.94); opacity: 0.7; }
+    100% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.95; }
+}
+
+@keyframes riskGlowPulseGreen {
+    0% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.6; }
+    100% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.85; }
+}
+
+/* INTERACTIVE PINS & TOOLTIP */
+.risk-map-pin {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 15;
+    box-shadow: 0 0 14px currentColor;
+    transition: transform 0.2s ease;
+}
+
+.risk-map-pin:hover {
+    transform: translate(-50%, -50%) scale(1.25);
+}
+
+.risk-map-pin.red { background: #ef4444; border: 2px solid #ffffff; box-shadow: 0 0 16px #ef4444; }
+.risk-map-pin.orange { background: #f97316; border: 2px solid #ffffff; box-shadow: 0 0 16px #f97316; }
+.risk-map-pin.green { background: #22c55e; border: 2px solid #ffffff; box-shadow: 0 0 16px #22c55e; }
+
+.map-tooltip-card {
+    position: absolute;
+    z-index: 30;
+    width: 280px;
+    background: rgba(11, 16, 28, 0.95);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.map-tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.map-tooltip-header h4 {
+    font-size: 13px;
+    font-weight: 800;
+    color: #38bdf8;
+    margin: 0;
+}
+
+.map-tooltip-badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.map-tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 6px;
+    color: #cbd5e1;
+}
+
+.map-tooltip-row strong {
+    color: #ffffff;
+}
+
+/* SPATIAL ANALYTICS SIDEBAR & GRAPH GAUGES */
+.spatial-analytics-sidebar {
+    background: rgba(14, 20, 34, 0.92);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.trend-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.trend-progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+
+/* LIGHT THEME OVERRIDES FOR RISK MAP */
+html[data-theme="light"] .risk-map-viewport {
+    background: radial-gradient(circle at center, #f8fafc 0%, #e2e8f0 100%);
+    border-color: #cbd5e1;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+html[data-theme="light"] .risk-map-bg-grid {
+    background-image: 
+        linear-gradient(rgba(2, 132, 199, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(2, 132, 199, 0.1) 1px, transparent 1px);
+}
+
+html[data-theme="light"] .map-tooltip-card,
+html[data-theme="light"] .spatial-analytics-sidebar {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: #cbd5e1;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+html[data-theme="light"] .map-tooltip-row {
+    color: #475569;
+}
+
+html[data-theme="light"] .map-tooltip-row strong {
+    color: #0f172a;
 }
 
 
