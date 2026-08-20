@@ -4454,26 +4454,96 @@ html[data-theme="light"] .sat-btn-group-toggles {
 
 html[data-theme="light"] .disaster-analysis-sidebar {
     background: #ffffff;
-    border-color: #e2e8f0;
+    border-color: #cbd5e1;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 }
 
 html[data-theme="light"] .risk-analysis-section {
     background: #ffffff;
-    border-color: #e2e8f0;
+    border-color: #cbd5e1;
 }
 
 html[data-theme="light"] .risk-section-header h2 {
     color: #0284c7;
 }
 
+html[data-theme="light"] .risk-section-header p {
+    color: #475569;
+}
+
 html[data-theme="light"] .risk-card-item {
-    background: #f8fafc;
+    background: #ffffff;
     border-color: #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 html[data-theme="light"] .risk-card-body h3 {
     color: #0f172a;
+}
+
+html[data-theme="light"] .risk-card-body p {
+    color: #475569;
+}
+
+html[data-theme="light"] .risk-bullet-row {
+    color: #334155;
+    font-weight: 500;
+}
+
+html[data-theme="light"] .risk-bullet-row span {
+    color: #334155;
+}
+
+html[data-theme="light"] .risk-bullet-row strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* Sidebar Light Theme High-Contrast Overrides */
+html[data-theme="light"] .sidebar-title-header span {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+}
+
+html[data-theme="light"] .analysis-type-info h4 {
+    color: #991b1b !important;
+    font-weight: 800 !important;
+}
+
+html[data-theme="light"] .analysis-type-info p {
+    color: #475569 !important;
+}
+
+html[data-theme="light"] .confidence-header span {
+    color: #334155 !important;
+    font-weight: 700 !important;
+}
+
+html[data-theme="light"] .analysis-metric-row {
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .analysis-metric-row span {
+    color: #475569 !important;
+    font-weight: 700 !important;
+}
+
+html[data-theme="light"] .analysis-metric-row strong {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+}
+
+html[data-theme="light"] .analysis-metric-row strong.highlight-orange {
+    color: #ea580c !important;
+}
+
+html[data-theme="light"] .analysis-metric-row strong.highlight-cyan {
+    color: #0284c7 !important;
+}
+
+html[data-theme="light"] .analysis-metric-row strong.highlight-red {
+    color: #dc2626 !important;
 }
 
 /* =========================================================
