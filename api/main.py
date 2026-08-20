@@ -40,7 +40,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# BH-02 — Static Asset Serving
+# BH-02 — Browser-Accessible Satellite Asset Serving
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 
