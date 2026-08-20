@@ -131,7 +131,15 @@ function initAuth() {
     const govSSOBtn = document.getElementById("govSSOBtn");
 
     let savedUser = localStorage.getItem("nirvaan_user");
-    let currentUser = savedUser ? JSON.parse(savedUser) : null;
+    let currentUser = null;
+    if (savedUser) {
+        try {
+            currentUser = JSON.parse(savedUser);
+        } catch (err) {
+            console.warn("Invalid nirvaan_user JSON in localStorage, clearing item.", err);
+            localStorage.removeItem("nirvaan_user");
+        }
+    }
 
     function updateAuthUI() {
         if (currentUser && currentUser.isLoggedIn) {
