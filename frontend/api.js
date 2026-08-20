@@ -5,12 +5,32 @@
    No mock/synthetic/fake data fallbacks.
 ========================================================= */
 
-const API_BASE_URL =
-    (typeof window !== "undefined" && window.NIRVAAN_API_URL)
-    ? window.NIRVAAN_API_URL
-    : (typeof window !== "undefined" && window.VITE_NIRVAAN_API_URL)
-    ? window.VITE_NIRVAAN_API_URL
-    : "http://localhost:8000/api";
+function getApiBaseUrl() {
+    // 1. Check window explicit override
+    if (typeof window !== "undefined" && window.NIRVAAN_API_URL) {
+        let u = String(window.NIRVAAN_API_URL).trim().replace(/\/$/, "");
+        return u.endsWith("/api") ? u : `${u}/api`;
+    }
+
+    // 2. Check Vite environment variables (VITE_API_BASE_URL or VITE_NIRVAAN_API_URL)
+    if (typeof import.meta !== "undefined" && import.meta.env) {
+        const viteUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_NIRVAAN_API_URL;
+        if (viteUrl) {
+            let u = String(viteUrl).trim().replace(/\/$/, "");
+            return u.endsWith("/api") ? u : `${u}/api`;
+        }
+    }
+
+    // 3. If running on local development host (localhost or 127.0.0.1)
+    if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+        return "http://localhost:8000/api";
+    }
+
+    // 4. Default Production Render Backend URL (for Vercel deployment and non-localhost)
+    return "https://nirvaan-pd7i.onrender.com/api";
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 
 /* =========================================================
@@ -34,7 +54,7 @@ async function getLatestDisaster() {
             beforeImage: "assets/before.jpg",
             afterImage: "assets/after.jpg",
             data_provenance: "NO_LIVE_DATA",
-            error: str(error)
+            error: String(error)
         };
     }
 }
