@@ -25,6 +25,14 @@ class TestFastAPIApplication(unittest.TestCase):
             self.skipTest("fastapi or starlette TestClient not installed in current environment")
         self.client = TestClient(app)
 
+    def test_root_endpoint(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            "status": "ok",
+            "message": "Nirvaan API is running"
+        })
+
     def test_health_check_endpoint(self):
         response = self.client.get("/api/v1/health")
         self.assertEqual(response.status_code, 200)

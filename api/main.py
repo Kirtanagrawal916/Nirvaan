@@ -51,6 +51,16 @@ if ASSETS_DIR.exists():
     app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
 
 
+# Root Endpoint — GET /
+@app.get("/")
+def root() -> Dict[str, str]:
+    """Root endpoint returning API status message."""
+    return {
+        "status": "ok",
+        "message": "Nirvaan API is running"
+    }
+
+
 # B-03 — GET /api/v1/health
 @app.get("/api/v1/health")
 @app.get("/api/health")
