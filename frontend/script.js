@@ -1,4 +1,17 @@
 
+function getTimeBasedGreeting() {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+        return { text: "Good Morning", icon: "☀️" };
+    } else if (hour >= 12 && hour < 17) {
+        return { text: "Good Afternoon", icon: "🌤️" };
+    } else if (hour >= 17 && hour < 21) {
+        return { text: "Good Evening", icon: "🌆" };
+    } else {
+        return { text: "Good Night", icon: "🌙" };
+    }
+}
+
 function setPageContent(html) {
     const container = document.getElementById("pageContent");
     if (container) {
@@ -917,14 +930,16 @@ function showDashboard() {
         </div>
     `;
 
+    const greeting = getTimeBasedGreeting();
+
     setPageContent(`
         <section class="dashboard-section nirvaan-dashboard-container">
 
-            <!-- FUTURISTIC MORNING WELCOME HERO BANNER -->
+            <!-- FUTURISTIC DYNAMIC WELCOME HERO BANNER -->
             <div class="morning-hero-banner">
                 <div class="morning-hero-content">
                     <h1 class="morning-greeting-title">
-                        Good Morning <span class="sun-icon-glowing">☀️</span>
+                        ${greeting.text} <span class="sun-icon-glowing">${greeting.icon}</span>
                     </h1>
                     <p class="morning-welcome-subtitle">Welcome to Nirvaan</p>
                     <div class="morning-badge">
