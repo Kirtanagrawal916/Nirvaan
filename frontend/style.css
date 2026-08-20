@@ -1646,8 +1646,266 @@ html[data-theme="light"] .theme-toggle-btn:hover {
 }
 
 /* =========================================================
-   FAQ SECTION STYLING (MATCHES ABOUT NIRVAAN SECTION)
+   ABOUT SECTION STYLING (MATCHES FAQ CARD STYLING)
 ========================================================= */
+
+.about-card-item {
+    position: relative;
+    background: rgba(14, 20, 34, 0.92);
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    border-left: 4px solid #38bdf8;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.about-card-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+    border-left-color: #0ea5e9;
+}
+
+.about-heading {
+    color: #38bdf8;
+    font-size: 18.5px;
+    font-weight: 800;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 1;
+}
+
+.about-heading-icon {
+    color: #38bdf8;
+    font-weight: 900;
+}
+
+.about-heading-text {
+    color: #f8fafc;
+}
+
+.about-answer {
+    color: #e2e8f0;
+    font-size: 15px;
+    line-height: 1.75;
+    margin: 0;
+    opacity: 1;
+}
+
+.about-answer strong {
+    color: #38bdf8;
+}
+
+/* LIGHT THEME OVERRIDES FOR ABOUT SECTION */
+html[data-theme="light"] .about-card-item {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-left: 4px solid #0284c7 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+html[data-theme="light"] .about-heading {
+    color: #0A0A0A !important;
+    font-size: 18.5px !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+}
+
+html[data-theme="light"] .about-heading-icon {
+    color: #0284c7 !important;
+    font-weight: 900 !important;
+}
+
+html[data-theme="light"] .about-heading-text {
+    color: #0A0A0A !important;
+}
+
+html[data-theme="light"] .about-answer {
+    color: #333333 !important;
+    font-size: 15px !important;
+    line-height: 1.75 !important;
+    opacity: 1 !important;
+}
+
+html[data-theme="light"] .about-answer strong {
+    color: #0284c7 !important;
+    font-weight: 700 !important;
+}
+
+/* =========================================================
+   INTERACTIVE RECORD & HISTORY SECTION STYLING
+========================================================= */
+
+.record-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.record-stat-card {
+    background: rgba(14, 20, 34, 0.92);
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    border-radius: 14px;
+    padding: 18px 22px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.record-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.record-stat-val {
+    font-size: 24px;
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 1.1;
+}
+
+.record-stat-label {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+.record-search-input {
+    background: rgba(15, 22, 36, 0.92);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #ffffff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    width: 280px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.record-search-input:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+.record-table-wrapper {
+    overflow-x: auto;
+    border-radius: 14px;
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    background: rgba(14, 20, 34, 0.92);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.record-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.record-table th {
+    background: rgba(255, 255, 255, 0.04);
+    color: #38bdf8;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.record-table td {
+    padding: 16px 20px;
+    font-size: 13.5px;
+    color: #cbd5e1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s ease;
+}
+
+.record-table tr:hover td {
+    background: rgba(56, 189, 248, 0.06);
+    color: #ffffff;
+}
+
+.record-status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    display: inline-block;
+}
+
+.record-status-badge.critical {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.record-status-badge.warning {
+    background: rgba(249, 115, 22, 0.2);
+    color: #f97316;
+    border: 1px solid rgba(249, 115, 22, 0.4);
+}
+
+.record-status-badge.resolved {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+/* LIGHT THEME OVERRIDES FOR RECORD SECTION */
+html[data-theme="light"] .record-stat-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05) !important;
+}
+
+html[data-theme="light"] .record-stat-val {
+    color: #0A0A0A !important;
+}
+
+html[data-theme="light"] .record-stat-label {
+    color: #333333 !important;
+}
+
+html[data-theme="light"] .record-search-input {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0A0A0A !important;
+}
+
+html[data-theme="light"] .record-table-wrapper {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05) !important;
+}
+
+html[data-theme="light"] .record-table th {
+    background: #f8fafc !important;
+    color: #0284c7 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] .record-table td {
+    color: #333333 !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+
+html[data-theme="light"] .record-table tr:hover td {
+    background: #f0f9ff !important;
+    color: #0A0A0A !important;
+}
 
 .faq-container {
     display: flex;
