@@ -1646,8 +1646,73 @@ html[data-theme="light"] .theme-toggle-btn:hover {
 }
 
 /* =========================================================
-   ABOUT SECTION STYLING (MATCHES FAQ CARD STYLING)
+   SETTINGS SECTION STYLING (MATCHES FAQ & ABOUT CARD STYLE)
 ========================================================= */
+
+.settings-card-panel {
+    position: relative;
+    background: rgba(14, 20, 34, 0.92);
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    border-left: 4px solid #38bdf8;
+    border-radius: 14px;
+    padding: 26px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.settings-card-panel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+}
+
+.setting-item {
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.setting-item strong {
+    color: #38bdf8;
+    font-size: 16.5px;
+    font-weight: 800;
+}
+
+.setting-item p {
+    color: #cbd5e1;
+    font-size: 14.5px;
+    line-height: 1.6;
+    margin-top: 4px;
+}
+
+/* LIGHT THEME OVERRIDES FOR SETTINGS SECTION */
+html[data-theme="light"] .settings-card-panel {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-left: 4px solid #0284c7 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+html[data-theme="light"] .settings-card-title {
+    color: #0A0A0A !important;
+    font-size: 19px !important;
+    font-weight: 800 !important;
+}
+
+html[data-theme="light"] .setting-item {
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+
+html[data-theme="light"] .setting-item strong {
+    color: #0A0A0A !important;
+    font-size: 16.5px !important;
+    font-weight: 800 !important;
+}
+
+html[data-theme="light"] .setting-item p {
+    color: #333333 !important;
+    font-size: 14.5px !important;
+    line-height: 1.6 !important;
+}
 
 .about-card-item {
     position: relative;
