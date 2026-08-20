@@ -13,13 +13,16 @@ Includes:
 """
 
 from datetime import datetime, timezone
+import json
 import logging
 import threading
 import time
 from typing import Any, Dict, Optional
 
 from db.repository import DatabaseRepository
-from services.flood_service import RealFloodDetectionService
+from detection.detector_base import DetectorInput
+from detection.detector_registry import DetectorRegistry
+from services.notification_service import NotificationEngine
 from utils.logging import set_job_id, set_request_id
 from utils.validation import validate_detection_result
 
@@ -29,15 +32,17 @@ MAX_RETRIES = 2
 
 
 class AsyncDetectionWorker:
-    """Worker service for processing queued detection jobs asynchronously."""
+    """Worker service for processing queued multi-disaster detection jobs asynchronously."""
 
     def __init__(
         self,
         repo: Optional[DatabaseRepository] = None,
-        flood_service: Optional[RealFloodDetectionService] = None,
+        notification_engine: Optional[NotificationEngine] = None,
+        flood_service: Optional[Any] = None,
+        **kwargs
     ):
         self.repo = repo or DatabaseRepository()
-        self.flood_service = flood_service or RealFloodDetectionService(repo=self.repo)
+        self.notification_engine = notification_engine or NotificationEngine(repo=self.repo)
 
     def submit_detection_job(
         self,
@@ -51,9 +56,11 @@ class AsyncDetectionWorker:
         """
         Enqueues an asynchronous detection job after checking AOI duplicate idempotency.
         """
+        norm_type = (disaster_type or "flood").lower().strip()
+
         # Idempotency / duplicate job check
         active_job = self.repo.find_active_job_for_aoi(
-            disaster_type=disaster_type,
+            disaster_type=norm_type,
             latitude=latitude,
             longitude=longitude,
             delta=0.05
@@ -64,7 +71,7 @@ class AsyncDetectionWorker:
 
         # Create new job record
         job = self.repo.create_job(
-            disaster_type=disaster_type,
+            disaster_type=norm_type,
             latitude=latitude,
             longitude=longitude,
             user_id=user_id
@@ -74,7 +81,7 @@ class AsyncDetectionWorker:
         # Launch worker thread
         thread = threading.Thread(
             target=self._process_job_lifecycle,
-            args=(job_id, latitude, longitude, location_name, request_id),
+            args=(job_id, norm_type, latitude, longitude, location_name, user_id, request_id),
             daemon=True
         )
         thread.start()
@@ -84,12 +91,14 @@ class AsyncDetectionWorker:
     def _process_job_lifecycle(
         self,
         job_id: str,
+        disaster_type: str,
         latitude: float,
         longitude: float,
         location_name: Optional[str],
+        user_id: Optional[str],
         request_id: Optional[str]
     ) -> None:
-        """Executes the multi-stage asynchronous processing lifecycle for a job."""
+        """Executes the multi-stage asynchronous processing lifecycle for a multi-disaster job."""
         if request_id:
             set_request_id(request_id)
         set_job_id(job_id)
@@ -108,17 +117,23 @@ class AsyncDetectionWorker:
         )
 
         try:
+            detector = DetectorRegistry.get_detector(disaster_type, repo=self.repo)
+
             # Stage 2: Preprocessing
             self.repo.update_job_status(job_id, status="processing", stage="preprocessing", progress=40)
 
             # Stage 3: ML Inference
             self.repo.update_job_status(job_id, status="processing", stage="inference", progress=60)
-            result = self.flood_service.execute_detection(
+            
+            inp = DetectorInput(
                 latitude=latitude,
                 longitude=longitude,
-                location_name=location_name,
-                disaster_type="flood"
+                location_name=location_name or f"{disaster_type.capitalize()} Observation Area",
+                disaster_type=disaster_type,
+                user_id=user_id
             )
+            detector_output = detector.run(inp)
+            result = detector_output.to_dict()
 
             # Stage 4: Postprocessing & Validation
             self.repo.update_job_status(job_id, status="processing", stage="postprocessing", progress=80)
@@ -146,27 +161,40 @@ class AsyncDetectionWorker:
                 stage="completed",
                 progress=100,
                 completed_at=completed_str,
-                result_dict=result
+                result_json=result
             )
-            logger.info("Job %s completed successfully", job_id)
+
+            # Event-Driven Notification Processing
+            alerts = self.repo.get_alerts()
+            if alerts:
+                top_alert = alerts[0]
+                self.notification_engine.process_alert_notifications(
+                    alert_id=top_alert["id"],
+                    event_id=result["event_id"],
+                    disaster_type=disaster_type,
+                    severity=result.get("severity", "MODERATE"),
+                    confidence=result.get("confidence_score", 90.0)
+                )
+
+            logger.info("Asynchronously completed detection job %s (%s) for AOI [%.3f, %.3f]", job_id, disaster_type, latitude, longitude)
 
         except Exception as e:
-            logger.error("Job %s encountered error (retry %d/%d): %s", job_id, retry_count, MAX_RETRIES, e)
-
+            logger.error("Error executing detection job %s: %s", job_id, e)
             if retry_count < MAX_RETRIES:
-                # Execute retry policy
                 new_retry = retry_count + 1
+                backoff_sec = 2 ** new_retry
+                logger.info("Retrying job %s (attempt %d/%d) in %ds...", job_id, new_retry, MAX_RETRIES, backoff_sec)
+                time.sleep(backoff_sec)
+                retry_now = datetime.now(timezone.utc).isoformat()
                 self.repo.update_job_status(
                     job_id,
                     status="processing",
                     stage="retrying",
                     retry_count=new_retry,
-                    last_retry_at=datetime.now(timezone.utc).isoformat()
+                    last_retry_at=retry_now
                 )
-                time.sleep(1.5 * new_retry)  # Short backoff
-                self._process_job_lifecycle(job_id, latitude, longitude, location_name, request_id)
+                self._process_job_lifecycle(job_id, disaster_type, latitude, longitude, location_name, user_id, request_id)
             else:
-                # Permanent failure
                 completed_str = datetime.now(timezone.utc).isoformat()
                 self.repo.update_job_status(
                     job_id,

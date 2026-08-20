@@ -276,6 +276,93 @@ def get_risk_map(response: Response) -> Dict[str, Any]:
     return res["data"]
 
 
+# =========================================================
+# PHASE 3: ANALYTICS & METADATA ENDPOINTS
+# =========================================================
+
+# GET /api/v1/analytics/overview
+@app.get("/api/v1/analytics/overview")
+def get_analytics_overview(response: Response, days: int = Query(30, ge=1, le=365)) -> Dict[str, Any]:
+    """Returns high-level aggregated analytics overview."""
+    from api.server import handle_analytics_overview_endpoint
+    res = handle_analytics_overview_endpoint(days=days)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# GET /api/v1/analytics/timeseries
+@app.get("/api/v1/analytics/timeseries")
+def get_analytics_timeseries(response: Response, days: int = Query(30, ge=1, le=365)) -> Any:
+    """Returns time-series disaster incident counts."""
+    from api.server import handle_analytics_timeseries_endpoint
+    res = handle_analytics_timeseries_endpoint(days=days)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# GET /api/v1/analytics/disasters
+@app.get("/api/v1/analytics/disasters")
+def get_analytics_disasters(response: Response) -> Dict[str, Any]:
+    """Returns disaster type frequency and severity distributions."""
+    from api.server import handle_analytics_disasters_endpoint
+    res = handle_analytics_disasters_endpoint()
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# GET /api/v1/analytics/geography
+@app.get("/api/v1/analytics/geography")
+def get_analytics_geography(response: Response) -> Any:
+    """Returns geographic incident clusters."""
+    from api.server import handle_analytics_geography_endpoint
+    res = handle_analytics_geography_endpoint()
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# GET /api/v1/disaster-types
+@app.get("/api/v1/disaster-types")
+def get_disaster_types_metadata(response: Response) -> Dict[str, Any]:
+    """Returns metadata for all supported disaster types, sensors, and limitations."""
+    from api.server import handle_disaster_types_metadata_endpoint
+    res = handle_disaster_types_metadata_endpoint()
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# GET /api/v1/notifications/preferences
+@app.get("/api/v1/notifications/preferences")
+def get_user_notification_preferences(response: Response, authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
+    """Gets notification preferences for authenticated user."""
+    from api.server import handle_get_user_preferences_endpoint
+    current_user = get_current_user_from_header(authorization)
+    res = handle_get_user_preferences_endpoint(current_user)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# POST /api/v1/notifications/preferences
+@app.post("/api/v1/notifications/preferences")
+def save_user_notification_preferences(payload: Dict[str, Any], response: Response, authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
+    """Saves notification preferences for authenticated user."""
+    from api.server import handle_save_user_preferences_endpoint
+    current_user = get_current_user_from_header(authorization)
+    res = handle_save_user_preferences_endpoint(payload, current_user)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# POST /api/v1/notifications/rules
+@app.post("/api/v1/notifications/rules")
+def create_notification_rule(payload: Dict[str, Any], response: Response, authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
+    """Creates a configurable alert notification rule."""
+    from api.server import handle_create_notification_rule_endpoint
+    current_user = get_current_user_from_header(authorization)
+    res = handle_create_notification_rule_endpoint(payload, current_user)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))

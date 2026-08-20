@@ -163,13 +163,60 @@ def init_db(db_path: Optional[Path] = None) -> None:
     );
     """)
 
-    # 8. Indexes for performance
+    # 8. Notification Rules Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS notification_rules (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        disaster_types TEXT NOT NULL DEFAULT 'all',
+        min_severity TEXT NOT NULL DEFAULT 'MODERATE',
+        min_confidence REAL NOT NULL DEFAULT 70.0,
+        channels_json TEXT NOT NULL DEFAULT '["in_app"]',
+        is_active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL
+    );
+    """)
+
+    # 9. Notifications Log Table (with Idempotency Key)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS notifications_log (
+        id TEXT PRIMARY KEY,
+        alert_id TEXT NOT NULL,
+        event_id TEXT NOT NULL,
+        channel TEXT NOT NULL,
+        recipient TEXT,
+        status TEXT NOT NULL DEFAULT 'DELIVERED', -- PENDING, DELIVERED, FAILED
+        idempotency_key TEXT NOT NULL UNIQUE,
+        failure_reason TEXT,
+        sent_at TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    );
+    """)
+
+    # 10. User Notification Preferences Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS user_preferences (
+        user_id TEXT PRIMARY KEY,
+        email TEXT,
+        phone TEXT,
+        disaster_types_json TEXT NOT NULL DEFAULT '["flood", "wildfire", "severe_weather"]',
+        min_severity TEXT NOT NULL DEFAULT 'MODERATE',
+        quiet_hours_enabled INTEGER NOT NULL DEFAULT 0,
+        updated_at TEXT NOT NULL
+    );
+    """)
+
+    # Indexes for performance and analytics
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_disasters_detection_time ON disasters(detection_time DESC);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_disasters_type_severity ON disasters(event_type, severity);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_disasters_created ON disasters(created_at DESC);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_created_status ON analysis_jobs(status, created_at DESC);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_alerts_created ON alerts(created_at DESC);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_alerts_event ON alerts(disaster_id);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_reports_created ON reports(created_at DESC);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_notif_log_alert ON notifications_log(alert_id, status);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_notif_log_idempotency ON notifications_log(idempotency_key);")
 
     # Safe Schema Migrations for existing databases
     existing_job_cols = [r["name"] for r in cursor.execute("PRAGMA table_info(analysis_jobs);").fetchall()]
