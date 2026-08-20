@@ -1084,35 +1084,50 @@ async function showDashboard() {
 
                 <div class="faq-container">
                     <div class="faq-card-item">
-                        <h4 class="faq-heading">Q1: How does Nirvaan detect disaster affected zones?</h4>
+                        <h4 class="faq-heading">
+                            <span class="faq-heading-prefix">Q1:</span>
+                            <span class="faq-heading-text">How does Nirvaan detect disaster affected zones?</span>
+                        </h4>
                         <p class="faq-answer">
                             Nirvaan compares pre-event baseline scenes with post-event satellite imagery using optical spectral indices (<strong>NDWI</strong> for floods, <strong>dNBR</strong> for burn severity) and synthetic aperture radar (<strong>SAR</strong>) to identify flooded surfaces regardless of cloud cover.
                         </p>
                     </div>
 
                     <div class="faq-card-item">
-                        <h4 class="faq-heading">Q2: What satellite constellations are supported?</h4>
+                        <h4 class="faq-heading">
+                            <span class="faq-heading-prefix">Q2:</span>
+                            <span class="faq-heading-text">What satellite constellations are supported?</span>
+                        </h4>
                         <p class="faq-answer">
                             Nirvaan natively ingests <strong>Copernicus Sentinel-2</strong> (Optical), <strong>Sentinel-1</strong> (C-Band Radar), <strong>USGS Landsat-8/9</strong>, and high-resolution <strong>PlanetScope (3m)</strong> imagery feeds via automated REST APIs.
                         </p>
                     </div>
 
                     <div class="faq-card-item">
-                        <h4 class="faq-heading">Q3: How frequently is the disaster risk map updated?</h4>
+                        <h4 class="faq-heading">
+                            <span class="faq-heading-prefix">Q3:</span>
+                            <span class="faq-heading-text">How frequently is the disaster risk map updated?</span>
+                        </h4>
                         <p class="faq-answer">
                             Automated background tasks ingest new satellite passes as soon as they become available from orbital feeds (typically <strong>12 to 24-hour revisit cadence</strong>), instantly recalculating hazard boundaries.
                         </p>
                     </div>
 
                     <div class="faq-card-item">
-                        <h4 class="faq-heading">Q4: Can SITREP situational reports be exported?</h4>
+                        <h4 class="faq-heading">
+                            <span class="faq-heading-prefix">Q4:</span>
+                            <span class="faq-heading-text">Can SITREP situational reports be exported?</span>
+                        </h4>
                         <p class="faq-answer">
                             Yes, under the <strong>Reports</strong> tab, response leads can generate and export <strong>JSON metadata</strong>, <strong>GeoJSON impact vector boundaries</strong>, or formatted <strong>SITREP situation reports</strong>.
                         </p>
                     </div>
 
                     <div class="faq-card-item">
-                        <h4 class="faq-heading">Q5: How do first responders receive critical warnings?</h4>
+                        <h4 class="faq-heading">
+                            <span class="faq-heading-prefix">Q5:</span>
+                            <span class="faq-heading-text">How do first responders receive critical warnings?</span>
+                        </h4>
                         <p class="faq-answer">
                             Whenever the AI neural network detects inundation confidence exceeding <strong>85%</strong>, automated push notifications and SMS warning broadcasts are immediately dispatched to registered emergency commanders.
                         </p>
@@ -2259,35 +2274,50 @@ function showFAQ() {
         <div class="faq-container">
 
             <div class="faq-card-item">
-                <h3 class="faq-heading">Q1: How does Nirvaan detect disaster affected zones?</h3>
+                <h3 class="faq-heading">
+                    <span class="faq-heading-prefix">Q1:</span>
+                    <span class="faq-heading-text">How does Nirvaan detect disaster affected zones?</span>
+                </h3>
                 <p class="faq-answer">
                     Nirvaan compares pre-event baseline scenes with post-event satellite imagery using optical spectral indices (<strong>NDWI</strong> for floods, <strong>dNBR</strong> for burn severity) and synthetic aperture radar (<strong>SAR</strong>) to identify flooded surfaces regardless of cloud cover.
                 </p>
             </div>
 
             <div class="faq-card-item">
-                <h3 class="faq-heading">Q2: What satellite constellations are supported?</h3>
+                <h3 class="faq-heading">
+                    <span class="faq-heading-prefix">Q2:</span>
+                    <span class="faq-heading-text">What satellite constellations are supported?</span>
+                </h3>
                 <p class="faq-answer">
                     Nirvaan natively ingests <strong>Copernicus Sentinel-2</strong> (Optical), <strong>Sentinel-1</strong> (C-Band Radar), <strong>USGS Landsat-8/9</strong>, and high-resolution <strong>PlanetScope (3m)</strong> imagery feeds via automated REST APIs.
                 </p>
             </div>
 
             <div class="faq-card-item">
-                <h3 class="faq-heading">Q3: How frequently is the disaster risk map updated?</h3>
+                <h3 class="faq-heading">
+                    <span class="faq-heading-prefix">Q3:</span>
+                    <span class="faq-heading-text">How frequently is the disaster risk map updated?</span>
+                </h3>
                 <p class="faq-answer">
                     Automated background tasks ingest new satellite passes as soon as they become available from orbital feeds (typically <strong>12 to 24-hour revisit cadence</strong>), instantly recalculating hazard boundaries.
                 </p>
             </div>
 
             <div class="faq-card-item">
-                <h3 class="faq-heading">Q4: Can SITREP situational reports be exported?</h3>
+                <h3 class="faq-heading">
+                    <span class="faq-heading-prefix">Q4:</span>
+                    <span class="faq-heading-text">Can SITREP situational reports be exported?</span>
+                </h3>
                 <p class="faq-answer">
                     Yes, under the <strong>Reports</strong> tab, response leads can generate and export <strong>JSON metadata</strong>, <strong>GeoJSON impact vector boundaries</strong>, or formatted <strong>SITREP situation reports</strong>.
                 </p>
             </div>
 
             <div class="faq-card-item">
-                <h3 class="faq-heading">Q5: How do first responders receive critical warnings?</h3>
+                <h3 class="faq-heading">
+                    <span class="faq-heading-prefix">Q5:</span>
+                    <span class="faq-heading-text">How do first responders receive critical warnings?</span>
+                </h3>
                 <p class="faq-answer">
                     Whenever the AI neural network detects inundation confidence exceeding <strong>85%</strong>, automated push notifications and SMS warning broadcasts are immediately dispatched to registered emergency commanders.
                 </p>
