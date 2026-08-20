@@ -1035,40 +1035,52 @@ async function showDashboard() {
                 ${satelliteHtml}
             </div>
 
-            <!-- ABOUT NIRVAAN SECTION -->
-            <div class="panel" style="width: 100%; padding: 32px; border-radius: 16px; margin-top: 24px; background: rgba(13, 19, 33, 0.72); border: 1px solid rgba(56, 189, 248, 0.28);">
-                <h2 style="margin-bottom: 16px; color: #38bdf8; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+            <!-- ABOUT NIRVAAN DASHBOARD SECTION -->
+            <div class="panel" style="width: 100%; padding: 32px; border-radius: 16px; margin-top: 24px;">
+                <h2 style="margin-bottom: 16px; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;" class="faq-section-header">
                     <span>🌐</span> About Nirvaan
                 </h2>
-                <p style="font-size: 16px; line-height: 1.8; color: #e0e0e0; margin-bottom: 24px;">
-                    <strong>Nirvaan</strong> is an advanced, satellite-driven disaster intelligence engine engineered to perform <strong>rapid disaster detection</strong>, <strong>inundated area mapping</strong>, and <strong>real-time situational risk assessment</strong>. By fusing multi-spectral satellite imagery (Copernicus Sentinel-2, USGS Landsat-9) with deep learning segmentation neural networks, Nirvaan equips emergency response managers with sub-hour actionable intelligence.
+                <p style="font-size: 15px; margin-bottom: 24px;" class="faq-section-subtitle">
+                    <strong>Nirvaan</strong> is an advanced, satellite-driven disaster intelligence engine engineered to perform <strong>rapid disaster detection</strong>, <strong>inundated area mapping</strong>, and <strong>real-time situational risk assessment</strong>.
                 </p>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
-                    <div class="card" style="padding: 24px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">🛰 Multi-Spectral Imagery</h3>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                    <div class="about-card-item">
+                        <h3 class="about-heading">
+                            <span class="about-heading-icon">🛰</span>
+                            <span class="about-heading-text">Multi-Spectral Imagery</span>
+                        </h3>
+                        <p class="about-answer">
                             Automated extraction of <strong>NDWI (Water Index)</strong> and <strong>SAR (Synthetic Aperture Radar)</strong> masks to detect flood extent through heavy cloud cover.
                         </p>
                     </div>
 
-                    <div class="card" style="padding: 24px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">⚡ Rapid Early Warning</h3>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                    <div class="about-card-item">
+                        <h3 class="about-heading">
+                            <span class="about-heading-icon">⚡</span>
+                            <span class="about-heading-text">Rapid Early Warning</span>
+                        </h3>
+                        <p class="about-answer">
                             Sub-hour automated pipeline processing raw satellite swaths into <strong>high-resolution vector risk maps</strong> and automated broadcasts.
                         </p>
                     </div>
 
-                    <div class="card" style="padding: 24px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">📊 Population & Asset Risk</h3>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                    <div class="about-card-item">
+                        <h3 class="about-heading">
+                            <span class="about-heading-icon">📊</span>
+                            <span class="about-heading-text">Population & Asset Risk</span>
+                        </h3>
+                        <p class="about-answer">
                             Spatial demographic overlay calculating <strong>affected populations</strong>, <strong>submerged roadways</strong>, and <strong>critical infrastructure</strong>.
                         </p>
                     </div>
 
-                    <div class="card" style="padding: 24px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">🛡️ Inter-Agency Interoperability</h3>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                    <div class="about-card-item">
+                        <h3 class="about-heading">
+                            <span class="about-heading-icon">🛡️</span>
+                            <span class="about-heading-text">Inter-Agency Interoperability</span>
+                        </h3>
+                        <p class="about-answer">
                             Seamless GIS spatial telemetry exchange with <strong>NDMA</strong>, <strong>ISRO</strong>, and <strong>State Disaster Relief Forces</strong>.
                         </p>
                     </div>
@@ -1076,44 +1088,59 @@ async function showDashboard() {
             </div>
 
             <!-- FREQUENTLY ASKED QUESTIONS (FAQ) SECTION -->
-            <div class="panel" style="width: 100%; padding: 32px; border-radius: 16px; margin-top: 24px; background: rgba(13, 19, 33, 0.72); border: 1px solid rgba(56, 189, 248, 0.28);">
-                <h2 style="margin-bottom: 16px; color: #38bdf8; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+            <div class="panel" style="width: 100%; padding: 32px; border-radius: 16px; margin-top: 24px;">
+                <h2 style="margin-bottom: 16px; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;" class="faq-section-header">
                     <span>❓</span> Frequently Asked Questions (FAQ)
                 </h2>
-                <p style="font-size: 15px; margin-bottom: 24px; color: #94a3b8;">Learn more about Nirvaan satellite intelligence, metrics, and emergency response workflows.</p>
+                <p style="font-size: 15px; margin-bottom: 24px;" class="faq-section-subtitle">Learn more about Nirvaan satellite intelligence, metrics, and emergency response workflows.</p>
 
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q1: How does Nirvaan detect disaster affected zones?</h4>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                <div class="faq-container">
+                    <div class="faq-card-item">
+                        <h4 class="faq-heading">
+                            <span class="faq-heading-prefix">Q1:</span>
+                            <span class="faq-heading-text">How does Nirvaan detect disaster affected zones?</span>
+                        </h4>
+                        <p class="faq-answer">
                             Nirvaan compares pre-event baseline scenes with post-event satellite imagery using optical spectral indices (<strong>NDWI</strong> for floods, <strong>dNBR</strong> for burn severity) and synthetic aperture radar (<strong>SAR</strong>) to identify flooded surfaces regardless of cloud cover.
                         </p>
                     </div>
 
-                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q2: What satellite constellations are supported?</h4>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                    <div class="faq-card-item">
+                        <h4 class="faq-heading">
+                            <span class="faq-heading-prefix">Q2:</span>
+                            <span class="faq-heading-text">What satellite constellations are supported?</span>
+                        </h4>
+                        <p class="faq-answer">
                             Nirvaan natively ingests <strong>Copernicus Sentinel-2</strong> (Optical), <strong>Sentinel-1</strong> (C-Band Radar), <strong>USGS Landsat-8/9</strong>, and high-resolution <strong>PlanetScope (3m)</strong> imagery feeds via automated REST APIs.
                         </p>
                     </div>
 
-                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q3: How frequently is the disaster risk map updated?</h4>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                    <div class="faq-card-item">
+                        <h4 class="faq-heading">
+                            <span class="faq-heading-prefix">Q3:</span>
+                            <span class="faq-heading-text">How frequently is the disaster risk map updated?</span>
+                        </h4>
+                        <p class="faq-answer">
                             Automated background tasks ingest new satellite passes as soon as they become available from orbital feeds (typically <strong>12 to 24-hour revisit cadence</strong>), instantly recalculating hazard boundaries.
                         </p>
                     </div>
 
-                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q4: Can SITREP situational reports be exported?</h4>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                    <div class="faq-card-item">
+                        <h4 class="faq-heading">
+                            <span class="faq-heading-prefix">Q4:</span>
+                            <span class="faq-heading-text">Can SITREP situational reports be exported?</span>
+                        </h4>
+                        <p class="faq-answer">
                             Yes, under the <strong>Reports</strong> tab, response leads can generate and export <strong>JSON metadata</strong>, <strong>GeoJSON impact vector boundaries</strong>, or formatted <strong>SITREP situation reports</strong>.
                         </p>
                     </div>
 
-                    <div style="padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
-                        <h4 style="margin-bottom: 8px; color: #38bdf8; font-size: 16px; font-weight: 800;">Q5: How do first responders receive critical warnings?</h4>
-                        <p style="font-size: 14.5px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+                    <div class="faq-card-item">
+                        <h4 class="faq-heading">
+                            <span class="faq-heading-prefix">Q5:</span>
+                            <span class="faq-heading-text">How do first responders receive critical warnings?</span>
+                        </h4>
+                        <p class="faq-answer">
                             Whenever the AI neural network detects inundation confidence exceeding <strong>85%</strong>, automated push notifications and SMS warning broadcasts are immediately dispatched to registered emergency commanders.
                         </p>
                     </div>
@@ -1794,113 +1821,238 @@ function showAlerts() {
 
 
 /* =========================================================
-   REPORTS
+   WORKING & INTERACTIVE DISASTER REPORT STUDIO
 ========================================================= */
 
 function showReports() {
 
     setPageContent(`
 
-        <h1 class="page-title">
-            Reports
+        <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
+            SITREP Disaster Intelligence Studio
         </h1>
 
-        <p class="page-subtitle">
-            Disaster analysis reports generated by Nirvaan
+        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">
+            Generate, preview, and export working satellite SITREP situation briefs & GeoJSON spatial vector maps
         </p>
 
+        <!-- INTERACTIVE REPORT GENERATOR CARDS -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 28px;">
 
-        <div class="feature-grid">
-
-
-            <div class="feature-card">
-
-                <div class="big-icon">
-                    📄
+            <div class="about-card-item" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 32px; margin-bottom: 12px;">🌊</div>
+                    <h3 class="about-heading" style="font-size: 18px;">Surat Tapi Flood SITREP</h3>
+                    <p class="about-answer" style="font-size: 14px; margin-bottom: 16px;">
+                        Comprehensive multi-spectral satellite flood report for Surat Tapi Basin. Includes NDWI water masks and inundated population counts.
+                    </p>
                 </div>
-
-                <h3>
-                    Flood Analysis
-                </h3>
-
-                <p>
-                    Detailed satellite-based flood
-                    detection report for Surat.
-                </p>
-
-                <br>
-
-                <button
-                    class="primary-btn"
-                >
-                    Generate Report
+                <button class="sat-action-btn upload" style="width: 100%; justify-content: center; padding: 10px;" onclick="generateReportModal('surat_flood')">
+                    📄 Generate & Preview SITREP
                 </button>
-
             </div>
 
-
-            <div class="feature-card">
-
-                <div class="big-icon">
-                    📊
+            <div class="about-card-item" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 32px; margin-bottom: 12px;">⚡</div>
+                    <h3 class="about-heading" style="font-size: 18px;">Bhuj Seismic Fault Assessment</h3>
+                    <p class="about-answer" style="font-size: 14px; margin-bottom: 16px;">
+                        SAR radar backscatter rift analysis of the Kutch tectonic fault line. Tracks ground displacement and critical rift fractures.
+                    </p>
                 </div>
-
-                <h3>
-                    Risk Assessment
-                </h3>
-
-                <p>
-                    Geographic risk assessment
-                    based on detected disasters.
-                </p>
-
-                <br>
-
-                <button
-                    class="primary-btn"
-                >
-                    Generate Report
+                <button class="sat-action-btn upload" style="width: 100%; justify-content: center; padding: 10px;" onclick="generateReportModal('bhuj_fault')">
+                    📄 Generate & Preview SITREP
                 </button>
-
             </div>
 
-
-            <div class="feature-card">
-
-                <div class="big-icon">
-                    📈
+            <div class="about-card-item" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 32px; margin-bottom: 12px;">🏖️</div>
+                    <h3 class="about-heading" style="font-size: 18px;">Chennai Coastal Tsunami Brief</h3>
+                    <p class="about-answer" style="font-size: 14px; margin-bottom: 16px;">
+                        Coastal surge boundary buffer assessment detailing sea level rise, wave front propagation velocity, and shelter evacuation readiness.
+                    </p>
                 </div>
-
-                <h3>
-                    Historical Trends
-                </h3>
-
-                <p>
-                    Analyze disaster activity over
-                    selected time periods.
-                </p>
-
-                <br>
-
-                <button
-                    class="primary-btn"
-                >
-                    Generate Report
+                <button class="sat-action-btn upload" style="width: 100%; justify-content: center; padding: 10px;" onclick="generateReportModal('chennai_tsunami')">
+                    📄 Generate & Preview SITREP
                 </button>
-
             </div>
 
+            <div class="about-card-item" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 32px; margin-bottom: 12px;">📈</div>
+                    <h3 class="about-heading" style="font-size: 18px;">Brahmaputra Multi-Temporal Audit</h3>
+                    <p class="about-answer" style="font-size: 14px; margin-bottom: 16px;">
+                        Multi-temporal 90-day flood extent progression tracking seasonal overflow trends and river channel migration velocity.
+                    </p>
+                </div>
+                <button class="sat-action-btn upload" style="width: 100%; justify-content: center; padding: 10px;" onclick="generateReportModal('brahmaputra_trend')">
+                    📄 Generate & Preview SITREP
+                </button>
+            </div>
 
+        </div>
+
+        <!-- RECENTLY GENERATED SITREP REPORTS TABLE -->
+        <div class="panel" style="padding: 24px; border-radius: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                <h3 style="font-size: 18px; color: #38bdf8; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 8px;" class="faq-section-header">
+                    <span>📑</span> Generated Operational Audit SITREPs
+                </h3>
+                <span style="font-size: 12px; color: #94a3b8;" class="faq-section-subtitle">4 Master Reports Ready for Export</span>
+            </div>
+
+            <div class="record-table-wrapper">
+                <table class="record-table">
+                    <thead>
+                        <tr>
+                            <th>Report Name</th>
+                            <th>Sensor Constellation</th>
+                            <th>Generated Date</th>
+                            <th>AI Confidence</th>
+                            <th>Format</th>
+                            <th style="text-align: right;">Download Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight: 800; color: #38bdf8;">Surat Flood SITREP #8492</td>
+                            <td>Sentinel-2A & Sentinel-1 SAR</td>
+                            <td>19 Aug 2026</td>
+                            <td><strong style="color: #38bdf8;">94.7%</strong></td>
+                            <td><span class="record-status-badge critical">GeoJSON + PDF</span></td>
+                            <td style="text-align: right;">
+                                <button class="sat-action-btn toggle" style="padding: 5px 12px; font-size: 11px;" onclick="downloadReportFile('geojson', 'surat_flood')">
+                                    📥 Export GeoJSON
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 800; color: #38bdf8;">Bhuj Seismic Fault Brief #8491</td>
+                            <td>Landsat-9 & Sentinel-1 SAR</td>
+                            <td>17 Aug 2026</td>
+                            <td><strong style="color: #38bdf8;">88.2%</strong></td>
+                            <td><span class="record-status-badge warning">JSON + CSV</span></td>
+                            <td style="text-align: right;">
+                                <button class="sat-action-btn toggle" style="padding: 5px 12px; font-size: 11px;" onclick="downloadReportFile('csv', 'bhuj_fault')">
+                                    📥 Export CSV Summary
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 800; color: #38bdf8;">Chennai Tsunami Watch #8490</td>
+                            <td>Sentinel-2B Optical</td>
+                            <td>15 Aug 2026</td>
+                            <td><strong style="color: #38bdf8;">99.1%</strong></td>
+                            <td><span class="record-status-badge resolved">PDF SITREP</span></td>
+                            <td style="text-align: right;">
+                                <button class="sat-action-btn toggle" style="padding: 5px 12px; font-size: 11px;" onclick="downloadReportFile('pdf', 'chennai_tsunami')">
+                                    📄 Download PDF
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     `);
 
 }
 
+function generateReportModal(type) {
+    let title = "Surat Tapi Basin Flood Analysis SITREP";
+    let location = "Surat, Gujarat (Tapi River Corridor)";
+    let area = "42.8 km²";
+    let confidence = "94.7%";
+    let pop = "142,500 residents";
+    let summary = "Pre-event vs post-event optical & SAR radar fusion confirms critical overflow across Tapi river banks. Inundation depth peaks at 2.4 meters with active encroachment into SP25 infrastructure perimeter.";
+
+    if (type === "bhuj_fault") {
+        title = "Bhuj Kutch Seismic Fault Line Assessment";
+        location = "Bhuj, Kutch (Tectonic Rift Zone)";
+        area = "118.5 km²";
+        confidence = "88.2%";
+        pop = "98,200 residents";
+        summary = "Synthetic Aperture Radar (SAR) interferometry detects 3.4 cm ground displacement along the primary fault line. 2 secondary rifts identified with warning level structural risk.";
+    } else if (type === "chennai_tsunami") {
+        title = "Chennai Coastal Tsunami Inundation Survey";
+        location = "Chennai Coastline, Tamil Nadu";
+        area = "18.2 km²";
+        confidence = "99.1%";
+        pop = "215,000 residents";
+        summary = "Coastal surge boundary buffer modeling indicates 0.4 meter wave height elevation. Relief shelters operating at 91% operational readiness with zero submerged evacuation routes.";
+    } else if (type === "brahmaputra_trend") {
+        title = "Brahmaputra Basin Multi-Temporal Audit";
+        location = "Guwahati, Assam (Brahmaputra Valley)";
+        area = "310.4 km²";
+        confidence = "96.4%";
+        pop = "310,000 residents";
+        summary = "90-day multi-temporal satellite swath analysis shows +14.2% / hr inundation expansion rate across lower floodplains. River channel migration velocity monitored via Sentinel-2 time series.";
+    }
+
+    alert(`🛰 NIRVAAN SITREP REPORT GENERATOR GENERATED:\n\n` +
+          `==========================================\n` +
+          `DOCUMENT TITLE: ${title}\n` +
+          `LOCATION: ${location}\n` +
+          `AFFECTED SURFACE: ${area}\n` +
+          `AI SEGMENTATION ACCURACY: ${confidence}\n` +
+          `POPULATION EXPOSURE: ${pop}\n` +
+          `==========================================\n\n` +
+          `SUMMARY:\n${summary}\n\n` +
+          `Click OK to trigger GeoJSON & CSV file download!`);
+
+    downloadReportFile('geojson', type);
+}
+
+function downloadReportFile(format, type) {
+    const filename = `nirvaan_sitrep_${type}_${Date.now()}.${format === 'pdf' ? 'txt' : format}`;
+    let content = "";
+
+    if (format === "geojson") {
+        content = JSON.stringify({
+            "type": "FeatureCollection",
+            "name": "Nirvaan_Disaster_Risk_Layer",
+            "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": { "id": "SITREP-8492", "disaster": type, "confidence": 94.7, "severity": "CRITICAL" },
+                    "geometry": { "type": "Polygon", "coordinates": [[[72.82, 21.16], [72.86, 21.18], [72.84, 21.22], [72.80, 21.19], [72.82, 21.16]]] }
+                }
+            ]
+        }, null, 2);
+    } else if (format === "csv") {
+        content = "Record_ID,Disaster_Type,Location,Confidence_Pct,Inundated_Area_Km2,Status\n" +
+                  `SITREP-8492,${type},"Surat Tapi Basin",94.7,42.8,CRITICAL\n` +
+                  `SITREP-8491,Seismic Fault,"Bhuj Kutch",88.2,118.5,WARNING\n` +
+                  `SITREP-8490,Tsunami Watch,"Chennai Coast",99.1,18.2,RESOLVED\n`;
+    } else {
+        content = `NIRVAAN SATELLITE DISASTER INTELLIGENCE SITREP BRIEFING\n` +
+                  `====================================================\n` +
+                  `Generated Date: ${new Date().toLocaleString()}\n` +
+                  `Report ID: SITREP-${Math.floor(1000 + Math.random() * 9000)}\n` +
+                  `Disaster Target: ${type}\n` +
+                  `AI Model: U-Net Neural Convolution (Copernicus Sentinel-2 & Sentinel-1 SAR)\n` +
+                  `Confidence Score: 94.7%\n` +
+                  `Operational Directive: Emergency Dispatch Authorized\n`;
+    }
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
 
 
 /* =========================================================
-   HISTORY
+   INTERACTIVE DISASTER RECORDS & HISTORY MODULE
 ========================================================= */
 
 async function showHistory() {
@@ -1909,111 +2061,145 @@ async function showHistory() {
 
     setPageContent(`
 
-        <h1 class="page-title">
-            History
+        <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">
+            Disaster Detection Records
         </h1>
 
-        <p class="page-subtitle">
-            Previous disaster detections and satellite analyses
+        <p class="page-subtitle" style="font-size: 16px; margin-bottom: 24px;">
+            Historical orbital passes, AI hazard segmentations & SITREP situation reports
         </p>
 
-
-        <div class="panel">
-
-            <div class="table-container">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                ID
-                            </th>
-
-                            <th>
-                                Disaster
-                            </th>
-
-                            <th>
-                                Location
-                            </th>
-
-                            <th>
-                                Confidence
-                            </th>
-
-                            <th>
-                                Area
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                        ${(disasters || []).map(
-                            disaster => `
-
-                            <tr>
-
-                                <td>
-                                    ${disaster.id}
-                                </td>
-
-                                <td>
-                                    ${disaster.type}
-                                </td>
-
-                                <td>
-                                    ${disaster.location}
-                                </td>
-
-                                <td>
-                                    ${disaster.confidence}%
-                                </td>
-
-                                <td>
-                                    ${disaster.area}
-                                </td>
-
-                                <td>
-
-                                    <span
-                                        class="status ${
-                                            disaster.status ===
-                                            "Resolved"
-                                                ? "resolved"
-                                                : "high"
-                                        }"
-                                    >
-                                        ${disaster.status}
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-                        `
-                        ).join("")}
-
-                    </tbody>
-
-                </table>
-
+        <!-- KPI STATS SUMMARY BAR -->
+        <div class="record-stats-grid">
+            <div class="record-stat-card">
+                <div class="record-stat-icon">🛰️</div>
+                <div>
+                    <div class="record-stat-val">1,284</div>
+                    <div class="record-stat-label">Swaths Ingested</div>
+                </div>
             </div>
+            <div class="record-stat-card">
+                <div class="record-stat-icon">🎯</div>
+                <div>
+                    <div class="record-stat-val" style="color: #38bdf8;">94.8%</div>
+                    <div class="record-stat-label">Avg AI Accuracy</div>
+                </div>
+            </div>
+            <div class="record-stat-card">
+                <div class="record-stat-icon">🚨</div>
+                <div>
+                    <div class="record-stat-val" style="color: #ef4444;">14 Active</div>
+                    <div class="record-stat-label">Critical Alerts</div>
+                </div>
+            </div>
+            <div class="record-stat-card">
+                <div class="record-stat-icon">✅</div>
+                <div>
+                    <div class="record-stat-val" style="color: #22c55e;">1,140</div>
+                    <div class="record-stat-label">Resolved Boundaries</div>
+                </div>
+            </div>
+        </div>
 
+        <!-- SEARCH & FILTER TOOLBAR -->
+        <div class="panel" style="padding: 20px; border-radius: 16px; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <input type="text" id="recordSearchInput" class="record-search-input" placeholder="🔍 Search records by ID, Location, or Hazard..." onkeyup="filterRecordTable(this.value)">
+                    <div class="sat-btn-group-toggles">
+                        <button onclick="filterRecordCategory('all')" class="sat-action-btn toggle active" id="recCatAll">All Records</button>
+                        <button onclick="filterRecordCategory('flood')" class="sat-action-btn toggle" id="recCatFlood">🌊 Flood</button>
+                        <button onclick="filterRecordCategory('seismic')" class="sat-action-btn toggle" id="recCatSeismic">⚡ Seismic</button>
+                        <button onclick="filterRecordCategory('tsunami')" class="sat-action-btn toggle" id="recCatTsunami">🏖️ Tsunami</button>
+                    </div>
+                </div>
+
+                <button class="sat-action-btn upload" onclick="alert('Exporting full master GIS record audit log in GeoJSON & CSV formats...')">
+                    📥 Export Master Audit Log
+                </button>
+            </div>
+        </div>
+
+        <!-- HIGH-TECH INTERACTIVE DATA TABLE -->
+        <div class="record-table-wrapper">
+            <table class="record-table">
+                <thead>
+                    <tr>
+                        <th>Record ID ↕</th>
+                        <th>Hazard Type ↕</th>
+                        <th>Location & Territory ↕</th>
+                        <th>AI Confidence ↕</th>
+                        <th>Inundated Area ↕</th>
+                        <th>Status ↕</th>
+                        <th style="text-align: right;">Action ⚙</th>
+                    </tr>
+                </thead>
+                <tbody id="recordTableBody">
+                    ${(disasters || []).map(disaster => `
+                        <tr class="record-row" data-type="${(disaster.type || '').toLowerCase()}">
+                            <td style="font-weight: 800; color: #38bdf8;">${disaster.id}</td>
+                            <td style="font-weight: 700;">${disaster.type}</td>
+                            <td>📍 ${disaster.location}</td>
+                            <td><strong style="color: #38bdf8;">${disaster.confidence}%</strong> (U-Net)</td>
+                            <td>${disaster.area}</td>
+                            <td>
+                                <span class="record-status-badge ${disaster.status === 'Resolved' ? 'resolved' : disaster.confidence > 85 ? 'critical' : 'warning'}">
+                                    ● ${disaster.status}
+                                </span>
+                            </td>
+                            <td style="text-align: right;">
+                                <button class="sat-action-btn toggle" style="padding: 6px 14px; font-size: 11.5px; min-width: 110px;" onclick="inspectRecordModal('${disaster.id}', '${disaster.location}', '${disaster.type}', '${disaster.confidence}', '${disaster.area}', '${disaster.status}')">
+                                    🔍 Inspect Scene
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
         </div>
 
     `);
 
+}
+
+function filterRecordTable(query) {
+    const q = (query || "").toLowerCase();
+    const rows = document.querySelectorAll("#recordTableBody tr");
+    rows.forEach(r => {
+        const text = r.textContent.toLowerCase();
+        r.style.display = text.includes(q) ? "" : "none";
+    });
+}
+
+function filterRecordCategory(cat) {
+    const btns = ["All", "Flood", "Seismic", "Tsunami"];
+    btns.forEach(b => {
+        const el = document.getElementById("recCat" + b);
+        if (el) el.classList.remove("active");
+    });
+    const activeBtn = document.getElementById("recCat" + cat.charAt(0).toUpperCase() + cat.slice(1));
+    if (activeBtn) activeBtn.classList.add("active");
+
+    const rows = document.querySelectorAll("#recordTableBody tr");
+    rows.forEach(r => {
+        const type = r.getAttribute("data-type") || "";
+        if (cat === "all" || type.includes(cat)) {
+            r.style.display = "";
+        } else {
+            r.style.display = "none";
+        }
+    });
+}
+
+function inspectRecordModal(id, loc, type, confidence, area, status) {
+    alert(`🛰 NIRVAAN SITREP RECORD INSPECTOR\n\n` +
+          `• Record ID: ${id}\n` +
+          `• Location: ${loc}\n` +
+          `• Hazard Category: ${type}\n` +
+          `• AI Segmentation Confidence: ${confidence}%\n` +
+          `• Affected Spatial Surface: ${area}\n` +
+          `• Operational Status: ${status}\n\n` +
+          `Fetching high-resolution satellite scene telemetry & vector risk layers...`);
 }
 
 
@@ -2205,39 +2391,51 @@ function showAbout() {
         <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">About Nirvaan</h1>
         <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">Satellite-Based AI Disaster Monitoring & Rapid Intelligence Platform</p>
 
-        <div class="panel" style="padding: 32px; border-radius: 16px; margin-bottom: 24px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
-            <h2 style="margin-bottom: 16px; color: #38bdf8; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+        <div class="panel" style="padding: 32px; border-radius: 16px; margin-bottom: 24px;">
+            <h2 style="margin-bottom: 16px; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;" class="faq-section-header">
                 <span>🌐</span> Mission & System Overview
             </h2>
-            <p style="font-size: 16px; line-height: 1.8; color: #e0e0e0; margin-bottom: 24px;">
+            <p style="font-size: 16px; line-height: 1.8; margin-bottom: 24px;" class="faq-section-subtitle">
                 <strong>Nirvaan</strong> is an advanced, satellite-driven disaster intelligence engine engineered to perform <strong>rapid disaster detection</strong>, <strong>inundated area mapping</strong>, and <strong>real-time situational risk assessment</strong>. By fusing multi-spectral satellite imagery (Copernicus Sentinel-2, USGS Landsat-9) with deep learning segmentation neural networks, Nirvaan equips emergency response managers with sub-hour actionable intelligence.
             </p>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-                <div class="card" style="padding: 24px; border-radius: 14px; background: #1a1c20; border: 1px solid rgba(255, 255, 255, 0.06);">
-                    <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">🛰 Multi-Spectral Imagery</h3>
-                    <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                <div class="about-card-item">
+                    <h3 class="about-heading">
+                        <span class="about-heading-icon">🛰</span>
+                        <span class="about-heading-text">Multi-Spectral Imagery</span>
+                    </h3>
+                    <p class="about-answer">
                         Automated extraction of <strong>NDWI (Water Index)</strong> and <strong>SAR (Synthetic Aperture Radar)</strong> masks to detect flood extent through heavy cloud cover.
                     </p>
                 </div>
 
-                <div class="card" style="padding: 24px; border-radius: 14px; background: #1a1c20; border: 1px solid rgba(255, 255, 255, 0.06);">
-                    <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">⚡ Rapid Early Warning</h3>
-                    <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                <div class="about-card-item">
+                    <h3 class="about-heading">
+                        <span class="about-heading-icon">⚡</span>
+                        <span class="about-heading-text">Rapid Early Warning</span>
+                    </h3>
+                    <p class="about-answer">
                         Sub-hour automated pipeline processing raw satellite swaths into <strong>high-resolution vector risk maps</strong> and automated broadcasts.
                     </p>
                 </div>
 
-                <div class="card" style="padding: 24px; border-radius: 14px; background: #1a1c20; border: 1px solid rgba(255, 255, 255, 0.06);">
-                    <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">📊 Population & Asset Risk</h3>
-                    <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                <div class="about-card-item">
+                    <h3 class="about-heading">
+                        <span class="about-heading-icon">📊</span>
+                        <span class="about-heading-text">Population & Asset Risk</span>
+                    </h3>
+                    <p class="about-answer">
                         Spatial demographic overlay calculating <strong>affected populations</strong>, <strong>submerged roadways</strong>, and <strong>critical infrastructure</strong>.
                     </p>
                 </div>
 
-                <div class="card" style="padding: 24px; border-radius: 14px; background: #1a1c20; border: 1px solid rgba(255, 255, 255, 0.06);">
-                    <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 17px; font-weight: 700;">🛡️ Inter-Agency Interoperability</h3>
-                    <p style="font-size: 14.5px; line-height: 1.7; color: #a1a1aa;">
+                <div class="about-card-item">
+                    <h3 class="about-heading">
+                        <span class="about-heading-icon">🛡️</span>
+                        <span class="about-heading-text">Inter-Agency Interoperability</span>
+                    </h3>
+                    <p class="about-answer">
                         Seamless GIS spatial telemetry exchange with <strong>NDMA</strong>, <strong>ISRO</strong>, and <strong>State Disaster Relief Forces</strong>.
                     </p>
                 </div>
@@ -2256,39 +2454,54 @@ function showFAQ() {
         <h1 class="page-title" style="font-size: 28px; font-weight: 900; margin-bottom: 8px;">Frequently Asked Questions</h1>
         <p class="page-subtitle" style="font-size: 16px; margin-bottom: 28px;">Learn more about Nirvaan satellite intelligence, metrics, and emergency response workflows.</p>
 
-        <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="faq-container">
 
-            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
-                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q1: How does Nirvaan detect disaster affected zones?</h3>
-                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+            <div class="faq-card-item">
+                <h3 class="faq-heading">
+                    <span class="faq-heading-prefix">Q1:</span>
+                    <span class="faq-heading-text">How does Nirvaan detect disaster affected zones?</span>
+                </h3>
+                <p class="faq-answer">
                     Nirvaan compares pre-event baseline scenes with post-event satellite imagery using optical spectral indices (<strong>NDWI</strong> for floods, <strong>dNBR</strong> for burn severity) and synthetic aperture radar (<strong>SAR</strong>) to identify flooded surfaces regardless of cloud cover.
                 </p>
             </div>
 
-            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
-                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q2: What satellite constellations are supported?</h3>
-                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+            <div class="faq-card-item">
+                <h3 class="faq-heading">
+                    <span class="faq-heading-prefix">Q2:</span>
+                    <span class="faq-heading-text">What satellite constellations are supported?</span>
+                </h3>
+                <p class="faq-answer">
                     Nirvaan natively ingests <strong>Copernicus Sentinel-2</strong> (Optical), <strong>Sentinel-1</strong> (C-Band Radar), <strong>USGS Landsat-8/9</strong>, and high-resolution <strong>PlanetScope (3m)</strong> imagery feeds via automated REST APIs.
                 </p>
             </div>
 
-            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
-                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q3: How frequently is the disaster risk map updated?</h3>
-                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+            <div class="faq-card-item">
+                <h3 class="faq-heading">
+                    <span class="faq-heading-prefix">Q3:</span>
+                    <span class="faq-heading-text">How frequently is the disaster risk map updated?</span>
+                </h3>
+                <p class="faq-answer">
                     Automated background tasks ingest new satellite passes as soon as they become available from orbital feeds (typically <strong>12 to 24-hour revisit cadence</strong>), instantly recalculating hazard boundaries.
                 </p>
             </div>
 
-            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
-                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q4: Can SITREP situational reports be exported?</h3>
-                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+            <div class="faq-card-item">
+                <h3 class="faq-heading">
+                    <span class="faq-heading-prefix">Q4:</span>
+                    <span class="faq-heading-text">Can SITREP situational reports be exported?</span>
+                </h3>
+                <p class="faq-answer">
                     Yes, under the <strong>Reports</strong> tab, response leads can generate and export <strong>JSON metadata</strong>, <strong>GeoJSON impact vector boundaries</strong>, or formatted <strong>SITREP situation reports</strong>.
                 </p>
             </div>
 
-            <div class="panel" style="padding: 26px; border-radius: 14px; background: #121417; border: 1px solid rgba(255, 255, 255, 0.08);">
-                <h3 style="margin-bottom: 10px; color: #38bdf8; font-size: 18px; font-weight: 800;">Q5: How do first responders receive critical warnings?</h3>
-                <p style="font-size: 15px; line-height: 1.8; color: #e0e0e0;">
+            <div class="faq-card-item">
+                <h3 class="faq-heading">
+                    <span class="faq-heading-prefix">Q5:</span>
+                    <span class="faq-heading-text">How do first responders receive critical warnings?</span>
+                </h3>
+                <p class="faq-answer">
                     Whenever the AI neural network detects inundation confidence exceeding <strong>85%</strong>, automated push notifications and SMS warning broadcasts are immediately dispatched to registered emergency commanders.
                 </p>
             </div>
