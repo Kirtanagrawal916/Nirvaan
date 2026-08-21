@@ -219,7 +219,7 @@ def generate_fallback_situation_report(evidence_payload: Dict[str, Any]) -> str:
 
 def generate_llm_situation_report(evidence_payload: Dict[str, Any], api_key: Optional[str] = None) -> Optional[str]:
     """
-    Generate a responder-oriented summary using an LLM if available and configured.
+    Generate a responder-oriented summary using Gemini if available and configured.
     Falls back to None if unconfigured or API fails.
     """
     key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("OPENAI_API_KEY")
@@ -227,7 +227,6 @@ def generate_llm_situation_report(evidence_payload: Dict[str, Any], api_key: Opt
         return None
 
     try:
-        # Prompt engineering with strict negative constraints
         prompt = f"""
         System: You are an emergency intelligence assistant for the NIRVAAN satellite monitoring platform.
         You must produce a concise responder-oriented situation report strictly using ONLY the provided structured evidence below.
@@ -250,13 +249,35 @@ def generate_llm_situation_report(evidence_payload: Dict[str, Any], api_key: Opt
         5. Limitations & Data Provenance
         """
 
-        # Optional Gemini import
-        import google.generativeai as genai
-        genai.configure(api_key=key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(prompt)
-        if response and response.text:
-            return response.text
+        # 1. Try google.genai
+        try:
+            from google import genai
+            client = genai.Client(api_key=key)
+            for model_name in ["gemini-3.6-flash", "gemini-3.7-flash", "gemini-flash-latest"]:
+                try:
+                    resp = client.models.generate_content(model=model_name, contents=prompt)
+                    if resp and resp.text:
+                        return resp.text
+                except Exception:
+                    continue
+        except Exception:
+            pass
+
+        # 2. Try google.generativeai
+        try:
+            import google.generativeai as genai_legacy
+            genai_legacy.configure(api_key=key)
+            for model_name in ["gemini-3.6-flash", "gemini-3.7-flash", "gemini-flash-latest"]:
+                try:
+                    model = genai_legacy.GenerativeModel(model_name)
+                    response = model.generate_content(prompt)
+                    if response and response.text:
+                        return response.text
+                except Exception:
+                    continue
+        except Exception:
+            pass
+
     except Exception:
         pass
 

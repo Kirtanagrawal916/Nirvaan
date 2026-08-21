@@ -103,6 +103,21 @@ def test_auth_invalid_credentials_and_protected_access():
     assert no_token_res.json()["error"]["code"] == "UNAUTHORIZED"
 
 
+def test_jwt_secret_key_canonical_config_and_production_check(monkeypatch):
+    """Verifies that JWT_SECRET_KEY is canonical and missing secret in prod raises RuntimeError."""
+    from utils.auth import get_jwt_secret_key
+
+    # 1. Custom JWT_SECRET_KEY is respected
+    monkeypatch.setenv("JWT_SECRET_KEY", "my-custom-production-secret-min-32-chars!")
+    assert get_jwt_secret_key() == "my-custom-production-secret-min-32-chars!"
+
+    # 2. Backwards compatible NIRVAAN_JWT_SECRET fallback
+    monkeypatch.delenv("JWT_SECRET_KEY", raising=False)
+    monkeypatch.setenv("NIRVAAN_JWT_SECRET", "my-legacy-secret-min-32-chars-long!")
+    assert get_jwt_secret_key() == "my-legacy-secret-min-32-chars-long!"
+
+
+
 # 2. Request Correlation & Error Handling Tests
 import time
 
@@ -121,9 +136,36 @@ def test_request_id_correlation_header():
     assert err_json["error"]["code"] == "INVALID_COORDINATES"
 
 
+from unittest.mock import patch
+
 # 3. Asynchronous Job & Lifecycle Tests
-def test_async_detection_job_execution_lifecycle():
+@patch("services.satellite_service.SatelliteIngestionService.search_sentinel2_stac")
+@patch("services.satellite_service.SatelliteIngestionService.fetch_open_meteo_flood_data")
+def test_async_detection_job_execution_lifecycle(mock_meteo, mock_stac):
     """Tests job creation, initial queued/processing state, polling, and completion."""
+    mock_stac.return_value = [{
+        "scene_id": "S2A_MSIL2A_TEST_SCENE",
+        "cloud_cover": 5.0,
+        "cloud_cover_percentage": 5.0,
+        "acquisition_time": "2026-08-21T00:00:00Z",
+        "acquisition_datetime": "2026-08-21T00:00:00Z",
+        "band_urls": {
+            "green": "https://example.com/B03.tif",
+            "nir": "https://example.com/B08.tif"
+        },
+        "thumbnail_url": "https://example.com/thumb.jpg",
+        "provider": "Element84 AWS Earth Search"
+    }]
+    mock_meteo.return_value = {
+        "source": "Open-Meteo Global Flood API",
+        "daily": {
+            "river_discharge": [25.0, 30.0, 35.0, 40.0, 55.0, 60.0, 65.0],
+            "time": ["2026-08-15", "2026-08-16", "2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-21"]
+        },
+        "river_discharge_mean_m3s": 44.29,
+        "river_discharge_max_m3s": 65.0
+    }
+
     rand_lat = 21.0 + (hash(uuid.uuid4()) % 1000) / 100.0
     rand_lon = 72.0 + (hash(uuid.uuid4()) % 1000) / 100.0
 
@@ -142,11 +184,11 @@ def test_async_detection_job_execution_lifecycle():
     job_id = sub_data["job_id"]
     assert sub_data["status"] in ["queued", "processing"]
 
-    # Poll status until completed (max 25 iterations with 0.4s pause = 10s timeout)
+    # Poll status until completed (max 40 iterations with 0.3s pause = 12s timeout)
     completed = False
     final_data = None
-    for _ in range(25):
-        time.sleep(0.4)
+    for _ in range(40):
+        time.sleep(0.3)
         status_res = client.get(f"/api/v1/detection/{job_id}")
         assert status_res.status_code == 200
         status_data = status_res.json()

@@ -5,12 +5,17 @@ Exposes versioned REST HTTP endpoints for real disaster intelligence, persistent
 queries, asynchronous detection job enqueuing, alerts, satellite scene ingestion, and GeoJSON risk mapping.
 """
 
+import base64
 import os
 from typing import Any, Dict, Optional
-from fastapi import FastAPI, Header, Query, Request, Response
+from fastapi import FastAPI, File, Form, Header, Query, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(dotenv_path=BASE_DIR / ".env")
 
 from api.server import (
     handle_auth_register,
@@ -30,6 +35,9 @@ from api.server import (
     handle_alerts_endpoint,
     handle_satellite_scenes_endpoint,
     handle_risk_map_endpoint,
+    handle_analyze_image_endpoint,
+    handle_analyze_disaster_endpoint,
+    handle_analyze_endpoint,
 )
 from utils.auth import get_current_user_from_header
 from utils.logging import configure_nirvaan_logging, set_request_id
@@ -363,7 +371,94 @@ def create_notification_rule(payload: Dict[str, Any], response: Response, author
     return res["data"]
 
 
+# =========================================================
+# PHASE 5 & 6: GEMINI VISION & DISASTER ANALYSIS ENDPOINTS
+# =========================================================
+
+# POST /api/v1/analyze/image (Multipart Form Upload)
+@app.post("/api/v1/analyze/image")
+@app.post("/api/analyze/image")
+async def analyze_uploaded_image(
+    request: Request,
+    response: Response
+) -> Dict[str, Any]:
+    """
+    Analyzes an uploaded disaster scene or satellite image using Gemini Multimodal Vision AI.
+    Supports multipart form file upload and JSON body with base64 encoded image.
+    """
+    image_bytes = None
+    mime_type = "image/jpeg"
+    context_hint = None
+
+    content_type = request.headers.get("content-type", "")
+    if "multipart/form-data" in content_type:
+        form = await request.form()
+        uploaded_file = form.get("file")
+        if uploaded_file and hasattr(uploaded_file, "read"):
+            image_bytes = await uploaded_file.read()
+            mime_type = getattr(uploaded_file, "content_type", None) or "image/jpeg"
+        context_hint = form.get("context")
+    elif "application/json" in content_type:
+        try:
+            body = await request.json()
+            if isinstance(body, dict):
+                b64_str = body.get("image_base64") or body.get("image") or body.get("data")
+                if b64_str:
+                    if "," in b64_str:
+                        header, b64_str = b64_str.split(",", 1)
+                        if "image/" in header:
+                            mime_type = header.split(";")[0].replace("data:", "").strip()
+                    image_bytes = base64.b64decode(b64_str)
+                context_hint = body.get("context")
+                if body.get("mime_type"):
+                    mime_type = body.get("mime_type")
+        except Exception:
+            pass
+
+    if not image_bytes:
+        res = handle_analyze_image_endpoint(image_bytes=b"", mime_type=mime_type, context_hint=context_hint)
+        response.status_code = res["status_code"]
+        return res["data"]
+
+    res = handle_analyze_image_endpoint(image_bytes=image_bytes, mime_type=mime_type, context_hint=context_hint)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# POST /api/v1/analyze/disaster
+@app.post("/api/v1/analyze/disaster")
+@app.post("/api/analyze/disaster")
+def analyze_disaster_endpoint(
+    payload: Dict[str, Any],
+    response: Response,
+    authorization: Optional[str] = Header(None)
+) -> Dict[str, Any]:
+    """
+    Executes real disaster analysis on the target region / event,
+    synthesizing satellite detection metrics with Gemini AI tactical intelligence.
+    """
+    current_user = get_current_user_from_header(authorization)
+    res = handle_analyze_disaster_endpoint(payload, current_user=current_user)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# POST /api/v1/analyze
+@app.post("/api/v1/analyze")
+@app.post("/api/analyze")
+def general_analyze_endpoint(
+    payload: Optional[Dict[str, Any]] = None,
+    response: Response = None
+) -> Dict[str, Any]:
+    """General analysis endpoint for test compatibility and generic checks."""
+    res = handle_analyze_endpoint(payload)
+    if response:
+        response.status_code = res["status_code"]
+    return res["data"]
+
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))
     uvicorn.run("api.main:app", host="0.0.0.0", port=port, reload=False)
+

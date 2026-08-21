@@ -409,3 +409,101 @@ async function saveUserPreferences(payload) {
         throw e;
     }
 }
+
+/* =========================================================
+   10. GEMINI DISASTER IMAGE & SITUATIONAL ANALYSIS APIs
+========================================================= */
+async function analyzeUploadedImage(fileOrBase64, context = "") {
+    try {
+        let response;
+        if (typeof File !== "undefined" && fileOrBase64 instanceof File) {
+            const formData = new FormData();
+            formData.append("file", fileOrBase64);
+            if (context) formData.append("context", context);
+
+            const token = typeof localStorage !== "undefined" ? localStorage.getItem("nirvaan_token") : null;
+            const headers = {};
+            if (token) headers["Authorization"] = `Bearer ${token}`;
+
+            response = await fetchWithRetry(`${API_BASE_URL}/v1/analyze/image`, {
+                method: "POST",
+                headers: headers,
+                body: formData
+            });
+        } else {
+            response = await fetchWithRetry(`${API_BASE_URL}/v1/analyze/image`, {
+                method: "POST",
+                headers: getAuthHeaders(),
+                body: JSON.stringify({
+                    image_base64: fileOrBase64,
+                    context: context
+                })
+            });
+        }
+
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            const msg = errData.error?.message || errData.message || `Image analysis failed with status ${response.status}`;
+            throw new Error(msg);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error in analyzeUploadedImage:", error);
+        throw error;
+    }
+}
+
+async function analyzeDisaster(payload = {}) {
+    try {
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/analyze/disaster`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            const msg = errData.error?.message || errData.message || `Disaster analysis failed with status ${response.status}`;
+            throw new Error(msg);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error in analyzeDisaster:", error);
+        throw error;
+    }
+}
+
+if (typeof window !== "undefined") {
+    Object.assign(window, {
+        API_BASE_URL,
+        getApiBaseUrl,
+        getAuthHeaders,
+        fetchWithRetry,
+        checkBackendHealth,
+        registerUser,
+        loginUser,
+        getAuthMe,
+        logoutUser,
+        getLatestDisaster,
+        getDisasterHistory,
+        getSatelliteImages,
+        getSatelliteScenes,
+        createDetectionJob,
+        getDetectionJobStatus,
+        getRealAlerts,
+        getRiskMapGeoJSON,
+        createReport,
+        getReports,
+        generateSituationReport,
+        getDisasterTypesMetadata,
+        getAnalyticsOverview,
+        getAnalyticsTimeseries,
+        getAnalyticsGeography,
+        getUserPreferences,
+        saveUserPreferences,
+        analyzeUploadedImage,
+        analyzeDisaster
+    });
+}

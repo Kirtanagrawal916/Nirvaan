@@ -14,14 +14,46 @@ import hmac
 import json
 import os
 import secrets
+import sys
 from typing import Any, Dict, Optional
 
 from fastapi import Depends, HTTPException, Header, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-SECRET_KEY = os.getenv("NIRVAAN_JWT_SECRET", "nirvaan-production-secret-key-32-chars-long!")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 24
+
+_TEST_SECRET_FALLBACK = "nirvaan-test-secret-key-do-not-use-in-prod-32ch"
+
+
+def get_jwt_secret_key() -> str:
+    """
+    Retrieves the canonical JWT secret key from environment (JWT_SECRET_KEY).
+    Supports NIRVAAN_JWT_SECRET as backwards-compatible fallback.
+
+    In testing/development runtime, provides a clearly labeled test fallback if unset.
+    In production runtime, raises RuntimeError if JWT_SECRET_KEY is missing or empty.
+    """
+    secret = os.getenv("JWT_SECRET_KEY") or os.getenv("NIRVAAN_JWT_SECRET")
+    if secret and secret.strip():
+        return secret.strip()
+
+    # Detect automated test or local development environments
+    is_testing_or_dev = (
+        "pytest" in sys.modules
+        or bool(os.getenv("PYTEST_CURRENT_TEST"))
+        or os.getenv("NIRVAAN_ENV", "").lower() in ("test", "testing", "dev", "development")
+        or os.getenv("TESTING", "").lower() in ("1", "true")
+    )
+
+    if is_testing_or_dev:
+        return _TEST_SECRET_FALLBACK
+
+    raise RuntimeError(
+        "CRITICAL SECURITY ERROR: JWT_SECRET_KEY environment variable is not configured. "
+        "Application startup halted to prevent insecure token generation."
+    )
+
 
 security_scheme = HTTPBearer(auto_error=False)
 
@@ -78,8 +110,9 @@ def create_access_token(user_id: str, email: str, role: str = "user", expires_de
     header_b64 = _base64url_encode(json.dumps(header).encode('utf-8'))
     payload_b64 = _base64url_encode(json.dumps(payload).encode('utf-8'))
 
+    secret_key = get_jwt_secret_key()
     signing_input = f"{header_b64}.{payload_b64}".encode('utf-8')
-    signature = hmac.new(SECRET_KEY.encode('utf-8'), signing_input, hashlib.sha256).digest()
+    signature = hmac.new(secret_key.encode('utf-8'), signing_input, hashlib.sha256).digest()
     sig_b64 = _base64url_encode(signature)
 
     return f"{header_b64}.{payload_b64}.{sig_b64}"
@@ -92,8 +125,9 @@ def decode_access_token(token: str) -> Dict[str, Any]:
         raise ValueError("Invalid JWT token format")
 
     header_b64, payload_b64, sig_b64 = parts
+    secret_key = get_jwt_secret_key()
     signing_input = f"{header_b64}.{payload_b64}".encode('utf-8')
-    expected_sig = hmac.new(SECRET_KEY.encode('utf-8'), signing_input, hashlib.sha256).digest()
+    expected_sig = hmac.new(secret_key.encode('utf-8'), signing_input, hashlib.sha256).digest()
     actual_sig = _base64url_decode(sig_b64)
 
     if not hmac.compare_digest(expected_sig, actual_sig):
