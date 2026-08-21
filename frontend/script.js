@@ -21,9 +21,9 @@ function updateProvenanceBanner(dataOrProvenance) {
         prov = dataOrProvenance;
     } else if (dataOrProvenance && typeof dataOrProvenance === "object") {
         prov = dataOrProvenance.data_provenance ||
-               (dataOrProvenance.provenance && dataOrProvenance.provenance.data_provenance) ||
-               (dataOrProvenance.event_metadata && dataOrProvenance.event_metadata.data_provenance) ||
-               "NO_LIVE_DATA";
+            (dataOrProvenance.provenance && dataOrProvenance.provenance.data_provenance) ||
+            (dataOrProvenance.event_metadata && dataOrProvenance.event_metadata.data_provenance) ||
+            "NO_LIVE_DATA";
     }
 
     if (prov === "REAL_SATELLITE_DATA") {
@@ -595,7 +595,7 @@ if (document.readyState === "loading") {
 
 function loadPage(page) {
 
-    switch(page) {
+    switch (page) {
 
         case "dashboard":
             showDashboard();
@@ -1028,10 +1028,82 @@ function renderSatelliteMonitoringHTML() {
 }
 
 /* =========================================================
+   TIME-BASED GREETING SYSTEM (LOCAL BROWSER TIME)
+========================================================= */
+
+let greetingAutoUpdateInterval = null;
+
+/**
+ * Computes the time-based greeting using the user's local browser time.
+ * Ranges:
+ *  05:00 – 11:59  -> "Good Morning" 🌅
+ *  12:00 – 16:59  -> "Good Afternoon" ☀️
+ *  17:00 – 20:59  -> "Good Evening" 🌇
+ *  21:00 – 04:59  -> "Good Night" 🌙
+ *
+ * @param {Date} [date=new Date()] Optional Date instance for calculation (defaults to current browser local time)
+ * @returns {{ greeting: string, icon: string, fullText: string }}
+ */
+function getTimeBasedGreeting(date = new Date()) {
+    const hours = date.getHours();
+    if (hours >= 5 && hours < 12) {
+        return {
+            greeting: "Good Morning",
+            icon: "🌅",
+            fullText: "Good Morning 🌅"
+        };
+    } else if (hours >= 12 && hours < 17) {
+        return {
+            greeting: "Good Afternoon",
+            icon: "☀️",
+            fullText: "Good Afternoon ☀️"
+        };
+    } else if (hours >= 17 && hours < 21) {
+        return {
+            greeting: "Good Evening",
+            icon: "🌇",
+            fullText: "Good Evening 🌇"
+        };
+    } else {
+        return {
+            greeting: "Good Night",
+            icon: "🌙",
+            fullText: "Good Night 🌙"
+        };
+    }
+}
+
+/**
+ * Dynamically updates the greeting on the dashboard DOM across time boundaries.
+ */
+function updateDashboardGreeting() {
+    const titleEl = document.getElementById("dashboardGreetingTitle");
+    if (!titleEl) return;
+    const g = getTimeBasedGreeting();
+    const desiredHTML = `${g.greeting} <span class="sun-icon-glowing">${g.icon}</span>`;
+    if (titleEl.innerHTML.trim() !== desiredHTML.trim()) {
+        titleEl.innerHTML = desiredHTML;
+    }
+}
+
+/**
+ * Starts automatic interval checking (every 10 seconds) to update across boundaries seamlessly.
+ */
+function startGreetingAutoUpdater() {
+    if (greetingAutoUpdateInterval) {
+        clearInterval(greetingAutoUpdateInterval);
+    }
+    // Update every 10 seconds to detect boundary crossing without user refresh
+    greetingAutoUpdateInterval = setInterval(updateDashboardGreeting, 10000);
+}
+
+/* =========================================================
    DASHBOARD
 ========================================================= */
 
 function showDashboard() {
+    const currentGreeting = getTimeBasedGreeting();
+
     let satelliteHtml = `
         <div style="padding: 20px;">
             <!-- FLOOD COMPARISON SCENE -->
@@ -1057,11 +1129,11 @@ function showDashboard() {
     setPageContent(`
         <section class="dashboard-section nirvaan-dashboard-container">
 
-            <!-- FUTURISTIC MORNING WELCOME HERO BANNER -->
+            <!-- FUTURISTIC WELCOME HERO BANNER -->
             <div class="morning-hero-banner">
                 <div class="morning-hero-content">
-                    <h1 class="morning-greeting-title">
-                        Good Morning <span class="sun-icon-glowing">☀️</span>
+                    <h1 class="morning-greeting-title" id="dashboardGreetingTitle">
+                        ${currentGreeting.greeting} <span class="sun-icon-glowing">${currentGreeting.icon}</span>
                     </h1>
                     <p class="morning-welcome-subtitle">Welcome to Nirvaan</p>
                     <div class="morning-badge">
@@ -1310,6 +1382,9 @@ function showDashboard() {
 
         </section>
     `);
+
+    // Initialize greeting boundary auto-updater
+    startGreetingAutoUpdater();
 
     // Trigger non-blocking async data load
     fetchDashboardDataAsync();
@@ -2385,15 +2460,15 @@ function generateReportModal(type) {
     }
 
     alert(`🛰 NIRVAAN SITREP REPORT GENERATOR GENERATED:\n\n` +
-          `==========================================\n` +
-          `DOCUMENT TITLE: ${title}\n` +
-          `LOCATION: ${location}\n` +
-          `AFFECTED SURFACE: ${area}\n` +
-          `AI SEGMENTATION ACCURACY: ${confidence}\n` +
-          `POPULATION EXPOSURE: ${pop}\n` +
-          `==========================================\n\n` +
-          `SUMMARY:\n${summary}\n\n` +
-          `Click OK to trigger GeoJSON & CSV file download!`);
+        `==========================================\n` +
+        `DOCUMENT TITLE: ${title}\n` +
+        `LOCATION: ${location}\n` +
+        `AFFECTED SURFACE: ${area}\n` +
+        `AI SEGMENTATION ACCURACY: ${confidence}\n` +
+        `POPULATION EXPOSURE: ${pop}\n` +
+        `==========================================\n\n` +
+        `SUMMARY:\n${summary}\n\n` +
+        `Click OK to trigger GeoJSON & CSV file download!`);
 
     downloadReportFile('geojson', type);
 }
@@ -2417,17 +2492,17 @@ function downloadReportFile(format, type) {
         }, null, 2);
     } else if (format === "csv") {
         content = "Record_ID,Disaster_Type,Location,Status\n" +
-                  `SITREP-8492,${type},"Surat Tapi Basin",ACTIVE\n` +
-                  `SITREP-8491,Seismic Fault,"Bhuj Kutch",ACTIVE\n` +
-                  `SITREP-8490,Tsunami Watch,"Chennai Coast",STANDBY\n`;
+            `SITREP-8492,${type},"Surat Tapi Basin",ACTIVE\n` +
+            `SITREP-8491,Seismic Fault,"Bhuj Kutch",ACTIVE\n` +
+            `SITREP-8490,Tsunami Watch,"Chennai Coast",STANDBY\n`;
     } else {
         content = `NIRVAAN SATELLITE DISASTER INTELLIGENCE SITREP BRIEFING\n` +
-                  `====================================================\n` +
-                  `Generated Date: ${new Date().toLocaleString()}\n` +
-                  `Report ID: SITREP-${Math.floor(1000 + Math.random() * 9000)}\n` +
-                  `Disaster Target: ${type}\n` +
-                  `AI Model: U-Net Neural Convolution (Copernicus Sentinel-2 & Sentinel-1 SAR)\n` +
-                  `Operational Directive: Emergency Dispatch Authorized\n`;
+            `====================================================\n` +
+            `Generated Date: ${new Date().toLocaleString()}\n` +
+            `Report ID: SITREP-${Math.floor(1000 + Math.random() * 9000)}\n` +
+            `Disaster Target: ${type}\n` +
+            `AI Model: U-Net Neural Convolution (Copernicus Sentinel-2 & Sentinel-1 SAR)\n` +
+            `Operational Directive: Emergency Dispatch Authorized\n`;
     }
 
     const blob = new Blob([content], { type: 'text/plain' });
@@ -2596,13 +2671,13 @@ function filterRecordTable(query) {
 
 function inspectRecordModal(id, loc, type, confidence, area, status) {
     alert(`🛰 NIRVAAN SITREP RECORD INSPECTOR\n\n` +
-          `• Record ID: ${id}\n` +
-          `• Location: ${loc}\n` +
-          `• Hazard Category: ${type}\n` +
-          `• AI Segmentation Confidence: ${confidence}%\n` +
-          `• Affected Spatial Surface: ${area}\n` +
-          `• Operational Status: ${status}\n\n` +
-          `Fetching high-resolution satellite scene telemetry & vector risk layers...`);
+        `• Record ID: ${id}\n` +
+        `• Location: ${loc}\n` +
+        `• Hazard Category: ${type}\n` +
+        `• AI Segmentation Confidence: ${confidence}%\n` +
+        `• Affected Spatial Surface: ${area}\n` +
+        `• Operational Status: ${status}\n\n` +
+        `Fetching high-resolution satellite scene telemetry & vector risk layers...`);
 }
 
 
@@ -2975,6 +3050,9 @@ if (typeof window !== "undefined") {
         toggleSatBoundingBoxes,
         refreshSatelliteMonitoringUI,
         renderSatelliteMonitoringHTML,
+        getTimeBasedGreeting,
+        updateDashboardGreeting,
+        startGreetingAutoUpdater,
         showDashboard,
         fetchDashboardDataAsync,
         showSatellite,
@@ -3006,4 +3084,3 @@ if (typeof window !== "undefined") {
         showFAQ
     });
 }
-
