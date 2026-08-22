@@ -1077,8 +1077,8 @@ function selectSatellitePreset(scenarioKey) {
         s.confidence = 95.8;
         s.severityScore = "CRITICAL (Level 4)";
         s.severityBand = "CRITICAL";
-        s.activeImage = "assets/after.jpg";
-        s.beforeImage = "assets/before.jpg";
+        s.activeImage = "assets/emilia-after.jpg";
+        s.beforeImage = "assets/emilia-before.jpg";
         s.dataProvenance = "REAL_SATELLITE_DATA";
     } else if (scenarioKey === "rhodes") {
         s.location = "Rhodes, Greece (Forest Corridor)";
@@ -1096,8 +1096,8 @@ function selectSatellitePreset(scenarioKey) {
         s.confidence = 94.2;
         s.severityScore = "HIGH (Level 3)";
         s.severityBand = "HIGH";
-        s.activeImage = "assets/after.jpg";
-        s.beforeImage = "assets/before.jpg";
+        s.activeImage = "assets/rhodes-after.jpg";
+        s.beforeImage = "assets/rhodes-before.jpg";
         s.dataProvenance = "REAL_SATELLITE_DATA";
     }
 
