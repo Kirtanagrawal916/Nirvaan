@@ -19,6 +19,12 @@ import urllib.parse
 import urllib.request
 import urllib.error
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 logger = logging.getLogger("nirvaan.copernicus_auth")
 
 DEFAULT_TOKEN_URL = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"

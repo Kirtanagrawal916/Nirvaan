@@ -133,16 +133,19 @@ class WildfireDetector:
         else:
             swir = raster.get_band("SWIR").astype(np.float32)
 
-        denom = nir + swir
         valid = (raster.valid_mask if raster.valid_mask is not None else np.ones(nir.shape, dtype=bool))
-        valid = valid & ~np.isnan(nir) & ~np.isnan(swir)
+        valid = valid & np.isfinite(nir) & np.isfinite(swir)
+
+        denom = np.zeros_like(nir, dtype=np.float32)
+        denom[valid] = nir[valid] + swir[valid]
 
         # Zero denominator safety mask
-        zero_denom = np.isclose(denom, 0.0) | (denom < 1e-7)
+        zero_denom = np.isclose(denom, 0.0) | (denom < 1e-7) | ~np.isfinite(denom)
         valid = valid & ~zero_denom
 
         nbr = np.zeros_like(nir, dtype=np.float32)
-        np.divide(nir - swir, np.maximum(denom, 1e-7), out=nbr, where=valid)
+        safe_denom = np.where(valid, np.maximum(denom, 1e-7), 1.0)
+        np.divide(nir - swir, safe_denom, out=nbr, where=valid)
 
         # Sanitize residual NaNs/Infs
         nbr[~valid] = 0.0

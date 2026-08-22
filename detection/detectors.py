@@ -114,14 +114,16 @@ class ModularFloodDetector(BaseDisasterDetector):
         has_real_bands = False
 
         if "B03" in bands and "B08" in bands:
-            b03 = bands["B03"]
-            b08 = bands["B08"]
+            raw_b03 = np.asarray(bands["B03"], dtype=np.float32)
+            raw_b08 = np.asarray(bands["B08"], dtype=np.float32)
+            b03 = np.where(np.isfinite(raw_b03) & (raw_b03 > 1.0), raw_b03 / 10000.0, raw_b03)
+            b08 = np.where(np.isfinite(raw_b08) & (raw_b08 > 1.0), raw_b08 / 10000.0, raw_b08)
             valid = np.isfinite(b03) & np.isfinite(b08)
             if valid.sum() > 0:
                 has_real_bands = True
                 denom = b03[valid] + b08[valid]
-                denom[denom == 0] = 1e-6
-                ndwi_arr = (b03[valid] - b08[valid]) / denom
+                safe_denom = np.where(np.isclose(denom, 0.0) | (denom < 1e-7), 1.0, denom)
+                ndwi_arr = (b03[valid] - b08[valid]) / safe_denom
                 ndwi_mean = float(np.mean(ndwi_arr))
                 water_ratio = float((ndwi_arr > 0.15).sum() / len(ndwi_arr))
                 base_confidence = min(98.0, base_confidence + 5.0)
@@ -365,16 +367,18 @@ class ModularWildfireDetector(BaseDisasterDetector):
         nbr_mean = 0.0
 
         if "B08" in bands and "B12" in bands:
-            b08 = bands["B08"]
-            b12 = bands["B12"]
+            raw_b08 = np.asarray(bands["B08"], dtype=np.float32)
+            raw_b12 = np.asarray(bands["B12"], dtype=np.float32)
+            b08 = np.where(np.isfinite(raw_b08) & (raw_b08 > 1.0), raw_b08 / 10000.0, raw_b08)
+            b12 = np.where(np.isfinite(raw_b12) & (raw_b12 > 1.0), raw_b12 / 10000.0, raw_b12)
             valid = np.isfinite(b08) & np.isfinite(b12)
             if valid.sum() > 0:
                 has_real_bands = True
                 denom = b08[valid] + b12[valid]
-                denom[denom == 0] = 1e-6
-                nbr_arr = (b08[valid] - b12[valid]) / denom
+                safe_denom = np.where(np.isclose(denom, 0.0) | (denom < 1e-7), 1.0, denom)
+                nbr_arr = (b08[valid] - b12[valid]) / safe_denom
                 nbr_mean = float(np.mean(nbr_arr))
-                # Burned pixels have lower/negative NBR values
+                # Burned pixels have lower/negative NBR values (< 0.10)
                 burned_ratio = float((nbr_arr < 0.10).sum() / len(nbr_arr))
                 burned_area_km2 = round(max(0.5, min(100.0, burned_ratio * 45.0)), 2)
                 confidence = min(98.0, confidence + 4.0)
