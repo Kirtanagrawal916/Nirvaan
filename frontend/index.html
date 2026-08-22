@@ -28,233 +28,108 @@
 <body>
 
 
-<div class="app">
+<div class="app" id="appLayout">
 
+    <!-- BACKDROP FOR MOBILE DRAWER -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
 
     <!-- =====================================================
-         SIDEBAR
+         MODERN LEFT SIDEBAR NAVIGATION
     ====================================================== -->
+    <aside class="sidebar" id="appSidebar">
 
-    <aside class="sidebar">
-
-
-        <!-- LOGO -->
-
+        <!-- SIDEBAR HEADER / BRAND -->
         <div class="brand">
-
-            <div class="brand-logo">
+            <div class="brand-logo" title="NIRVAAN Geospatial Core">
                 🛰️
             </div>
-
-            <div>
-
+            <div class="brand-text">
                 <h2 class="nirvaan-title">NIRVAAN</h2>
-
-                <p>
-                    Satellite Disaster Intelligence
-                </p>
-
+                <p class="nirvaan-tagline">Satellite Disaster Intelligence</p>
             </div>
-
+            <button
+                type="button"
+                id="sidebarCollapseBtn"
+                class="sidebar-collapse-btn"
+                title="Toggle Sidebar (Expand/Collapse)"
+                aria-label="Toggle Sidebar"
+            >
+                «
+            </button>
         </div>
 
+        <!-- SIDEBAR NAVIGATION -->
+        <nav class="sidebar-nav" aria-label="Main Navigation">
 
+            <div class="nav-section-title">MONITORING</div>
 
-        <!-- NAVIGATION -->
-
-        <nav class="sidebar-nav">
-
-
-            <!-- THEME SWITCHER AT TOP OF NAVIGATION -->
-
-            <div class="sidebar-theme-section">
-
-                <span class="theme-section-label">THEME</span>
-
-                <div class="theme-toggle-pill">
-
-                    <button
-                        type="button"
-                        class="theme-pill-btn dark-btn active"
-                        data-theme-set="dark"
-                        title="Dark Mode"
-                    >
-                        <span>🌙</span>
-                        <span>Dark</span>
-                    </button>
-
-                    <button
-                        type="button"
-                        class="theme-pill-btn light-btn"
-                        data-theme-set="light"
-                        title="Light Mode"
-                    >
-                        <span>☀️</span>
-                        <span>Light</span>
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <button
-                class="nav-item active"
-                data-page="dashboard"
-            >
-
+            <button class="nav-item active" data-page="dashboard" title="Dashboard Overview">
                 <span class="nav-icon">⌂</span>
-
-                <span>
-                    Dashboard
-                </span>
-
+                <span class="nav-label">Dashboard</span>
             </button>
 
-
-
-            <button
-                class="nav-item"
-                data-page="satellite"
-            >
-
+            <button class="nav-item" data-page="satellite" title="Satellite Monitor & Multi-Spectral Swaths">
                 <span class="nav-icon">◇</span>
-
-                <span>
-                    Satellite Monitor
-                </span>
-
+                <span class="nav-label">Satellite Monitor</span>
             </button>
 
-
-
-            <button
-                class="nav-item"
-                data-page="detection"
-            >
-
+            <button class="nav-item" data-page="detection" title="Live Disaster Detection & Analysis">
                 <span class="nav-icon">△</span>
-
-                <span>
-                    Disaster Detection
-                </span>
-
+                <span class="nav-label">Live Detection</span>
             </button>
 
-
-
-            <button
-                class="nav-item"
-                data-page="risk"
-            >
-
+            <button class="nav-item" data-page="risk" title="Geospatial Risk Map">
                 <span class="nav-icon">♢</span>
-
-                <span>
-                    Risk Map
-                </span>
-
+                <span class="nav-label">Risk Map</span>
             </button>
 
+            <div class="nav-section-title">INTELLIGENCE</div>
 
-
-            <button
-                class="nav-item"
-                data-page="alerts"
-            >
-
+            <button class="nav-item" data-page="alerts" title="Disaster Alerts">
                 <span class="nav-icon">♧</span>
-
-                <span>
-                    Alerts
-                </span>
-
-                <span class="alert-count" id="sidebarAlertCount">
-                    0
-                </span>
-
+                <span class="nav-label">Alerts</span>
+                <span class="alert-count" id="sidebarAlertCount">0</span>
             </button>
 
-
-
-            <button
-                class="nav-item"
-                data-page="reports"
-            >
-
+            <button class="nav-item" data-page="reports" title="SITREP Situation Reports">
                 <span class="nav-icon">▤</span>
-
-                <span>
-                    Reports
-                </span>
-
+                <span class="nav-label">Reports</span>
             </button>
 
-
-
-            <button
-                class="nav-item"
-                data-page="history"
-            >
-
+            <button class="nav-item" data-page="history" title="Historical Disaster Events Archive">
                 <span class="nav-icon">◷</span>
-
-                <span>
-                    History
-                </span>
-
+                <span class="nav-label">History</span>
             </button>
 
+            <div class="nav-section-title">SYSTEM</div>
 
-
-            <button
-                class="nav-item"
-                data-page="settings"
-            >
-
+            <button class="nav-item" data-page="settings" title="System Configuration & Preferences">
                 <span class="nav-icon">⚙</span>
-
-                <span>
-                    Settings
-                </span>
-
+                <span class="nav-label">Settings</span>
             </button>
 
+            <button class="nav-item" data-page="about" title="About Nirvaan Platform">
+                <span class="nav-icon">ℹ</span>
+                <span class="nav-label">About</span>
+            </button>
+
+            <button class="nav-item" data-page="faq" title="Frequently Asked Questions">
+                <span class="nav-icon">❓</span>
+                <span class="nav-label">FAQ</span>
+            </button>
 
         </nav>
 
-
-
-        <!-- ABOUT -->
-
-        <div class="about-box">
-
-            <h4>
-                ABOUT
-            </h4>
-
-            <p>
-                Nirvaan uses AI and satellite imagery
-                to detect disasters, monitor affected
-                areas and generate rapid alerts.
-            </p>
-
+        <!-- SIDEBAR FOOTER / TELEMETRY BADGE -->
+        <div class="sidebar-footer">
+            <div class="sidebar-telemetry-badge" title="Copernicus Sentinel-2 Surface Reflectance Pipeline Active">
+                <span class="telemetry-dot"></span>
+                <div class="telemetry-text">
+                    <span class="telemetry-title">CDSE SENTINEL-2</span>
+                    <span class="telemetry-sub">Live Process API</span>
+                </div>
+            </div>
         </div>
-
-
-
-        <!-- LOGOUT -->
-
-        <button class="logout">
-
-            ↪
-
-            <span>
-                Logout
-            </span>
-
-        </button>
-
 
     </aside>
 

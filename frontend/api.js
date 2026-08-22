@@ -429,7 +429,7 @@ async function analyzeUploadedImage(fileOrBase64, context = "") {
                 method: "POST",
                 headers: headers,
                 body: formData
-            });
+            }, 1, 1000, 60000);
         } else {
             response = await fetchWithRetry(`${API_BASE_URL}/v1/analyze/image`, {
                 method: "POST",
@@ -438,7 +438,7 @@ async function analyzeUploadedImage(fileOrBase64, context = "") {
                     image_base64: fileOrBase64,
                     context: context
                 })
-            });
+            }, 1, 1000, 60000);
         }
 
         if (!response.ok) {
@@ -460,7 +460,7 @@ async function analyzeDisaster(payload = {}) {
             method: "POST",
             headers: getAuthHeaders(),
             body: JSON.stringify(payload)
-        });
+        }, 1, 1000, 60000);
 
         if (!response.ok) {
             const errData = await response.json().catch(() => ({}));
