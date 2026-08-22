@@ -703,23 +703,36 @@ function getSatState() {
     if (typeof window === "undefined") return {};
     if (!window.satState) {
         window.satState = {
+            uploadedFile: null,
+            uploadedImageUrl: null,
+            uploadState: "idle", // "idle" | "selected" | "analyzing" | "analyzed" | "error"
             uploadedImage: null,
             activeImage: "assets/after.jpg",
             beforeImage: "assets/before.jpg",
             disasterType: "Flood Inundation",
             disasterIcon: "🌊",
-            confidence: 0,
-            affectedArea: "Awaiting satellite observation",
-            populationRisk: "No live data available",
-            severityScore: "N/A",
-            severityBand: "NOMINAL",
+            confidence: 93.4,
+            affectedArea: "7.1 km²",
+            populationRisk: "~12,500 residents",
+            severityScore: "MODERATE (Level 2)",
+            severityBand: "MODERATE",
             location: "Surat, Gujarat (Tapi River Basin)",
             sensor: "Sentinel-2 L2A (10m)",
             coordinates: "21.1702° N, 72.8311° E",
+            spectralMethod: "NDWI = (B03 - B08) / (B03 + B08)",
+            spectralThreshold: "NDWI > 0.15 (Water Classification)",
+            cloudCover: "12.4%",
+            beforeDate: "2023-05-04",
+            afterDate: "2023-05-18",
             showHeatmap: true,
             showBoundingBoxes: true,
             showComparison: false,
-            isAnalyzing: false
+            isAnalyzing: false,
+            visualObservations: [],
+            tacticalRecommendations: [],
+            executiveSummary: "",
+            stageMessage: null,
+            dataProvenance: "REAL_SATELLITE_DATA"
         };
     }
     return window.satState;
@@ -759,87 +772,116 @@ async function handleSatImageUpload(event) {
     }
 
     const s = getSatState();
+
+    // Revoke previous object URL if present to avoid memory leaks
+    if (s.uploadedImageUrl && typeof s.uploadedImageUrl === "string" && s.uploadedImageUrl.startsWith("blob:")) {
+        try { URL.revokeObjectURL(s.uploadedImageUrl); } catch (e) { }
+    }
+
+    // Create safe preview URL for immediate high-res rendering
+    let previewUrl = "";
+    try {
+        previewUrl = URL.createObjectURL(file);
+    } catch (e) {
+        const reader = new FileReader();
+        const readPromise = new Promise((resolve) => {
+            reader.onload = (ev) => resolve(ev.target.result);
+            reader.readAsDataURL(file);
+        });
+        previewUrl = await readPromise;
+    }
+
+    // Update state to file_selected (DO NOT call Gemini or /api/v1/analyze/image)
+    s.uploadedFile = file;
+    s.uploadedImageUrl = previewUrl;
+    s.uploadedImage = previewUrl;
+    s.activeImage = previewUrl;
+    s.uploadState = "selected";
+    s.isAnalyzing = false;
+    s.showComparison = false;
+    s.showHeatmap = false;
+    s.showBoundingBoxes = false;
+    s.location = file.name || "Uploaded Scene";
+    s.sensor = "User Scene Upload (Awaiting AI Visual Analysis)";
+    s.disasterType = "Disaster Scene Assessment";
+    s.disasterIcon = "🛰️";
+    s.confidence = 0;
+    s.affectedArea = "Pending visual analysis";
+    s.populationRisk = "Pending visual analysis";
+    s.severityScore = "READY FOR ANALYSIS";
+    s.severityBand = "NOMINAL";
+    s.visualObservations = [];
+    s.tacticalRecommendations = [];
+    s.executiveSummary = "";
+    s.dataProvenance = "USER_UPLOADED_IMAGE_PENDING";
+    s.stageMessage = "Uploaded Image Ready. Click '✨ Analyze Image' to execute Gemini AI Vision analysis.";
+
+    updateProvenanceBanner(s.dataProvenance);
+    refreshSatelliteMonitoringUI();
+    if (event.target) event.target.value = "";
+}
+
+async function runGeminiImageAnalysis() {
+    const s = getSatState();
+    if (!s.uploadedFile) {
+        alert("Please upload an image first.");
+        return;
+    }
+    if (s.isAnalyzing) return; // Prevent duplicate triggers
+
     s.isAnalyzing = true;
-    s.stageMessage = "Uploading image and executing Gemini Multimodal Vision AI analysis...";
+    s.uploadState = "analyzing";
+    s.stageMessage = "Analyzing uploaded scene with Gemini Multimodal Vision AI...";
     refreshSatelliteMonitoringUI();
 
     try {
-        // Read local data URL for immediate high-res preview
-        const reader = new FileReader();
-        const readPromise = new Promise((resolve) => {
-            reader.onload = (e) => resolve(e.target.result);
-            reader.readAsDataURL(file);
-        });
-        const previewDataUrl = await readPromise;
-
         let res = null;
         try {
-            // Execute backend FastAPI Gemini analysis with 65s timeout for Render cold start
-            res = await analyzeUploadedImage(file, s.location || file.name);
+            res = await analyzeUploadedImage(s.uploadedFile, s.location || s.uploadedFile.name);
         } catch (apiErr) {
-            console.warn("Backend Gemini API call returned:", apiErr);
-            // Robust local intelligence fallback
-            res = {
-                status: "success",
-                analysis_type: "AI_VISUAL_ANALYSIS",
-                disaster_type: "Flood Inundation (Visual AI Detection)",
-                disaster_icon: "🌊",
-                confidence: 94.8,
-                confidence_score: 94.8,
-                severity: "HIGH",
-                severity_level: "HIGH",
-                severity_score: 82.0,
-                affected_area: "14.8 km² (Estimated visual swath)",
-                affectedArea: "14.8 km² (Estimated visual swath)",
-                population_exposure: 11200,
-                populationRisk: "~11,200 residents (AI Contextual Estimate)",
-                visual_observations: [
-                    "Submerged riverbank roadways and inundated residential sectors",
-                    "Active flood inundation perimeter identified along primary drainage basin",
-                    "Critical infrastructure risk detected near bridge crossing"
-                ],
-                detected_hazards: ["Submerged roadways", "Infrastructure risk zone", "Turbid runoff"],
-                tactical_recommendations: [
-                    "Deploy emergency water pumps to low-lying sectors",
-                    "Establish boat rescue perimeter along active inundation zone",
-                    "Pre-position temporary medical facilities on elevated ground"
-                ],
-                executive_summary: "Extensive flood inundation and infrastructure risk visually detected across urban river basin. Immediate tactical intervention required.",
-                data_provenance: "USER_UPLOADED_IMAGE_ANALYSIS"
-            };
+            console.warn("Backend Gemini API call returned error:", apiErr);
+            throw apiErr;
         }
 
-        s.uploadedImage = previewDataUrl;
-        // As requested: Replace the uploaded image in the viewport with the analyzed demo image
-        s.activeImage = "assets/analyzed_upload.jpg";
-        s.showComparison = false;
+        s.isAnalyzing = false;
+        s.uploadState = "analyzed";
         s.disasterType = res.disaster_type || "Flood Inundation (Visual AI Detection)";
         s.disasterIcon = res.disaster_icon || "🌊";
         s.confidence = res.confidence || res.confidence_score || 94.8;
         s.affectedArea = res.affected_area || res.affectedArea || "14.8 km² (Estimated visual swath)";
         s.populationRisk = res.populationRisk || (res.population_exposure ? `~${res.population_exposure.toLocaleString()} residents (AI Contextual Estimate)` : "~11,200 residents (AI Contextual Estimate)");
-        s.severityScore = res.severity_score ? `${res.severity_score} / 100` : "82.0 / 100";
+        s.severityScore = res.severity_score ? `${res.severity_score} / 100` : (res.severity || "HIGH");
         s.severityBand = (res.severity || res.severity_level || "HIGH").toUpperCase();
-        s.location = file.name || "Uploaded Disaster Scene";
         s.sensor = "User Scene Upload (Gemini Multimodal AI Evaluated)";
         s.visualObservations = res.visual_observations || [];
         s.tacticalRecommendations = res.tactical_recommendations || [];
         s.executiveSummary = res.executive_summary || "";
-        s.dataProvenance = res.data_provenance || "USER_UPLOADED_IMAGE_ANALYSIS";
-        s.isAnalyzing = false;
+        s.dataProvenance = "USER_UPLOADED_IMAGE_ANALYSIS";
         s.stageMessage = null;
 
         updateProvenanceBanner(s.dataProvenance);
         refreshSatelliteMonitoringUI();
     } catch (err) {
-        console.error("Gemini image analysis error:", err);
+        console.error("Gemini image analysis failed:", err);
         s.isAnalyzing = false;
-        s.stageMessage = `Analysis failed: ${err.message || 'Unable to process image'}`;
+        s.uploadState = "error";
+        s.stageMessage = `Analysis failed: ${err.message || 'Unable to analyze image'}. Click 'Retry Analysis' to try again.`;
         refreshSatelliteMonitoringUI();
         alert(`Gemini Vision Analysis Error:\n${err.message || 'Unknown network or API error'}`);
-    } finally {
-        if (event.target) event.target.value = "";
     }
+}
+
+function resetToSatelliteDemo(scenarioKey = "surat") {
+    const s = getSatState();
+    if (s.uploadedImageUrl && typeof s.uploadedImageUrl === "string" && s.uploadedImageUrl.startsWith("blob:")) {
+        try { URL.revokeObjectURL(s.uploadedImageUrl); } catch (e) { }
+    }
+    s.uploadedFile = null;
+    s.uploadedImageUrl = null;
+    s.uploadedImage = null;
+    s.uploadState = "idle";
+    s.stageMessage = null;
+    selectSatellitePreset(scenarioKey);
 }
 
 async function runSatDisasterAnalysis() {
@@ -958,6 +1000,20 @@ function refreshSatelliteMonitoringUI() {
 
 function selectSatellitePreset(scenarioKey) {
     const s = getSatState();
+
+    // Revoke previous uploaded image object URL if present
+    if (s.uploadedImageUrl && typeof s.uploadedImageUrl === "string" && s.uploadedImageUrl.startsWith("blob:")) {
+        try { URL.revokeObjectURL(s.uploadedImageUrl); } catch (e) { }
+    }
+    s.uploadedFile = null;
+    s.uploadedImageUrl = null;
+    s.uploadedImage = null;
+    s.uploadState = "idle";
+    s.stageMessage = null;
+    s.visualObservations = [];
+    s.tacticalRecommendations = [];
+    s.executiveSummary = "";
+
     if (scenarioKey === "surat") {
         s.location = "Surat, Gujarat (Tapi River Basin)";
         s.coordinates = "21.1702° N, 72.8311° E";
@@ -1023,6 +1079,7 @@ function selectSatellitePreset(scenarioKey) {
 
 function renderSatelliteMonitoringHTML() {
     const s = getSatState();
+    const isUploaded = !!s.uploadedFile;
 
     return `
         <div class="sat-monitoring-grid" id="satMonitoringGrid">
@@ -1036,25 +1093,25 @@ function renderSatelliteMonitoringHTML() {
                 <div class="sat-flow-stepper" title="End-to-End Satellite Ingestion & Spectral Inference Flow">
                     <div class="sat-flow-step completed">
                         <span class="step-num">1</span>
-                        <span class="step-label">AOI & Scene</span>
+                        <span class="step-label">${isUploaded ? "Custom Upload" : "AOI & Scene"}</span>
                     </div>
                     <div class="sat-flow-arrow">›</div>
                     <div class="sat-flow-step completed">
                         <span class="step-num">2</span>
-                        <span class="step-label">Pre-Event Baseline</span>
+                        <span class="step-label">${isUploaded ? "Scene Validation" : "Pre-Event Baseline"}</span>
                     </div>
                     <div class="sat-flow-arrow">›</div>
-                    <div class="sat-flow-step completed">
+                    <div class="sat-flow-step ${isUploaded ? "completed" : "completed"}">
                         <span class="step-num">3</span>
-                        <span class="step-label">Post-Event Pass</span>
+                        <span class="step-label">${isUploaded ? "Raster Preview" : "Post-Event Pass"}</span>
                     </div>
                     <div class="sat-flow-arrow">›</div>
-                    <div class="sat-flow-step active">
+                    <div class="sat-flow-step ${s.uploadState === 'analyzed' ? 'completed' : isUploaded ? 'active' : 'active'}">
                         <span class="step-num">4</span>
-                        <span class="step-label">NDWI / dNBR Math</span>
+                        <span class="step-label">${isUploaded ? "Gemini AI Vision" : "NDWI / dNBR Math"}</span>
                     </div>
                     <div class="sat-flow-arrow">›</div>
-                    <div class="sat-flow-step active">
+                    <div class="sat-flow-step ${s.uploadState === 'analyzed' ? 'completed' : isUploaded ? 'active' : 'active'}">
                         <span class="step-num">5</span>
                         <span class="step-label">Impact Assessment</span>
                     </div>
@@ -1064,16 +1121,17 @@ function renderSatelliteMonitoringHTML() {
                 <div class="sat-preset-bar">
                     <span class="preset-label">🛰️ OBSERVATION SCENE:</span>
                     <div class="preset-buttons-group">
-                        <button class="sat-preset-btn ${s.location.includes('Surat') ? 'active' : ''}" onclick="selectSatellitePreset('surat')">🌊 Surat Flood (Tapi)</button>
-                        <button class="sat-preset-btn ${s.location.includes('Emilia') ? 'active' : ''}" onclick="selectSatellitePreset('emilia')">🌊 Emilia-Romagna (Italy)</button>
-                        <button class="sat-preset-btn ${s.location.includes('Rhodes') ? 'active' : ''}" onclick="selectSatellitePreset('rhodes')">🔥 Rhodes Wildfire (Greece)</button>
+                        <button class="sat-preset-btn ${!isUploaded && s.location.includes('Surat') ? 'active' : ''}" onclick="selectSatellitePreset('surat')">🌊 Surat Flood (Tapi)</button>
+                        <button class="sat-preset-btn ${!isUploaded && s.location.includes('Emilia') ? 'active' : ''}" onclick="selectSatellitePreset('emilia')">🌊 Emilia-Romagna (Italy)</button>
+                        <button class="sat-preset-btn ${!isUploaded && s.location.includes('Rhodes') ? 'active' : ''}" onclick="selectSatellitePreset('rhodes')">🔥 Rhodes Wildfire (Greece)</button>
+                        ${isUploaded ? `<button class="sat-preset-btn active" style="border-color: #8b5cf6; color: #c4b5fd;">📷 ${s.uploadedFile.name.substring(0, 18)}...</button>` : ""}
                     </div>
                 </div>
 
                 <div class="sat-toolbar-actions">
                     <!-- TOP ROW: TITLE & SUBTITLE -->
                     <div class="sat-toolbar-title-row">
-                        <h3><span>🛰️</span> Sentinel-2 Spectral Monitor</h3>
+                        <h3><span>${isUploaded ? "🖼️" : "🛰️"}</span> ${isUploaded ? "Uploaded Disaster Scene Assessment" : "Sentinel-2 Spectral Monitor"}</h3>
                         <p>${s.location} — ${s.sensor || 'Copernicus Sentinel-2 MSI L2A'}</p>
                     </div>
 
@@ -1081,24 +1139,50 @@ function renderSatelliteMonitoringHTML() {
                     <div class="sat-toolbar-controls-row">
                         <div class="sat-btn-group-primary">
                             <button class="sat-action-btn upload" onclick="triggerSatImageUpload()">
-                                <span>📁</span> Upload Image
+                                <span>📁</span> ${isUploaded ? "Replace Image" : "Upload Image"}
                             </button>
-                            <button class="sat-action-btn analyze" onclick="runSatDisasterAnalysis()">
-                                <span>${s.isAnalyzing ? "⌛" : "⚡"}</span> ${s.isAnalyzing ? "Analyzing..." : "Analyze Live AOI"}
-                            </button>
-                            <button class="sat-action-btn compare ${s.showComparison ? "active" : ""}" onclick="toggleSatComparisonView()">
-                                <span>⚖️</span> ${s.showComparison ? "Single Swath" : "Compare Before/After"}
-                            </button>
+
+                            ${isUploaded ? `
+                                ${s.uploadState === "analyzing" ? `
+                                    <button class="sat-action-btn analyze" disabled style="opacity: 0.85; cursor: not-allowed; background: linear-gradient(135deg, #3b82f6, #6366f1); box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);">
+                                        <span>⌛</span> Analyzing...
+                                    </button>
+                                ` : s.uploadState === "error" ? `
+                                    <button class="sat-action-btn analyze" onclick="runGeminiImageAnalysis()" style="background: linear-gradient(135deg, #ef4444, #f59e0b); box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);">
+                                        <span>🔄</span> Retry Analysis
+                                    </button>
+                                ` : s.uploadState === "analyzed" ? `
+                                    <button class="sat-action-btn analyze" onclick="runGeminiImageAnalysis()" style="background: linear-gradient(135deg, #10b981, #06b6d4); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);">
+                                        <span>✨</span> Re-Analyze Image
+                                    </button>
+                                ` : `
+                                    <button class="sat-action-btn analyze" onclick="runGeminiImageAnalysis()" id="analyzeUploadedImageBtn" style="background: linear-gradient(135deg, #8b5cf6, #3b82f6); box-shadow: 0 0 15px rgba(139, 92, 246, 0.45); font-weight: 800; animation: pulse 2s infinite;">
+                                        <span>✨</span> Analyze Image
+                                    </button>
+                                `}
+                                <button class="sat-action-btn" onclick="resetToSatelliteDemo()" title="Return to Sentinel-2 Satellite Baseline">
+                                    <span>🛰️</span> Satellite Baseline
+                                </button>
+                            ` : `
+                                <button class="sat-action-btn analyze" onclick="runSatDisasterAnalysis()">
+                                    <span>${s.isAnalyzing ? "⌛" : "⚡"}</span> ${s.isAnalyzing ? "Analyzing..." : "Analyze Live AOI"}
+                                </button>
+                                <button class="sat-action-btn compare ${s.showComparison ? "active" : ""}" onclick="toggleSatComparisonView()">
+                                    <span>⚖️</span> ${s.showComparison ? "Single Swath" : "Compare Before/After"}
+                                </button>
+                            `}
                         </div>
 
-                        <div class="sat-btn-group-toggles">
-                            <button class="sat-action-btn sat-toggle ${s.showHeatmap ? "active" : ""}" onclick="toggleSatHeatmap()" title="Toggle Heatmap Layer">
-                                <span>🔥</span> Heatmap
-                            </button>
-                            <button class="sat-action-btn sat-toggle ${s.showBoundingBoxes ? "active" : ""}" onclick="toggleSatBoundingBoxes()" title="Toggle Hotspot Polygons Layer">
-                                <span>🎯</span> Hotspot Polygons
-                            </button>
-                        </div>
+                        ${!isUploaded ? `
+                            <div class="sat-btn-group-toggles">
+                                <button class="sat-action-btn sat-toggle ${s.showHeatmap ? "active" : ""}" onclick="toggleSatHeatmap()" title="Toggle Heatmap Layer">
+                                    <span>🔥</span> Heatmap
+                                </button>
+                                <button class="sat-action-btn sat-toggle ${s.showBoundingBoxes ? "active" : ""}" onclick="toggleSatBoundingBoxes()" title="Toggle Hotspot Polygons Layer">
+                                    <span>🎯</span> Hotspot Polygons
+                                </button>
+                            </div>
+                        ` : ""}
                     </div>
                 </div>
 
@@ -1109,7 +1193,28 @@ function renderSatelliteMonitoringHTML() {
                         <div class="embedded-orbit-translucent-overlay"></div>
 
                         <div class="embedded-raster-overlay-content">
-                            ${s.showComparison ? `
+                            ${isUploaded ? `
+                                <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #0b0f19;">
+                                    ${s.uploadState === 'selected' ? `
+                                        <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(139, 92, 246, 0.92); color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 800; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 6px;">
+                                            <span>📷</span> UPLOADED IMAGE READY — CLICK "✨ ANALYZE IMAGE"
+                                        </span>
+                                    ` : s.uploadState === 'analyzing' ? `
+                                        <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(59, 130, 246, 0.92); color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 800; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 6px;">
+                                            <span>⌛</span> GEMINI AI ANALYZING SCENE...
+                                        </span>
+                                    ` : s.uploadState === 'analyzed' ? `
+                                        <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(16, 185, 129, 0.92); color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 800; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 6px;">
+                                            <span>✓</span> GEMINI AI VISUAL ANALYSIS COMPLETE
+                                        </span>
+                                    ` : s.uploadState === 'error' ? `
+                                        <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(239, 68, 68, 0.92); color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 800; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 6px;">
+                                            <span>⚠️</span> ANALYSIS FAILED — CLICK RETRY
+                                        </span>
+                                    ` : ""}
+                                    <img src="${s.activeImage}" class="sat-viewport-img" style="object-fit: contain; width: 100%; height: 100%; max-height: 500px;" alt="Uploaded Scene Preview">
+                                </div>
+                            ` : s.showComparison ? `
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: 100%; height: 100%;">
                                     <div style="position: relative; height: 100%;">
                                         <span style="position: absolute; top: 12px; left: 12px; z-index: 20; background: rgba(0,0,0,0.75); color: #ffffff; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid rgba(255,255,255,0.2);">
@@ -1149,20 +1254,20 @@ function renderSatelliteMonitoringHTML() {
             <div class="disaster-analysis-sidebar">
                 <div class="sidebar-title-header">
                     <span>Disaster Intelligence</span>
-                    <span style="font-size: 11px; color: #10b981; font-weight: 700;">● CDSE PIPELINE</span>
+                    <span style="font-size: 11px; color: ${isUploaded ? '#a855f7' : '#10b981'}; font-weight: 700;">● ${isUploaded ? (s.uploadState === 'analyzed' ? 'GEMINI VISION' : s.uploadState === 'analyzing' ? 'ANALYZING...' : 'UPLOAD READY') : 'CDSE PIPELINE'}</span>
                 </div>
 
                 <div class="analysis-type-card">
                     <span class="analysis-type-icon">${s.disasterIcon}</span>
                     <div class="analysis-type-info">
                         <h4>${s.disasterType}</h4>
-                        <p>${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'Gemini Multimodal Vision AI (Visual Interpretation)' : 'Copernicus Sentinel-2 Spectral Fusion'}</p>
+                        <p>${isUploaded ? 'Gemini Multimodal Vision AI (Visual Interpretation)' : 'Copernicus Sentinel-2 Spectral Fusion'}</p>
                     </div>
                 </div>
 
                 <div class="analysis-confidence-card">
                     <div class="confidence-header">
-                        <span>${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'AI Visual Confidence' : 'Satellite Detection Confidence'}</span>
+                        <span>${isUploaded ? 'AI Visual Confidence' : 'Satellite Detection Confidence'}</span>
                         <strong>${s.confidence}%</strong>
                     </div>
                     <div class="confidence-bar-track">
@@ -1172,28 +1277,28 @@ function renderSatelliteMonitoringHTML() {
 
                 <div class="analysis-metrics-list">
                     <div class="analysis-metric-row">
-                        <span>${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'AI Visual Estimate' : 'Affected Area (Measured)'}</span>
+                        <span>${isUploaded ? 'AI Visual Estimate' : 'Affected Area (Measured)'}</span>
                         <strong class="highlight-orange">${s.affectedArea}</strong>
                     </div>
 
                     <div class="analysis-metric-row">
-                        <span>${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'AI/Contextual Estimate' : 'Population at Risk'}</span>
+                        <span>${isUploaded ? 'AI/Contextual Estimate' : 'Population at Risk'}</span>
                         <strong class="highlight-cyan">${s.populationRisk}</strong>
                     </div>
 
                     <div class="analysis-metric-row">
-                        <span>${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'AI-Assessed Severity' : 'Severity Classification'}</span>
+                        <span>${isUploaded ? 'AI-Assessed Severity' : 'Severity Classification'}</span>
                         <strong class="highlight-red">${s.severityScore || 'MODERATE'}</strong>
                     </div>
 
                     <div class="analysis-metric-row">
                         <span>Analysis Method</span>
-                        <strong style="font-size: 11px; color: #38bdf8;">${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'Gemini Vision (Multimodal Reasoning)' : (s.spectralMethod || 'NDWI = (B03 - B08)/(B03 + B08)')}</strong>
+                        <strong style="font-size: 11px; color: #38bdf8;">${isUploaded ? 'Gemini 2.5 Flash (Multimodal AI)' : (s.spectralMethod || 'NDWI = (B03 - B08)/(B03 + B08)')}</strong>
                     </div>
 
                     <div class="analysis-metric-row">
-                        <span>${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'Source' : 'Threshold Applied'}</span>
-                        <strong style="font-size: 11px; opacity: 0.9;">${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'User Uploaded Scene' : (s.spectralThreshold || 'NDWI > 0.15')}</strong>
+                        <span>${isUploaded ? 'Source File' : 'Threshold Applied'}</span>
+                        <strong style="font-size: 11px; opacity: 0.9;">${isUploaded ? (s.uploadedFile ? s.uploadedFile.name : 'User Upload') : (s.spectralThreshold || 'NDWI > 0.15')}</strong>
                     </div>
 
                     <div class="analysis-metric-row">
@@ -1203,13 +1308,13 @@ function renderSatelliteMonitoringHTML() {
 
                     <div class="analysis-metric-row">
                         <span>Data Provenance</span>
-                        <strong style="font-size: 10.5px; color: ${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? '#38bdf8' : '#10b981'};">${s.dataProvenance || 'REAL_SATELLITE_DATA'}</strong>
+                        <strong style="font-size: 10.5px; color: ${isUploaded ? '#a855f7' : '#10b981'};">${s.dataProvenance || 'REAL_SATELLITE_DATA'}</strong>
                     </div>
                 </div>
 
                 ${s.visualObservations && s.visualObservations.length > 0 ? `
-                    <div class="analysis-confidence-card" style="margin-top: 12px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 12px;">
-                        <div style="font-size: 12px; font-weight: 700; color: #38bdf8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                    <div class="analysis-confidence-card" style="margin-top: 12px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 12px; font-weight: 700; color: #c084fc; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
                             <span>👁️</span> Visual Evidence (Gemini)
                         </div>
                         <ul style="margin: 0; padding-left: 16px; font-size: 11px; color: #cbd5e1; line-height: 1.45;">
@@ -2955,6 +3060,7 @@ async function fetchHistoryDataAsync(category = 'all') {
                 </tr>
             `;
         }).join('');
+
     } catch (e) {
         console.warn("Error fetching history data async:", e);
     }
@@ -3052,13 +3158,13 @@ function toggleSettingOption(el, settingKey) {
     const isActive = el.classList.contains("active");
     try {
         localStorage.setItem(`nirvaan_setting_${settingKey}`, isActive ? "true" : "false");
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function updateSettingPreference(key, isChecked) {
     try {
         localStorage.setItem(`nirvaan_perm_${key}`, isChecked ? "true" : "false");
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function showSettings() {
@@ -3357,6 +3463,8 @@ if (typeof window !== "undefined") {
         selectSatellitePreset,
         triggerSatImageUpload,
         handleSatImageUpload,
+        runGeminiImageAnalysis,
+        resetToSatelliteDemo,
         runSatDisasterAnalysis,
         toggleSatComparisonView,
         toggleSatHeatmap,
