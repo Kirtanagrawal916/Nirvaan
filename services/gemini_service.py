@@ -22,9 +22,12 @@ logger = logging.getLogger("nirvaan.services.gemini")
 
 # Recommended model cascade for resilience
 PREFERRED_MODELS = [
+    "gemini-3.5-flash",
+    "gemini-3.5-flash-lite",
     "gemini-3.6-flash",
     "gemini-3.7-flash",
     "gemini-flash-latest",
+    "gemini-flash-lite-latest",
     "gemini-2.5-pro",
 ]
 
@@ -232,12 +235,8 @@ CRITICAL SAFETY & ETHICAL RULES:
                             status_code=401,
                             error_code="INVALID_API_KEY"
                         )
-                    if "RESOURCE_EXHAUSTED" in last_error or "429" in last_error:
-                        raise GeminiServiceError(
-                            message="Gemini API rate limit or quota exceeded. Please retry shortly.",
-                            status_code=429,
-                            error_code="QUOTA_EXCEEDED"
-                        )
+                    # For 429, 404, or other errors, continue to next model in cascade
+                    continue
         except GeminiServiceError:
             raise
         except Exception as sdk_err:
