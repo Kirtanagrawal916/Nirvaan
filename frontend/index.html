@@ -147,9 +147,19 @@
         <header class="topbar">
 
 
-            <!-- LEFT: NIRVAAN BRAND -->
+            <!-- LEFT: NIRVAAN BRAND & MOBILE HAMBURGER -->
             <div class="topbar-left">
-                <div class="topbar-brand">
+                <button
+                    type="button"
+                    id="mobileSidebarOpenBtn"
+                    class="mobile-sidebar-open-btn"
+                    aria-label="Open Navigation Menu"
+                    title="Open Menu"
+                    onclick="openMobileSidebar()"
+                >
+                    ☰
+                </button>
+                <div class="topbar-brand" onclick="navigateToPage('dashboard')">
                     <div class="topbar-brand-logo">
                         <span class="brand-logo-icon">🛰️</span>
                     </div>

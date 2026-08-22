@@ -5166,4 +5166,364 @@ html[data-theme="light"] .sat-preset-btn.active {
     color: #0369a1;
 }
 
+/* =========================================================
+   MOBILE HAMBURGER & TOPBAR RESPONSIVE CONTROLS
+========================================================= */
+
+.mobile-sidebar-open-btn {
+    display: none;
+    width: 40px;
+    height: 40px;
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    color: #cbd5e1;
+    font-size: 20px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.mobile-sidebar-open-btn:hover {
+    background: #1e293b;
+    border-color: #38bdf8;
+    color: #38bdf8;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+}
+
+html[data-theme="light"] .mobile-sidebar-open-btn {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #334155;
+}
+
+html[data-theme="light"] .mobile-sidebar-open-btn:hover {
+    background: #f1f5f9;
+    border-color: #0284c7;
+    color: #0284c7;
+}
+
+/* =========================================================
+   COMPREHENSIVE MULTI-DEVICE RESPONSIVE BREAKPOINTS
+========================================================= */
+
+/* 1. ULTRAWIDE & LARGE SCREENS (>= 1920px) */
+@media (min-width: 1920px) {
+    .page-content {
+        max-width: 1920px;
+        margin: 0 auto;
+        padding: 40px 48px 60px;
+    }
+}
+
+/* 2. LAPTOPS & SPLIT SCREEN DESKTOPS (1024px to 1366px) */
+@media (max-width: 1366px) {
+    .sat-monitoring-grid {
+        grid-template-columns: 1fr 320px;
+        gap: 16px;
+    }
+
+    .topbar {
+        padding: 0 24px;
+    }
+
+    .page-content {
+        padding: 28px 24px 44px;
+    }
+}
+
+/* 3. TABLETS & LARGE SPLIT SCREENS (768px to 1023px) */
+@media (max-width: 1023px) {
+    .mobile-sidebar-open-btn {
+        display: flex;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+        width: 270px;
+        min-width: 270px;
+        position: fixed;
+        z-index: 1000;
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.85);
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .main-area {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .topbar {
+        height: 68px;
+        padding: 0 18px;
+    }
+
+    .sat-monitoring-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .disaster-analysis-sidebar {
+        width: 100%;
+    }
+
+    .risk-map-grid,
+    .risk-map-container {
+        grid-template-columns: 1fr !important;
+    }
+
+    .spatial-analytics-sidebar {
+        width: 100% !important;
+    }
+
+    .stats-grid,
+    .dashboard-metrics-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+        gap: 14px;
+    }
+
+    .page-content {
+        padding: 22px 18px 36px;
+    }
+}
+
+/* 4. PHONES & COMPACT SPLIT SCREENS (481px to 767px) */
+@media (max-width: 767px) {
+    .topbar {
+        height: 62px;
+        padding: 0 14px;
+    }
+
+    .topbar-brand-logo {
+        width: 38px;
+        height: 38px;
+        font-size: 20px;
+        border-radius: 9px;
+    }
+
+    .nirvaan-title {
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+
+    .nirvaan-tagline {
+        display: none;
+    }
+
+    .topbar-right {
+        gap: 10px;
+    }
+
+    .mode-indicator {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+
+    .mode-indicator #modeText {
+        display: none;
+    }
+
+    .page-content {
+        padding: 16px 12px 32px;
+    }
+
+    .page-title {
+        font-size: clamp(20px, 5.5vw, 26px);
+        margin-bottom: 6px;
+    }
+
+    .page-subtitle {
+        font-size: 13.5px;
+        margin-bottom: 18px;
+        line-height: 1.45;
+    }
+
+    /* Satellite Monitor Phone Layout */
+    .sat-toolbar-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .sat-toolbar-controls-row {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .sat-btn-group-primary,
+    .sat-btn-group-toggles {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .sat-action-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .sat-preset-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .preset-buttons-group {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .sat-preset-btn {
+        flex: 1 1 calc(50% - 4px);
+        text-align: center;
+        padding: 6px 8px;
+        font-size: 11.5px;
+    }
+
+    .sat-viewport-box {
+        height: 280px;
+    }
+
+    /* Grids & Cards */
+    .stats-grid,
+    .dashboard-metrics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+    }
+
+    .dash-analytics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px;
+    }
+
+    .reports-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .alerts-list {
+        gap: 10px;
+    }
+
+    .alert-card {
+        padding: 14px 12px;
+    }
+
+    /* Tables Responsive Container */
+    .history-table-container,
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+    }
+
+    .history-table {
+        min-width: 600px;
+    }
+
+    /* Modals Mobile */
+    .modal-content,
+    .auth-modal-box {
+        width: calc(100vw - 24px) !important;
+        max-height: 90vh;
+        padding: 20px 16px;
+        margin: 12px;
+    }
+}
+
+/* 5. SMALL PHONES (<= 480px) */
+@media (max-width: 480px) {
+    .topbar {
+        height: 58px;
+        padding: 0 10px;
+    }
+
+    .topbar-left {
+        gap: 8px;
+    }
+
+    .mobile-sidebar-open-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+
+    .topbar-brand-logo {
+        width: 34px;
+        height: 34px;
+        font-size: 17px;
+    }
+
+    .nirvaan-title {
+        font-size: 16px;
+    }
+
+    .topbar-right {
+        gap: 6px;
+    }
+
+    .alert-icon-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .theme-switch-wrapper {
+        gap: 4px;
+    }
+
+    .theme-switch-track {
+        width: 38px;
+        height: 22px;
+    }
+
+    .theme-switch-thumb {
+        width: 16px;
+        height: 16px;
+    }
+
+    .page-content {
+        padding: 12px 8px 24px;
+    }
+
+    .sat-preset-btn {
+        flex: 1 1 100%;
+    }
+
+    .sat-viewport-box {
+        height: 240px;
+    }
+
+    .risk-map-viewport {
+        height: 300px;
+    }
+}
+
+/* 6. LANDSCAPE PHONES & SMALL HEIGHT MONITORS (max-height: 600px) */
+@media (max-height: 600px) {
+    .topbar {
+        height: 52px;
+    }
+
+    .sat-viewport-box {
+        height: 220px;
+    }
+
+    .modal-content {
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+}
+
 
