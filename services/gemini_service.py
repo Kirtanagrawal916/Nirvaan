@@ -22,11 +22,15 @@ logger = logging.getLogger("nirvaan.services.gemini")
 
 # Recommended model cascade for resilience (official Google Generative AI models)
 PREFERRED_MODELS = [
+    "gemini-3.6-flash",
+    "gemini-3.7-flash",
+    "gemini-3.5-flash",
+    "gemini-flash-latest",
+    "gemini-3.1-pro-preview",
+    "gemini-2.5-flash-lite",
+    "gemini-pro-latest",
     "gemini-2.5-flash",
     "gemini-2.0-flash",
-    "gemini-1.5-flash",
-    "gemini-1.5-pro",
-    "gemini-2.5-pro",
 ]
 
 # Supported image mime types

@@ -253,7 +253,7 @@ def generate_llm_situation_report(evidence_payload: Dict[str, Any], api_key: Opt
         try:
             from google import genai
             client = genai.Client(api_key=key)
-            for model_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]:
+            for model_name in ["gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-3.1-pro-preview", "gemini-2.5-flash-lite"]:
                 try:
                     resp = client.models.generate_content(model=model_name, contents=prompt)
                     if resp and resp.text:
@@ -267,7 +267,7 @@ def generate_llm_situation_report(evidence_payload: Dict[str, Any], api_key: Opt
         try:
             import google.generativeai as genai_legacy
             genai_legacy.configure(api_key=key)
-            for model_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]:
+            for model_name in ["gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-3.1-pro-preview", "gemini-2.5-flash-lite"]:
                 try:
                     model = genai_legacy.GenerativeModel(model_name)
                     response = model.generate_content(prompt)

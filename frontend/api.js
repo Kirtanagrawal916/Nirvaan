@@ -9,16 +9,18 @@
 function getApiBaseUrl() {
     let rawUrl = null;
 
-    // 1. Check Vite build-time environment variables
-    try {
-        if (typeof import.meta !== "undefined" && import.meta.env) {
-            rawUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_NIRVAAN_API_URL || import.meta.env.VITE_API_URL;
-        }
-    } catch (e) {}
+    // 1. Check window runtime globals
+    if (typeof window !== "undefined" && window.NIRVAAN_API_URL) {
+        rawUrl = window.NIRVAAN_API_URL;
+    }
 
-    // 2. Check window runtime globals
-    if (!rawUrl && typeof window !== "undefined") {
-        rawUrl = window.NIRVAAN_API_URL || window.VITE_API_BASE_URL || window.VITE_NIRVAAN_API_URL;
+    // 2. Check Vite build-time environment variables
+    if (!rawUrl) {
+        try {
+            if (typeof import.meta !== "undefined" && import.meta.env) {
+                rawUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_NIRVAAN_API_URL || import.meta.env.VITE_API_URL;
+            }
+        } catch (e) {}
     }
 
     if (rawUrl) {
@@ -26,7 +28,12 @@ function getApiBaseUrl() {
         return u.endsWith("/api") ? u : `${u}/api`;
     }
 
-    // 3. Default Production Render Backend URL
+    // 3. If running locally on localhost / 127.0.0.1, use local relative /api proxy
+    if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+        return "/api";
+    }
+
+    // 4. Default Production Render Backend URL
     return "https://nirvaan-pd7i.onrender.com/api";
 }
 
