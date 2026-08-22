@@ -1121,13 +1121,13 @@ function renderSatelliteMonitoringHTML() {
                     <span class="analysis-type-icon">${s.disasterIcon}</span>
                     <div class="analysis-type-info">
                         <h4>${s.disasterType}</h4>
-                        <p>Copernicus Sentinel-2 Spectral Fusion</p>
+                        <p>${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'Gemini Multimodal Vision AI (Visual Interpretation)' : 'Copernicus Sentinel-2 Spectral Fusion'}</p>
                     </div>
                 </div>
 
                 <div class="analysis-confidence-card">
                     <div class="confidence-header">
-                        <span>AI Neural Confidence</span>
+                        <span>${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'AI Visual Confidence' : 'Satellite Detection Confidence'}</span>
                         <strong>${s.confidence}%</strong>
                     </div>
                     <div class="confidence-bar-track">
@@ -1137,28 +1137,28 @@ function renderSatelliteMonitoringHTML() {
 
                 <div class="analysis-metrics-list">
                     <div class="analysis-metric-row">
-                        <span>Affected Area</span>
+                        <span>${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'AI Visual Estimate' : 'Affected Area (Measured)'}</span>
                         <strong class="highlight-orange">${s.affectedArea}</strong>
                     </div>
 
                     <div class="analysis-metric-row">
-                        <span>Population at Risk</span>
+                        <span>${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'AI/Contextual Estimate' : 'Population at Risk'}</span>
                         <strong class="highlight-cyan">${s.populationRisk}</strong>
                     </div>
 
                     <div class="analysis-metric-row">
-                        <span>Severity Classification</span>
+                        <span>${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'AI-Assessed Severity' : 'Severity Classification'}</span>
                         <strong class="highlight-red">${s.severityScore || 'MODERATE'}</strong>
                     </div>
 
                     <div class="analysis-metric-row">
-                        <span>Spectral Algorithm</span>
-                        <strong style="font-size: 11px; color: #38bdf8;">${s.spectralMethod || 'NDWI = (B03 - B08)/(B03 + B08)'}</strong>
+                        <span>Analysis Method</span>
+                        <strong style="font-size: 11px; color: #38bdf8;">${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'Gemini Vision (Multimodal Reasoning)' : (s.spectralMethod || 'NDWI = (B03 - B08)/(B03 + B08)')}</strong>
                     </div>
 
                     <div class="analysis-metric-row">
-                        <span>Threshold Applied</span>
-                        <strong style="font-size: 11px; opacity: 0.9;">${s.spectralThreshold || 'NDWI > 0.15'}</strong>
+                        <span>${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'Source' : 'Threshold Applied'}</span>
+                        <strong style="font-size: 11px; opacity: 0.9;">${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? 'User Uploaded Scene' : (s.spectralThreshold || 'NDWI > 0.15')}</strong>
                     </div>
 
                     <div class="analysis-metric-row">
@@ -1168,12 +1168,23 @@ function renderSatelliteMonitoringHTML() {
 
                     <div class="analysis-metric-row">
                         <span>Data Provenance</span>
-                        <strong style="font-size: 10.5px; color: #10b981;">REAL_SATELLITE_DATA</strong>
+                        <strong style="font-size: 10.5px; color: ${s.dataProvenance === 'USER_UPLOADED_IMAGE_ANALYSIS' ? '#38bdf8' : '#10b981'};">${s.dataProvenance || 'REAL_SATELLITE_DATA'}</strong>
                     </div>
                 </div>
 
-                ${s.executiveSummary ? `
+                ${s.visualObservations && s.visualObservations.length > 0 ? `
                     <div class="analysis-confidence-card" style="margin-top: 12px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 12px; font-weight: 700; color: #38bdf8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                            <span>👁️</span> Visual Evidence (Gemini)
+                        </div>
+                        <ul style="margin: 0; padding-left: 16px; font-size: 11px; color: #cbd5e1; line-height: 1.45;">
+                            ${s.visualObservations.slice(0, 3).map(obs => `<li>${obs}</li>`).join("")}
+                        </ul>
+                    </div>
+                ` : ""}
+
+                ${s.executiveSummary ? `
+                    <div class="analysis-confidence-card" style="margin-top: 10px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 12px;">
                         <div style="font-size: 12px; font-weight: 700; color: #38bdf8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
                             <span>🧠</span> AI Tactical Summary
                         </div>
@@ -1184,7 +1195,7 @@ function renderSatelliteMonitoringHTML() {
                 ${s.tacticalRecommendations && s.tacticalRecommendations.length > 0 ? `
                     <div class="analysis-confidence-card" style="margin-top: 10px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px;">
                         <div style="font-size: 12px; font-weight: 700; color: #34d399; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-                            <span>📋</span> Priority Actions
+                            <span>📋</span> Priority Actions (AI Advisory)
                         </div>
                         <ul style="margin: 0; padding-left: 16px; font-size: 11px; color: #94a3b8; line-height: 1.4;">
                             ${s.tacticalRecommendations.slice(0, 3).map(r => `<li>${r}</li>`).join("")}

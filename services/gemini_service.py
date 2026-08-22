@@ -20,14 +20,12 @@ from PIL import Image
 
 logger = logging.getLogger("nirvaan.services.gemini")
 
-# Recommended model cascade for resilience
+# Recommended model cascade for resilience (official Google Generative AI models)
 PREFERRED_MODELS = [
-    "gemini-3.5-flash",
-    "gemini-3.5-flash-lite",
-    "gemini-3.6-flash",
-    "gemini-3.7-flash",
-    "gemini-flash-latest",
-    "gemini-flash-lite-latest",
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
     "gemini-2.5-pro",
 ]
 
@@ -321,17 +319,23 @@ CRITICAL SAFETY & ETHICAL RULES:
 
         return {
             "status": "success",
-            "disaster_type": parsed.get("disaster_type", "Disaster Event"),
+            "analysis_type": "AI_VISUAL_ANALYSIS",
+            "source_type": "USER_UPLOADED_IMAGE",
+            "disaster_type": parsed.get("disaster_type", "Visual Disaster Assessment"),
             "disaster_icon": parsed.get("disaster_icon", "🛰️"),
             "confidence": round(confidence, 1),
             "confidence_score": round(confidence, 1),
+            "confidence_label": "AI Visual Confidence",
             "severity": severity_level,
             "severity_level": severity_level,
             "severity_score": round(severity_score, 1),
-            "affected_area": parsed.get("affected_area_estimate", "Estimated scene extent"),
-            "affectedArea": parsed.get("affected_area_estimate", "Estimated scene extent"),
+            "severity_label": "AI-Assessed Severity",
+            "affected_area": parsed.get("affected_area_estimate", "Estimated visual swath"),
+            "affectedArea": parsed.get("affected_area_estimate", "Estimated visual swath"),
+            "affected_area_label": "AI Visual Estimate",
             "population_exposure": int(parsed.get("population_exposure_estimate", 0)),
-            "populationRisk": f"~{int(parsed.get('population_exposure_estimate', 0)):,} residents (Estimate)",
+            "populationRisk": f"~{int(parsed.get('population_exposure_estimate', 0)):,} residents (AI Contextual Estimate)",
+            "population_risk_label": "AI/Contextual Estimate",
             "visual_observations": parsed.get("visual_observations", []),
             "detected_hazards": parsed.get("detected_hazards", []),
             "tactical_recommendations": parsed.get("tactical_recommendations", []),
@@ -345,7 +349,7 @@ CRITICAL SAFETY & ETHICAL RULES:
             },
             "data_provenance": "USER_UPLOADED_IMAGE_ANALYSIS",
             "provenance_badge": "USER_UPLOADED_IMAGE_ANALYSIS",
-            "disclaimer": "PROTOTYPE ESTIMATE — Visual AI interpretation only. Ground truth verification required."
+            "disclaimer": "PROTOTYPE ESTIMATE — Visual AI interpretation of uploaded imagery only. Ground truth verification required before operational deployment."
         }
 
     def enrich_disaster_analysis(self, disaster_data: Dict[str, Any]) -> Dict[str, Any]:
