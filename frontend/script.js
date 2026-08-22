@@ -1484,11 +1484,11 @@ function showDashboard() {
     setPageContent(`
         <section class="dashboard-section nirvaan-dashboard-container">
 
-            <!-- FUTURISTIC MORNING WELCOME HERO BANNER -->
+            <!-- FUTURISTIC DYNAMIC WELCOME HERO BANNER -->
             <div class="morning-hero-banner">
                 <div class="morning-hero-content">
-                    <h1 class="morning-greeting-title">
-                        Good Morning <span class="sun-icon-glowing">☀️</span>
+                    <h1 class="morning-greeting-title" id="dashboardGreetingTitle">
+                        ${greeting.greeting} <span class="sun-icon-glowing">${greeting.icon}</span>
                     </h1>
                     <p class="morning-welcome-subtitle">Welcome to Nirvaan</p>
                     <div class="morning-badge">
