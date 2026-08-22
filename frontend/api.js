@@ -9,16 +9,18 @@
 function getApiBaseUrl() {
     let rawUrl = null;
 
-    // 1. Check Vite build-time environment variables
-    try {
-        if (typeof import.meta !== "undefined" && import.meta.env) {
-            rawUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_NIRVAAN_API_URL || import.meta.env.VITE_API_URL;
-        }
-    } catch (e) {}
+    // 1. Check window runtime globals
+    if (typeof window !== "undefined" && window.NIRVAAN_API_URL) {
+        rawUrl = window.NIRVAAN_API_URL;
+    }
 
-    // 2. Check window runtime globals
-    if (!rawUrl && typeof window !== "undefined") {
-        rawUrl = window.NIRVAAN_API_URL || window.VITE_API_BASE_URL || window.VITE_NIRVAAN_API_URL;
+    // 2. Check Vite build-time environment variables
+    if (!rawUrl) {
+        try {
+            if (typeof import.meta !== "undefined" && import.meta.env) {
+                rawUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_NIRVAAN_API_URL || import.meta.env.VITE_API_URL;
+            }
+        } catch (e) {}
     }
 
     if (rawUrl) {
@@ -26,12 +28,12 @@ function getApiBaseUrl() {
         return u.endsWith("/api") ? u : `${u}/api`;
     }
 
-    // 3. If running on local development host (localhost or 127.0.0.1)
+    // 3. If running locally on localhost / 127.0.0.1, use local relative /api proxy
     if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
-        return "http://localhost:8000/api";
+        return "/api";
     }
 
-    // 4. Default Production Render Backend URL (for Vercel deployment: https://nirvaan-one.vercel.app)
+    // 4. Default Production Render Backend URL
     return "https://nirvaan-pd7i.onrender.com/api";
 }
 
@@ -408,4 +410,119 @@ async function saveUserPreferences(payload) {
         console.error("Error saving user preferences:", e);
         throw e;
     }
+}
+
+/* =========================================================
+   10. GEMINI DISASTER IMAGE & SITUATIONAL ANALYSIS APIs
+========================================================= */
+async function analyzeUploadedImage(fileOrBase64, context = "") {
+    try {
+        let response;
+        if (typeof File !== "undefined" && fileOrBase64 instanceof File) {
+            const formData = new FormData();
+            formData.append("file", fileOrBase64);
+            if (context) formData.append("context", context);
+
+            const token = typeof localStorage !== "undefined" ? localStorage.getItem("nirvaan_token") : null;
+            const headers = {};
+            if (token) headers["Authorization"] = `Bearer ${token}`;
+
+            response = await fetchWithRetry(`${API_BASE_URL}/v1/analyze/image`, {
+                method: "POST",
+                headers: headers,
+                body: formData
+            }, 1, 1000, 60000);
+        } else {
+            response = await fetchWithRetry(`${API_BASE_URL}/v1/analyze/image`, {
+                method: "POST",
+                headers: getAuthHeaders(),
+                body: JSON.stringify({
+                    image_base64: fileOrBase64,
+                    context: context
+                })
+            }, 1, 1000, 60000);
+        }
+
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            let msg = errData.error?.message || errData.message;
+            if (!msg) {
+                if (response.status === 400 || response.status === 422) {
+                    msg = "Invalid image or unsupported format. Please upload a standard JPG or PNG image.";
+                } else if (response.status === 503) {
+                    msg = "Gemini analysis is not configured on this instance.";
+                } else if (response.status === 502 || response.status === 504) {
+                    msg = "Gemini analysis service is temporarily unavailable. Please retry shortly.";
+                } else {
+                    msg = `Image analysis failed with status ${response.status}`;
+                }
+            }
+            throw new Error(msg);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error in analyzeUploadedImage:", error);
+        if (error.name === "AbortError") {
+            throw new Error("Image analysis timed out. Please try with a smaller image.");
+        }
+        if (error.message && error.message.includes("Failed to fetch")) {
+            throw new Error("Unable to connect to analysis service. Please check network connection.");
+        }
+        throw error;
+    }
+}
+
+async function analyzeDisaster(payload = {}) {
+    try {
+        const response = await fetchWithRetry(`${API_BASE_URL}/v1/analyze/disaster`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        }, 1, 1000, 60000);
+
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            const msg = errData.error?.message || errData.message || `Disaster analysis failed with status ${response.status}`;
+            throw new Error(msg);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error in analyzeDisaster:", error);
+        throw error;
+    }
+}
+
+if (typeof window !== "undefined") {
+    Object.assign(window, {
+        API_BASE_URL,
+        getApiBaseUrl,
+        getAuthHeaders,
+        fetchWithRetry,
+        checkBackendHealth,
+        registerUser,
+        loginUser,
+        getAuthMe,
+        logoutUser,
+        getLatestDisaster,
+        getDisasterHistory,
+        getSatelliteImages,
+        getSatelliteScenes,
+        createDetectionJob,
+        getDetectionJobStatus,
+        getRealAlerts,
+        getRiskMapGeoJSON,
+        createReport,
+        getReports,
+        generateSituationReport,
+        getDisasterTypesMetadata,
+        getAnalyticsOverview,
+        getAnalyticsTimeseries,
+        getAnalyticsGeography,
+        getUserPreferences,
+        saveUserPreferences,
+        analyzeUploadedImage,
+        analyzeDisaster
+    });
 }

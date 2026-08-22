@@ -43,209 +43,345 @@ button:hover {
 
 
 /* =========================================================
-   SIDEBAR
+   MODERN LEFT SIDEBAR NAVIGATION SYSTEM
 ========================================================= */
 
 .sidebar {
-
-    width: 350px;
-
-    min-width: 350px;
-
+    width: 260px;
+    min-width: 260px;
     height: 100vh;
-
     position: fixed;
-
     left: 0;
-
     top: 0;
-
-    background: #091525;
-
-    border-right:
-        1px solid #26364c;
-
-    padding: 18px 22px;
-
+    bottom: 0;
+    background: #090e17;
+    border-right: 1px solid #1e293b;
+    padding: 16px 14px;
     display: flex;
-
     flex-direction: column;
-
+    z-index: 150;
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #1e293b transparent;
 }
 
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+}
 
-/* =========================================================
-   BRAND
-========================================================= */
-
-.brand {
-
+/* APP LAYOUT ADJUSTMENT FOR DESKTOP SIDEBAR */
+.app {
     display: flex;
-
-    align-items: center;
-
-    gap: 13px;
-
-    padding:
-        5px 0 25px;
-
+    min-height: 100vh;
+    background-color: #0b0c10;
 }
 
+.main-area {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    min-height: 100vh;
+    transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* COLLAPSED STATE (DESKTOP) */
+.app.sidebar-collapsed .sidebar {
+    width: 72px;
+    min-width: 72px;
+    padding: 16px 10px;
+}
+
+.app.sidebar-collapsed .main-area {
+    margin-left: 72px;
+    width: calc(100% - 72px);
+}
+
+.app.sidebar-collapsed .brand-text,
+.app.sidebar-collapsed .nav-label,
+.app.sidebar-collapsed .nav-section-title,
+.app.sidebar-collapsed .alert-count,
+.app.sidebar-collapsed .telemetry-text {
+    display: none !important;
+}
+
+.app.sidebar-collapsed .nav-item {
+    justify-content: center;
+    padding: 0;
+    height: 44px;
+}
+
+.app.sidebar-collapsed .brand {
+    justify-content: center;
+    padding-bottom: 16px;
+}
+
+.app.sidebar-collapsed .sidebar-collapse-btn {
+    transform: rotate(180deg);
+}
+
+/* BRAND HEADER */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 6px 18px 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 12px;
+    position: relative;
+}
 
 .brand-logo {
-
-    width: 45px;
-
-    height: 45px;
-
-    border:
-        2px solid #4ca7ff;
-
-    border-radius: 50%;
-
+    width: 40px;
+    height: 40px;
+    background: #111827;
+    border: 1.5px solid #38bdf8;
+    border-radius: 10px;
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
-    color: #4ca7ff;
-
-    font-size: 25px;
-
+    font-size: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-
-.brand h2 {
-
-    font-size: 23px;
-
-    margin-bottom: 4px;
-
+.brand:hover .brand-logo {
+    transform: scale(1.05);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.4);
 }
 
-
-.brand p {
-
-    color: #8492a5;
-
-    font-size: 11px;
-
-    line-height: 1.4;
-
-}
-
-
-/* =========================================================
-   NAV
-========================================================= */
-
-.sidebar-nav {
-
+.brand-text {
     display: flex;
-
     flex-direction: column;
-
-    gap: 8px;
-
-    margin-top: 5px;
-
+    overflow: hidden;
+    white-space: nowrap;
 }
 
+.sidebar-collapse-btn {
+    margin-left: auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-collapse-btn:hover {
+    background: #1e293b;
+    color: #38bdf8;
+    border-color: #38bdf8;
+}
+
+/* NAVIGATION LINKS */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.nav-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #64748b;
+    padding: 14px 10px 6px 10px;
+    text-transform: uppercase;
+}
 
 .nav-item {
-
     width: 100%;
-
-    height: 60px;
-
-    border: none;
-
-    border-radius: 10px;
-
+    height: 42px;
+    border: 1px solid transparent;
+    border-radius: 8px;
     background: transparent;
-
-    color: #aab6c7;
-
+    color: #94a3b8;
     display: flex;
-
     align-items: center;
-
-    gap: 18px;
-
-    padding: 0 18px;
-
-    font-size: 20px;
-
+    gap: 12px;
+    padding: 0 12px;
+    font-size: 13.5px;
+    font-weight: 500;
     text-align: left;
-
     cursor: pointer;
-
-    transition: 0.2s;
-
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    position: relative;
+    user-select: none;
 }
-
 
 .nav-item:hover {
-
-    background: #142237;
-
-    color: white;
-
+    background: #131d2e;
+    color: #f8fafc;
+    transform: translateX(2px);
 }
 
+.nav-item:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
+}
 
 .nav-item.active {
-
-    background:
-        linear-gradient(
-            90deg,
-            #4135cf,
-            #353db5
-        );
-
-    color: white;
-
-    box-shadow:
-        0 5px 20px
-        rgba(58, 54, 210, 0.25);
-
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.22) 0%, rgba(56, 189, 248, 0.12) 100%);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    box-shadow: 0 2px 10px rgba(56, 189, 248, 0.12);
+    font-weight: 600;
 }
 
+.nav-item.active::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    border-radius: 4px;
+    background: #38bdf8;
+    box-shadow: 0 0 10px #38bdf8;
+}
 
 .nav-icon {
-
     width: 20px;
-
-    text-align: center;
-
-    font-size: 18px;
-
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    color: inherit;
 }
 
+.nav-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 .alert-count {
-
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 9999px;
     margin-left: auto;
+    line-height: 1;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
 
-    width: 29px;
+/* SIDEBAR FOOTER */
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
 
-    height: 29px;
-
-    border-radius: 50%;
-
+.sidebar-telemetry-badge {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 8px 10px;
     display: flex;
-
     align-items: center;
+    gap: 10px;
+    cursor: default;
+    transition: border-color 0.2s ease;
+}
 
-    justify-content: center;
+.sidebar-telemetry-badge:hover {
+    border-color: #10b981;
+}
 
-    background: #f05258;
+.telemetry-dot {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #10b981;
+    animation: pulseGlow 2s infinite ease-in-out;
+    flex-shrink: 0;
+}
 
-    color: white;
+@keyframes pulseGlow {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+}
 
-    font-size: 13px;
+.telemetry-text {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    white-space: nowrap;
+}
 
+.telemetry-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #e2e8f0;
+    letter-spacing: 0.5px;
+}
+
+.telemetry-sub {
+    font-size: 9.5px;
+    color: #10b981;
+    font-weight: 500;
+}
+
+/* MOBILE BACKDROP & RESPONSIVE DRAWER */
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 140;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-backdrop.show {
+    display: block;
+    opacity: 1;
+}
+
+@media (max-width: 1023px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 270px;
+        min-width: 270px;
+        z-index: 999;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .main-area {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .sidebar-collapse-btn {
+        display: none;
+    }
 }
 
 
@@ -384,28 +520,7 @@ button:hover {
 }
 
 
-/* =========================================================
-   MAIN AREA & SIDEBAR DRAWER OVERRIDES
-========================================================= */
-
-.sidebar {
-    display: none;
-    position: fixed;
-    left: 0;
-    top: 80px;
-    height: calc(100vh - 80px);
-    z-index: 99;
-}
-
-.sidebar.mobile-open {
-    display: flex;
-}
-
-.main-area {
-    margin-left: 0;
-    width: 100%;
-    min-height: 100vh;
-}
+/* Modern sidebar and layout rules applied at top */
 
 
 /* =========================================================
@@ -1311,39 +1426,51 @@ td {
 }
 
 
-.toggle {
-
+.setting-item .toggle,
+.switch-toggle {
     width: 45px;
-
     height: 24px;
-
     border-radius: 20px;
-
     background: #373bd1;
-
     position: relative;
-
+    cursor: pointer;
 }
 
-
-.toggle::after {
-
+.setting-item .toggle::after,
+.switch-toggle::after {
     content: "";
-
     width: 18px;
-
     height: 18px;
-
     background: white;
-
     border-radius: 50%;
-
     position: absolute;
-
     right: 3px;
-
     top: 3px;
+}
 
+/* SATELLITE ACTION TOGGLE BUTTONS */
+.sat-action-btn.sat-toggle {
+    background: rgba(17, 24, 39, 0.7);
+    border: 1px solid #334155;
+    color: #94a3b8;
+    position: relative;
+}
+
+.sat-action-btn.sat-toggle::after {
+    display: none !important;
+}
+
+.sat-action-btn.sat-toggle:hover {
+    background: #1e293b;
+    color: #f1f5f9;
+    border-color: #64748b;
+}
+
+.sat-action-btn.sat-toggle.active {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(56, 189, 248, 0.15) 100%);
+    border-color: #38bdf8;
+    color: #38bdf8;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
 }
 
 
@@ -1819,18 +1946,88 @@ html[data-theme="light"] .setting-item:hover {
     border-color: #cbd5e1 !important;
 }
 
-html[data-theme="light"] .setting-item strong {
-    color: #000000 !important;
-    font-size: 16.5px !important;
-    font-weight: 800 !important;
-    opacity: 1 !important;
+/* SETTINGS SWITCHES & TOGGLES */
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-html[data-theme="light"] .setting-item p {
-    color: #333333 !important;
-    font-size: 14.5px !important;
-    line-height: 1.6 !important;
-    opacity: 1 !important;
+.toggle {
+    width: 48px;
+    height: 26px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    flex-shrink: 0;
+}
+
+.toggle::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform 0.3s ease;
+}
+
+.toggle.active {
+    background: #38bdf8;
+}
+
+.toggle.active::after {
+    transform: translateX(22px);
+}
+
+.setting-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.setting-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.setting-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255, 255, 255, 0.15);
+    transition: .3s;
+    border-radius: 26px;
+}
+
+.setting-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+
+.setting-switch input:checked + .setting-switch-slider {
+    background-color: #38bdf8;
+}
+
+.setting-switch input:checked + .setting-switch-slider:before {
+    transform: translateX(22px);
 }
 
 .about-card-item {
@@ -4905,15 +5102,510 @@ html[data-theme="light"] .map-tooltip-row strong {
     border-radius: 6px;
 }
 
+/* =========================================================
+   SATELLITE FLOW STEPPER & SCENE PRESET CONTROLS
+========================================================= */
 
+.sat-flow-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 10px 16px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+    gap: 8px;
+}
 
+.sat-flow-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+}
 
+.sat-flow-step .step-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+}
 
+.sat-flow-step.completed {
+    color: #38bdf8;
+}
 
+.sat-flow-step.completed .step-num {
+    background: rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+    border: 1px solid #38bdf8;
+}
 
+.sat-flow-step.active {
+    color: #10b981;
+}
 
+.sat-flow-step.active .step-num {
+    background: #10b981;
+    color: #0f172a;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
 
+.sat-flow-arrow {
+    color: #334155;
+    font-size: 16px;
+    font-weight: 300;
+}
 
+/* SCENE PRESET QUICK-SELECTOR BAR */
+.sat-preset-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 8px 14px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
 
+.preset-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.preset-buttons-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.sat-preset-btn {
+    background: #111827;
+    border: 1px solid #334155;
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.sat-preset-btn:hover {
+    background: #1e293b;
+    color: #38bdf8;
+    border-color: #38bdf8;
+    transform: translateY(-1px);
+}
+
+.sat-preset-btn.active {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.3) 0%, rgba(56, 189, 248, 0.2) 100%);
+    border-color: #38bdf8;
+    color: #38bdf8;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+}
+
+/* LIGHT THEME ADJUSTMENTS */
+html[data-theme="light"] .sat-flow-stepper,
+html[data-theme="light"] .sat-preset-bar {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+html[data-theme="light"] .sat-preset-btn {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #334155;
+}
+
+html[data-theme="light"] .sat-preset-btn:hover {
+    background: #f1f5f9;
+    border-color: #0284c7;
+    color: #0284c7;
+}
+
+html[data-theme="light"] .sat-preset-btn.active {
+    background: #e0f2fe;
+    border-color: #0284c7;
+    color: #0369a1;
+}
+
+/* =========================================================
+   MOBILE HAMBURGER & TOPBAR RESPONSIVE CONTROLS
+========================================================= */
+
+.mobile-sidebar-open-btn {
+    display: none;
+    width: 40px;
+    height: 40px;
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    color: #cbd5e1;
+    font-size: 20px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.mobile-sidebar-open-btn:hover {
+    background: #1e293b;
+    border-color: #38bdf8;
+    color: #38bdf8;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+}
+
+html[data-theme="light"] .mobile-sidebar-open-btn {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #334155;
+}
+
+html[data-theme="light"] .mobile-sidebar-open-btn:hover {
+    background: #f1f5f9;
+    border-color: #0284c7;
+    color: #0284c7;
+}
+
+/* =========================================================
+   COMPREHENSIVE MULTI-DEVICE RESPONSIVE BREAKPOINTS
+========================================================= */
+
+/* 1. ULTRAWIDE & LARGE SCREENS (>= 1920px) */
+@media (min-width: 1920px) {
+    .page-content {
+        max-width: 1920px;
+        margin: 0 auto;
+        padding: 40px 48px 60px;
+    }
+}
+
+/* 2. LAPTOPS & SPLIT SCREEN DESKTOPS (1024px to 1366px) */
+@media (max-width: 1366px) {
+    .sat-monitoring-grid {
+        grid-template-columns: 1fr 320px;
+        gap: 16px;
+    }
+
+    .topbar {
+        padding: 0 24px;
+    }
+
+    .page-content {
+        padding: 28px 24px 44px;
+    }
+}
+
+/* 3. TABLETS & LARGE SPLIT SCREENS (768px to 1023px) */
+@media (max-width: 1023px) {
+    .mobile-sidebar-open-btn {
+        display: flex;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+        width: 270px;
+        min-width: 270px;
+        position: fixed;
+        z-index: 1000;
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.85);
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .main-area {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .topbar {
+        height: 68px;
+        padding: 0 18px;
+    }
+
+    .sat-monitoring-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .disaster-analysis-sidebar {
+        width: 100%;
+    }
+
+    .risk-map-grid,
+    .risk-map-container {
+        grid-template-columns: 1fr !important;
+    }
+
+    .spatial-analytics-sidebar {
+        width: 100% !important;
+    }
+
+    .stats-grid,
+    .dashboard-metrics-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+        gap: 14px;
+    }
+
+    .page-content {
+        padding: 22px 18px 36px;
+    }
+}
+
+/* 4. PHONES & COMPACT SPLIT SCREENS (481px to 767px) */
+@media (max-width: 767px) {
+    .topbar {
+        height: 62px;
+        padding: 0 14px;
+    }
+
+    .topbar-brand-logo {
+        width: 38px;
+        height: 38px;
+        font-size: 20px;
+        border-radius: 9px;
+    }
+
+    .nirvaan-title {
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+
+    .nirvaan-tagline {
+        display: none;
+    }
+
+    .topbar-right {
+        gap: 10px;
+    }
+
+    .mode-indicator {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+
+    .mode-indicator #modeText {
+        display: none;
+    }
+
+    .page-content {
+        padding: 16px 12px 32px;
+    }
+
+    .page-title {
+        font-size: clamp(20px, 5.5vw, 26px);
+        margin-bottom: 6px;
+    }
+
+    .page-subtitle {
+        font-size: 13.5px;
+        margin-bottom: 18px;
+        line-height: 1.45;
+    }
+
+    /* Satellite Monitor Phone Layout */
+    .sat-toolbar-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .sat-toolbar-controls-row {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .sat-btn-group-primary,
+    .sat-btn-group-toggles {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .sat-action-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .sat-preset-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .preset-buttons-group {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .sat-preset-btn {
+        flex: 1 1 calc(50% - 4px);
+        text-align: center;
+        padding: 6px 8px;
+        font-size: 11.5px;
+    }
+
+    .sat-viewport-box {
+        height: 280px;
+    }
+
+    /* Grids & Cards */
+    .stats-grid,
+    .dashboard-metrics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+    }
+
+    .dash-analytics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px;
+    }
+
+    .reports-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .alerts-list {
+        gap: 10px;
+    }
+
+    .alert-card {
+        padding: 14px 12px;
+    }
+
+    /* Tables Responsive Container */
+    .history-table-container,
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+    }
+
+    .history-table {
+        min-width: 600px;
+    }
+
+    /* Modals Mobile */
+    .modal-content,
+    .auth-modal-box {
+        width: calc(100vw - 24px) !important;
+        max-height: 90vh;
+        padding: 20px 16px;
+        margin: 12px;
+    }
+}
+
+/* 5. SMALL PHONES (<= 480px) */
+@media (max-width: 480px) {
+    .topbar {
+        height: 58px;
+        padding: 0 10px;
+    }
+
+    .topbar-left {
+        gap: 8px;
+    }
+
+    .mobile-sidebar-open-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+
+    .topbar-brand-logo {
+        width: 34px;
+        height: 34px;
+        font-size: 17px;
+    }
+
+    .nirvaan-title {
+        font-size: 16px;
+    }
+
+    .topbar-right {
+        gap: 6px;
+    }
+
+    .alert-icon-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .theme-switch-wrapper {
+        gap: 4px;
+    }
+
+    .theme-switch-track {
+        width: 38px;
+        height: 22px;
+    }
+
+    .theme-switch-thumb {
+        width: 16px;
+        height: 16px;
+    }
+
+    .page-content {
+        padding: 12px 8px 24px;
+    }
+
+    .sat-preset-btn {
+        flex: 1 1 100%;
+    }
+
+    .sat-viewport-box {
+        height: 240px;
+    }
+
+    .risk-map-viewport {
+        height: 300px;
+    }
+}
+
+/* 6. LANDSCAPE PHONES & SMALL HEIGHT MONITORS (max-height: 600px) */
+@media (max-height: 600px) {
+    .topbar {
+        height: 52px;
+    }
+
+    .sat-viewport-box {
+        height: 220px;
+    }
+
+    .modal-content {
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+}
 
 

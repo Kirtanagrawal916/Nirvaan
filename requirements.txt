@@ -4,3 +4,7 @@ uvicorn
 httpx
 Pillow
 folium
+google-genai
+google-generativeai
+python-dotenv
+python-multipart

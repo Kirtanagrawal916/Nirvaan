@@ -5,12 +5,17 @@ Exposes versioned REST HTTP endpoints for real disaster intelligence, persistent
 queries, asynchronous detection job enqueuing, alerts, satellite scene ingestion, and GeoJSON risk mapping.
 """
 
+import base64
 import os
 from typing import Any, Dict, Optional
-from fastapi import FastAPI, Header, Query, Request, Response
+from fastapi import FastAPI, File, Form, Header, Query, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(dotenv_path=BASE_DIR / ".env")
 
 from api.server import (
     handle_auth_register,
@@ -30,6 +35,9 @@ from api.server import (
     handle_alerts_endpoint,
     handle_satellite_scenes_endpoint,
     handle_risk_map_endpoint,
+    handle_analyze_image_endpoint,
+    handle_analyze_disaster_endpoint,
+    handle_analyze_endpoint,
 )
 from utils.auth import get_current_user_from_header
 from utils.logging import configure_nirvaan_logging, set_request_id
@@ -55,22 +63,29 @@ async def request_id_middleware(request: Request, call_next):
 default_origins = [
     "https://nirvaan-one.vercel.app",
     "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
     "http://localhost:3000",
     "http://localhost:8000",
     "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5175",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:8000",
 ]
 env_origins = os.getenv("CORS_ORIGINS")
 if env_origins:
     allowed_origins = [origin.strip() for origin in env_origins.split(",") if origin.strip()]
+    for d in default_origins:
+        if d not in allowed_origins:
+            allowed_origins.append(d)
 else:
     allowed_origins = default_origins
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origin_regex=r"(https://.*\.vercel\.app|http://localhost:\d+|http://127\.0\.0\.1:\d+)",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
@@ -363,7 +378,94 @@ def create_notification_rule(payload: Dict[str, Any], response: Response, author
     return res["data"]
 
 
+# =========================================================
+# PHASE 5 & 6: GEMINI VISION & DISASTER ANALYSIS ENDPOINTS
+# =========================================================
+
+# POST /api/v1/analyze/image (Multipart Form Upload)
+@app.post("/api/v1/analyze/image")
+@app.post("/api/analyze/image")
+async def analyze_uploaded_image(
+    request: Request,
+    response: Response
+) -> Dict[str, Any]:
+    """
+    Analyzes an uploaded disaster scene or satellite image using Gemini Multimodal Vision AI.
+    Supports multipart form file upload and JSON body with base64 encoded image.
+    """
+    image_bytes = None
+    mime_type = "image/jpeg"
+    context_hint = None
+
+    content_type = request.headers.get("content-type", "")
+    if "multipart/form-data" in content_type:
+        form = await request.form()
+        uploaded_file = form.get("file")
+        if uploaded_file and hasattr(uploaded_file, "read"):
+            image_bytes = await uploaded_file.read()
+            mime_type = getattr(uploaded_file, "content_type", None) or "image/jpeg"
+        context_hint = form.get("context")
+    elif "application/json" in content_type:
+        try:
+            body = await request.json()
+            if isinstance(body, dict):
+                b64_str = body.get("image_base64") or body.get("image") or body.get("data")
+                if b64_str:
+                    if "," in b64_str:
+                        header, b64_str = b64_str.split(",", 1)
+                        if "image/" in header:
+                            mime_type = header.split(";")[0].replace("data:", "").strip()
+                    image_bytes = base64.b64decode(b64_str)
+                context_hint = body.get("context")
+                if body.get("mime_type"):
+                    mime_type = body.get("mime_type")
+        except Exception:
+            pass
+
+    if not image_bytes:
+        res = handle_analyze_image_endpoint(image_bytes=b"", mime_type=mime_type, context_hint=context_hint)
+        response.status_code = res["status_code"]
+        return res["data"]
+
+    res = handle_analyze_image_endpoint(image_bytes=image_bytes, mime_type=mime_type, context_hint=context_hint)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# POST /api/v1/analyze/disaster
+@app.post("/api/v1/analyze/disaster")
+@app.post("/api/analyze/disaster")
+def analyze_disaster_endpoint(
+    payload: Dict[str, Any],
+    response: Response,
+    authorization: Optional[str] = Header(None)
+) -> Dict[str, Any]:
+    """
+    Executes real disaster analysis on the target region / event,
+    synthesizing satellite detection metrics with Gemini AI tactical intelligence.
+    """
+    current_user = get_current_user_from_header(authorization)
+    res = handle_analyze_disaster_endpoint(payload, current_user=current_user)
+    response.status_code = res["status_code"]
+    return res["data"]
+
+
+# POST /api/v1/analyze
+@app.post("/api/v1/analyze")
+@app.post("/api/analyze")
+def general_analyze_endpoint(
+    payload: Optional[Dict[str, Any]] = None,
+    response: Response = None
+) -> Dict[str, Any]:
+    """General analysis endpoint for test compatibility and generic checks."""
+    res = handle_analyze_endpoint(payload)
+    if response:
+        response.status_code = res["status_code"]
+    return res["data"]
+
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))
     uvicorn.run("api.main:app", host="0.0.0.0", port=port, reload=False)
+

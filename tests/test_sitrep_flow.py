@@ -100,8 +100,8 @@ class TestSitrepFlow(unittest.TestCase):
         res = handle_report_endpoint(None)
         self.assertEqual(res["status_code"], 400)
         data = res["data"]
-        self.assertEqual(data["status"], "error")
-        self.assertEqual(data["code"], "BAD_REQUEST")
+        self.assertIn("error", data)
+        self.assertEqual(data["error"]["code"], "BAD_REQUEST")
 
     def test_data_provenance_preserved_in_report(self):
         """Confirm data_provenance is surfaced in report response."""

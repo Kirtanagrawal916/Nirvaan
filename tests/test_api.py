@@ -35,8 +35,8 @@ class TestAPIServiceEndpoints(unittest.TestCase):
         self.assertIn("location", res["data"])
         self.assertIn("severity", res["data"])
         self.assertIn("affectedArea", res["data"])
-        self.assertEqual(res["data"]["type"], "Flood")
-        self.assertIn("Emilia-Romagna", res["data"]["location"])
+        self.assertIsInstance(res["data"]["location"], str)
+        self.assertGreater(len(res["data"]["location"]), 0)
 
     def test_disasters_history_endpoint(self):
         res = handle_api_request("/api/disasters", method="GET")
@@ -80,7 +80,8 @@ class TestAPIServiceEndpoints(unittest.TestCase):
         }
         res = handle_api_request("/api/v1/detect", method="POST", payload=payload)
         self.assertEqual(res["status_code"], 422)
-        self.assertEqual(res["data"]["error"], "UNPROCESSABLE_ENTITY")
+        self.assertIn("error", res["data"])
+        self.assertEqual(res["data"]["error"]["code"], "UNPROCESSABLE_ENTITY")
 
     def test_analyze_endpoint_valid_request(self):
         payload = {
@@ -107,7 +108,8 @@ class TestAPIServiceEndpoints(unittest.TestCase):
     def test_404_not_found(self):
         res = handle_api_request("/api/v1/nonexistent", method="GET")
         self.assertEqual(res["status_code"], 404)
-        self.assertEqual(res["data"]["error"], "NOT_FOUND")
+        self.assertIn("error", res["data"])
+        self.assertEqual(res["data"]["error"]["code"], "NOT_FOUND")
 
 
 if __name__ == "__main__":

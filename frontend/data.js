@@ -15,3 +15,7 @@ const nirvaanData = {
         detectionAccuracy: "0.0%"
     }
 };
+
+if (typeof window !== "undefined") {
+    window.nirvaanData = nirvaanData;
+}

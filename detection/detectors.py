@@ -11,8 +11,10 @@ import json
 import logging
 import math
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional, Tuple
+
+import numpy as np
 
 from detection.detector_base import BaseDisasterDetector, DetectorInput, DetectorOutput
 from db.repository import DatabaseRepository
@@ -54,43 +56,91 @@ class ModularFloodDetector(BaseDisasterDetector):
             limit=3,
         )
         meteo = self.satellite_service.fetch_open_meteo_flood_data(inp.latitude, inp.longitude)
-        return {"scenes": scenes, "meteo": meteo}
+
+        # Retrieve real Sentinel-2 spectral bands (B03 Green, B08 NIR) via Copernicus API
+        bbox = self.satellite_service.create_bbox_from_latlon(inp.latitude, inp.longitude, delta_deg=0.10)
+        now_dt = datetime.now(timezone.utc)
+        start_dt = now_dt - timedelta(days=inp.time_window_days)
+        time_from = start_dt.strftime("%Y-%m-%dT00:00:00Z")
+        time_to = now_dt.strftime("%Y-%m-%dT23:59:59Z")
+
+        bands = {}
+        try:
+            bands = self.satellite_service.fetch_sentinel2_bands(
+                bbox=bbox,
+                time_from=time_from,
+                time_to=time_to,
+                bands=["B03", "B08"],
+                width=64,
+                height=64,
+            )
+        except Exception as e:
+            logger.warning("Optional Copernicus band retrieval skipped: %s", e)
+
+        return {"scenes": scenes, "meteo": meteo, "bands": bands}
 
     def preprocess(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
         scenes = raw_data.get("scenes", [])
         meteo = raw_data.get("meteo", {})
+        bands = raw_data.get("bands", {})
         top_scene = scenes[0] if scenes else None
         return {
             "top_scene": top_scene,
             "scene_count": len(scenes),
             "discharge_daily": meteo.get("daily", {}).get("river_discharge", []),
-            "elevation": meteo.get("elevation", 15.0)
+            "elevation": meteo.get("elevation", 15.0),
+            "bands": bands
         }
 
     def infer(self, preprocessed: Dict[str, Any]) -> Dict[str, Any]:
         start_t = time.perf_counter()
         top_scene = preprocessed.get("top_scene")
         discharges = preprocessed.get("discharge_daily", [])
+        bands = preprocessed.get("bands", {})
 
         recent_discharges = [float(d) for d in discharges[-7:] if d is not None] if discharges else []
         mean_discharge = sum(recent_discharges) / len(recent_discharges) if recent_discharges else 15.0
         max_discharge = max(recent_discharges) if recent_discharges else mean_discharge
 
         # Confidence derived from actual data quality
-        base_confidence = 90.0 if top_scene else 70.0
+        base_confidence = 92.0 if top_scene else 70.0
         cloud_cov = float(top_scene.get("cloud_cover", 15.0)) if top_scene else 20.0
         cloud_penalty = min(20.0, cloud_cov * 0.25)
         gauge_bonus = min(10.0, (mean_discharge / 50.0) * 5.0)
+
+        # Real NDWI calculation if Copernicus bands retrieved
+        ndwi_mean = 0.0
+        water_ratio = 0.0
+        has_real_bands = False
+
+        if "B03" in bands and "B08" in bands:
+            raw_b03 = np.asarray(bands["B03"], dtype=np.float32)
+            raw_b08 = np.asarray(bands["B08"], dtype=np.float32)
+            b03 = np.where(np.isfinite(raw_b03) & (raw_b03 > 1.0), raw_b03 / 10000.0, raw_b03)
+            b08 = np.where(np.isfinite(raw_b08) & (raw_b08 > 1.0), raw_b08 / 10000.0, raw_b08)
+            valid = np.isfinite(b03) & np.isfinite(b08)
+            if valid.sum() > 0:
+                has_real_bands = True
+                denom = b03[valid] + b08[valid]
+                safe_denom = np.where(np.isclose(denom, 0.0) | (denom < 1e-7), 1.0, denom)
+                ndwi_arr = (b03[valid] - b08[valid]) / safe_denom
+                ndwi_mean = float(np.mean(ndwi_arr))
+                water_ratio = float((ndwi_arr > 0.15).sum() / len(ndwi_arr))
+                base_confidence = min(98.0, base_confidence + 5.0)
+
         confidence = max(50.0, min(99.0, base_confidence - cloud_penalty + gauge_bonus))
 
-        # Affected area based on discharge and spatial grid
-        area_km2 = round(max(0.5, min(120.0, 2.5 + (mean_discharge * 0.2))), 2)
+        # Affected area based on real NDWI water ratio or gauge discharge
+        if has_real_bands and water_ratio > 0.0:
+            area_km2 = round(max(0.5, min(140.0, (water_ratio * 80.0) + (mean_discharge * 0.15))), 2)
+        else:
+            area_km2 = round(max(0.5, min(120.0, 2.5 + (mean_discharge * 0.2))), 2)
 
-        if area_km2 > 50.0 or mean_discharge > 100.0:
+        if area_km2 > 50.0 or mean_discharge > 100.0 or (has_real_bands and water_ratio > 0.40):
             severity = "CRITICAL"
-        elif area_km2 > 20.0 or mean_discharge > 50.0:
+        elif area_km2 > 20.0 or mean_discharge > 50.0 or (has_real_bands and water_ratio > 0.20):
             severity = "HIGH"
-        elif area_km2 > 5.0 or mean_discharge > 20.0:
+        elif area_km2 > 5.0 or mean_discharge > 20.0 or (has_real_bands and water_ratio > 0.05):
             severity = "MODERATE"
         else:
             severity = "LOW"
@@ -105,7 +155,10 @@ class ModularFloodDetector(BaseDisasterDetector):
             "mean_discharge": mean_discharge,
             "max_discharge": max_discharge,
             "cloud_cover": cloud_cov,
-            "duration_ms": duration_ms
+            "duration_ms": duration_ms,
+            "ndwi_mean": ndwi_mean,
+            "water_ratio": water_ratio,
+            "has_real_bands": has_real_bands
         }
 
     def postprocess(self, res: Dict[str, Any], inp: DetectorInput) -> DetectorOutput:
@@ -128,7 +181,7 @@ class ModularFloodDetector(BaseDisasterDetector):
                 "properties": {
                     "area_km2": res["area_km2"],
                     "detection_type": "Flood Inundation Boundary",
-                    "spectral_index": "NDWI",
+                    "spectral_index": "NDWI (Copernicus B03-B08)",
                     "crs": "EPSG:4326"
                 },
                 "geometry": {
@@ -139,7 +192,7 @@ class ModularFloodDetector(BaseDisasterDetector):
         }
 
         # Model & Provenance
-        scene_id = top_scene.get("scene_id") if top_scene else "S2_STAC_SCENE"
+        scene_id = top_scene.get("scene_id") if top_scene else "S2_COPERNICUS_SCENE"
         acq_time = top_scene.get("acquisition_time") if top_scene else datetime.now(timezone.utc).isoformat()
         sat_info = {
             "scene_id": scene_id,
@@ -152,14 +205,15 @@ class ModularFloodDetector(BaseDisasterDetector):
         model_meta = {
             "model_name": self.model_version,
             "model_version": "1.0.0",
-            "inference_method": "Sentinel-2 NDWI Thresholding & Hydrological Composite Analysis",
+            "inference_method": "Copernicus Sentinel-2 NDWI Thresholding & Hydrological Composite Analysis",
             "inference_timestamp": datetime.now(timezone.utc).isoformat(),
             "input_source": "Copernicus Sentinel-2 L2A & Open-Meteo Flood API",
             "satellite_sensor": "Sentinel-2 MSI",
             "acquisition_timestamp": acq_time,
             "confidence": res["confidence"],
             "ndwi_threshold": 0.15,
-            "processing_duration_ms": res["duration_ms"]
+            "processing_duration_ms": res["duration_ms"],
+            "real_spectral_bands_analyzed": res.get("has_real_bands", False)
         }
 
         # Explainable Risk Breakdown
@@ -181,9 +235,10 @@ class ModularFloodDetector(BaseDisasterDetector):
             "methodology_version": "Nirvaan-Risk-v1.0"
         }
 
+        is_real_data = bool(top_scene or res.get("has_real_bands"))
         provenance = {
-            "data_provenance": "REAL_SATELLITE_DATA",
-            "provider": "Element84 AWS / Copernicus Sentinel-2 STAC",
+            "data_provenance": "REAL_SATELLITE_DATA" if is_real_data else "NO_LIVE_DATA",
+            "provider": "Copernicus Data Space Ecosystem (Sentinel-2 L2A)",
             "provenance_type": "NIRVAAN_DETECTION"
         }
 
@@ -229,7 +284,7 @@ class ModularFloodDetector(BaseDisasterDetector):
             affected_area=f"{res['area_km2']} km²",
             population_at_risk=f"~{int(pop_exposure * 180):,} residents",
             recommended_action=f"Activate regional flood barrier response and notify district emergency management.",
-            provenance="REAL_SATELLITE_DATA"
+            provenance="REAL_SATELLITE_DATA" if is_real_data else "NO_LIVE_DATA"
         )
 
         return output
@@ -266,26 +321,67 @@ class ModularWildfireDetector(BaseDisasterDetector):
             max_cloud_cover=inp.max_cloud_cover,
             limit=3,
         )
-        return {"scenes": scenes}
+
+        # Retrieve real Sentinel-2 spectral bands (B08 NIR, B12 SWIR-2) via Copernicus API
+        bbox = self.satellite_service.create_bbox_from_latlon(inp.latitude, inp.longitude, delta_deg=0.10)
+        now_dt = datetime.now(timezone.utc)
+        start_dt = now_dt - timedelta(days=inp.time_window_days)
+        time_from = start_dt.strftime("%Y-%m-%dT00:00:00Z")
+        time_to = now_dt.strftime("%Y-%m-%dT23:59:59Z")
+
+        bands = {}
+        try:
+            bands = self.satellite_service.fetch_sentinel2_bands(
+                bbox=bbox,
+                time_from=time_from,
+                time_to=time_to,
+                bands=["B08", "B12"],
+                width=64,
+                height=64,
+            )
+        except Exception as e:
+            logger.warning("Optional Copernicus band retrieval skipped for wildfire: %s", e)
+
+        return {"scenes": scenes, "bands": bands}
 
     def preprocess(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
         scenes = raw_data.get("scenes", [])
+        bands = raw_data.get("bands", {})
         top_scene = scenes[0] if scenes else None
         return {
             "top_scene": top_scene,
             "scene_count": len(scenes),
-            "cloud_cover": float(top_scene.get("cloud_cover", 10.0)) if top_scene else 10.0
+            "cloud_cover": float(top_scene.get("cloud_cover", 10.0)) if top_scene else 10.0,
+            "bands": bands
         }
 
     def infer(self, preprocessed: Dict[str, Any]) -> Dict[str, Any]:
         start_t = time.perf_counter()
         top_scene = preprocessed.get("top_scene")
         cloud_cov = preprocessed.get("cloud_cover", 10.0)
+        bands = preprocessed.get("bands", {})
 
-        # NBR burn severity inference
-        # In real STAC scenes, B08 (NIR) and B12 (SWIR-2) are processed
         confidence = max(60.0, min(97.0, 94.0 - (cloud_cov * 0.2)))
         burned_area_km2 = 12.4
+        has_real_bands = False
+        nbr_mean = 0.0
+
+        if "B08" in bands and "B12" in bands:
+            raw_b08 = np.asarray(bands["B08"], dtype=np.float32)
+            raw_b12 = np.asarray(bands["B12"], dtype=np.float32)
+            b08 = np.where(np.isfinite(raw_b08) & (raw_b08 > 1.0), raw_b08 / 10000.0, raw_b08)
+            b12 = np.where(np.isfinite(raw_b12) & (raw_b12 > 1.0), raw_b12 / 10000.0, raw_b12)
+            valid = np.isfinite(b08) & np.isfinite(b12)
+            if valid.sum() > 0:
+                has_real_bands = True
+                denom = b08[valid] + b12[valid]
+                safe_denom = np.where(np.isclose(denom, 0.0) | (denom < 1e-7), 1.0, denom)
+                nbr_arr = (b08[valid] - b12[valid]) / safe_denom
+                nbr_mean = float(np.mean(nbr_arr))
+                # Burned pixels have lower/negative NBR values (< 0.10)
+                burned_ratio = float((nbr_arr < 0.10).sum() / len(nbr_arr))
+                burned_area_km2 = round(max(0.5, min(100.0, burned_ratio * 45.0)), 2)
+                confidence = min(98.0, confidence + 4.0)
 
         severity = "HIGH" if burned_area_km2 > 10.0 else "MODERATE"
         duration_ms = round((time.perf_counter() - start_t) * 1000, 2)
@@ -296,7 +392,9 @@ class ModularWildfireDetector(BaseDisasterDetector):
             "severity": severity,
             "area_km2": burned_area_km2,
             "cloud_cover": cloud_cov,
-            "duration_ms": duration_ms
+            "duration_ms": duration_ms,
+            "nbr_mean": nbr_mean,
+            "has_real_bands": has_real_bands
         }
 
     def postprocess(self, res: Dict[str, Any], inp: DetectorInput) -> DetectorOutput:
@@ -318,7 +416,7 @@ class ModularWildfireDetector(BaseDisasterDetector):
                 "properties": {
                     "area_km2": res["area_km2"],
                     "detection_type": "Wildfire Burn Scar Boundary",
-                    "spectral_index": "NBR (B08-B12)",
+                    "spectral_index": "NBR (Copernicus B08-B12)",
                     "crs": "EPSG:4326"
                 },
                 "geometry": {
@@ -328,7 +426,7 @@ class ModularWildfireDetector(BaseDisasterDetector):
             }]
         }
 
-        scene_id = top_scene.get("scene_id") if top_scene else "S2_STAC_WILDFIRE_SCENE"
+        scene_id = top_scene.get("scene_id") if top_scene else "S2_COPERNICUS_WILDFIRE_SCENE"
         acq_time = top_scene.get("acquisition_time") if top_scene else datetime.now(timezone.utc).isoformat()
         sat_info = {
             "scene_id": scene_id,
@@ -341,14 +439,15 @@ class ModularWildfireDetector(BaseDisasterDetector):
         model_meta = {
             "model_name": self.model_version,
             "model_version": "1.0.0",
-            "inference_method": "Sentinel-2 NBR (Normalized Burn Ratio) & SWIR-2 Radiance Analysis",
+            "inference_method": "Copernicus Sentinel-2 NBR (Normalized Burn Ratio) & SWIR-2 Radiance Analysis",
             "inference_timestamp": datetime.now(timezone.utc).isoformat(),
             "input_source": "Copernicus Sentinel-2 L2A Multispectral Instrument",
             "satellite_sensor": "Sentinel-2 MSI",
             "acquisition_timestamp": acq_time,
             "confidence": res["confidence"],
             "nbr_threshold": 0.27,
-            "processing_duration_ms": res["duration_ms"]
+            "processing_duration_ms": res["duration_ms"],
+            "real_spectral_bands_analyzed": res.get("has_real_bands", False)
         }
 
         hazard_score = 75.0
@@ -368,9 +467,10 @@ class ModularWildfireDetector(BaseDisasterDetector):
             "methodology_version": "Nirvaan-Risk-v1.0"
         }
 
+        is_real_data = bool(top_scene or res.get("has_real_bands"))
         provenance = {
-            "data_provenance": "REAL_SATELLITE_DATA",
-            "provider": "Element84 AWS / Copernicus Sentinel-2 STAC",
+            "data_provenance": "REAL_SATELLITE_DATA" if is_real_data else "NO_LIVE_DATA",
+            "provider": "Copernicus Data Space Ecosystem (Sentinel-2 L2A)",
             "provenance_type": "NIRVAAN_DETECTION"
         }
 
