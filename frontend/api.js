@@ -26,12 +26,7 @@ function getApiBaseUrl() {
         return u.endsWith("/api") ? u : `${u}/api`;
     }
 
-    // 3. If running on local development host (localhost or 127.0.0.1)
-    if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
-        return "http://localhost:8000/api";
-    }
-
-    // 4. Default Production Render Backend URL (for Vercel deployment: https://nirvaan-one.vercel.app)
+    // 3. Default Production Render Backend URL
     return "https://nirvaan-pd7i.onrender.com/api";
 }
 
@@ -443,13 +438,30 @@ async function analyzeUploadedImage(fileOrBase64, context = "") {
 
         if (!response.ok) {
             const errData = await response.json().catch(() => ({}));
-            const msg = errData.error?.message || errData.message || `Image analysis failed with status ${response.status}`;
+            let msg = errData.error?.message || errData.message;
+            if (!msg) {
+                if (response.status === 400 || response.status === 422) {
+                    msg = "Invalid image or unsupported format. Please upload a standard JPG or PNG image.";
+                } else if (response.status === 503) {
+                    msg = "Gemini analysis is not configured on this instance.";
+                } else if (response.status === 502 || response.status === 504) {
+                    msg = "Gemini analysis service is temporarily unavailable. Please retry shortly.";
+                } else {
+                    msg = `Image analysis failed with status ${response.status}`;
+                }
+            }
             throw new Error(msg);
         }
 
         return await response.json();
     } catch (error) {
         console.error("Error in analyzeUploadedImage:", error);
+        if (error.name === "AbortError") {
+            throw new Error("Image analysis timed out. Please try with a smaller image.");
+        }
+        if (error.message && error.message.includes("Failed to fetch")) {
+            throw new Error("Unable to connect to analysis service. Please check network connection.");
+        }
         throw error;
     }
 }

@@ -63,22 +63,29 @@ async def request_id_middleware(request: Request, call_next):
 default_origins = [
     "https://nirvaan-one.vercel.app",
     "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
     "http://localhost:3000",
     "http://localhost:8000",
     "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5175",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:8000",
 ]
 env_origins = os.getenv("CORS_ORIGINS")
 if env_origins:
     allowed_origins = [origin.strip() for origin in env_origins.split(",") if origin.strip()]
+    for d in default_origins:
+        if d not in allowed_origins:
+            allowed_origins.append(d)
 else:
     allowed_origins = default_origins
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origin_regex=r"(https://.*\.vercel\.app|http://localhost:\d+|http://127\.0\.0\.1:\d+)",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
