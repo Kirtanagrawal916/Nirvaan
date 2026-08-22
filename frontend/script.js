@@ -1057,10 +1057,10 @@ function renderSatelliteMonitoringHTML() {
                         </div>
 
                         <div class="sat-btn-group-toggles">
-                            <button class="sat-action-btn toggle ${s.showHeatmap ? "active" : ""}" onclick="toggleSatHeatmap()" title="Toggle Heatmap Layer">
+                            <button class="sat-action-btn sat-toggle ${s.showHeatmap ? "active" : ""}" onclick="toggleSatHeatmap()" title="Toggle Heatmap Layer">
                                 <span>🔥</span> Heatmap
                             </button>
-                            <button class="sat-action-btn toggle ${s.showBoundingBoxes ? "active" : ""}" onclick="toggleSatBoundingBoxes()" title="Toggle Bounding Boxes">
+                            <button class="sat-action-btn sat-toggle ${s.showBoundingBoxes ? "active" : ""}" onclick="toggleSatBoundingBoxes()" title="Toggle Hotspot Polygons Layer">
                                 <span>🎯</span> Hotspot Polygons
                             </button>
                         </div>

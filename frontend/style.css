@@ -1426,39 +1426,51 @@ td {
 }
 
 
-.toggle {
-
+.setting-item .toggle,
+.switch-toggle {
     width: 45px;
-
     height: 24px;
-
     border-radius: 20px;
-
     background: #373bd1;
-
     position: relative;
-
+    cursor: pointer;
 }
 
-
-.toggle::after {
-
+.setting-item .toggle::after,
+.switch-toggle::after {
     content: "";
-
     width: 18px;
-
     height: 18px;
-
     background: white;
-
     border-radius: 50%;
-
     position: absolute;
-
     right: 3px;
-
     top: 3px;
+}
 
+/* SATELLITE ACTION TOGGLE BUTTONS */
+.sat-action-btn.sat-toggle {
+    background: rgba(17, 24, 39, 0.7);
+    border: 1px solid #334155;
+    color: #94a3b8;
+    position: relative;
+}
+
+.sat-action-btn.sat-toggle::after {
+    display: none !important;
+}
+
+.sat-action-btn.sat-toggle:hover {
+    background: #1e293b;
+    color: #f1f5f9;
+    border-color: #64748b;
+}
+
+.sat-action-btn.sat-toggle.active {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(56, 189, 248, 0.15) 100%);
+    border-color: #38bdf8;
+    color: #38bdf8;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
 }
 
 
