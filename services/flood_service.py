@@ -81,6 +81,15 @@ class RealFloodDetectionService:
             ]
         }
 
+    def detect_flood_from_satellite(
+        self,
+        lat: float,
+        lon: float,
+        location_name: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Convenience wrapper for execute_detection."""
+        return self.execute_detection(latitude=lat, longitude=lon, location_name=location_name)
+
     def execute_detection(
         self,
         latitude: float,
@@ -115,12 +124,12 @@ class RealFloodDetectionService:
             acq_time = primary_scene.get("acquisition_time", now_str)
             cloud_cov = primary_scene.get("cloud_cover", 0.0)
             satellite_name = primary_scene.get("satellite", "Sentinel-2")
-            provider_name = primary_scene.get("provider", "Element84 AWS / Copernicus")
+            provider_name = primary_scene.get("provider", "Copernicus Data Space Ecosystem (Sentinel-2 L2A)")
         else:
             scene_id = f"STAC-SEARCH-{int(now.timestamp())}"
             acq_time = now_str
             cloud_cov = 0.0
-            satellite_name = "Sentinel-2 (STAC Index)"
+            satellite_name = "Sentinel-2 (Copernicus STAC)"
             provider_name = "Copernicus Sentinel-2 & Open-Meteo Flood API"
 
         # Calculate affected area and confidence based on real discharge and scene metadata
