@@ -265,17 +265,17 @@ function updateAuthUI() {
     const userProfileBadge = document.getElementById("userProfileBadge");
     const userNameText = document.getElementById("userNameText");
     const userRoleText = document.getElementById("userRoleText");
-    const togglePasswordBtn = document.getElementById("togglePasswordBtn");
-    const loginPassword = document.getElementById("loginPassword");
-    const tabSignin = document.getElementById("tabSignin");
-    const tabRegister = document.getElementById("tabRegister");
-    const nameGroup = document.getElementById("nameGroup");
-    const authSubmitText = document.getElementById("authSubmitText");
-    const googleSSOBtn = document.getElementById("googleSSOBtn");
-    const govSSOBtn = document.getElementById("govSSOBtn");
+    const menuLoginText = document.getElementById("menuLoginText");
 
-    let savedUser = localStorage.getItem("nirvaan_user");
-    let currentUser = savedUser ? JSON.parse(savedUser) : null;
+    let savedUser = typeof localStorage !== "undefined" ? localStorage.getItem("nirvaan_user") : null;
+    let currentUser = null;
+    if (savedUser) {
+        try {
+            currentUser = JSON.parse(savedUser);
+        } catch (err) {
+            currentUser = null;
+        }
+    }
 
     if (currentUser && currentUser.isLoggedIn) {
         if (loginBtn) loginBtn.style.display = "none";
@@ -3569,10 +3569,26 @@ if (typeof window !== "undefined") {
 ========================================================= */
 
 function initApp() {
-    initTheme();
-    initNavigation();
-    initAuth();
-    initSatelliteOrbitBackground();
+    try {
+        initTheme();
+    } catch (e) {
+        console.warn("initTheme error:", e);
+    }
+    try {
+        initNavigation();
+    } catch (e) {
+        console.warn("initNavigation error:", e);
+    }
+    try {
+        initAuth();
+    } catch (e) {
+        console.warn("initAuth error:", e);
+    }
+    try {
+        initSatelliteOrbitBackground();
+    } catch (e) {
+        console.warn("initSatelliteOrbitBackground error:", e);
+    }
     loadPage("dashboard");
 }
 
